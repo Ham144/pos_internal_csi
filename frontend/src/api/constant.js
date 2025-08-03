@@ -1,9 +1,13 @@
 const DEV_URL = "http://192.168.169.12:3000";
-const PROD_URL = "https://pos.mycsi.net";
+const PROD_URL = import.meta.env.VITE_PROD_URL ?? "https://pos.mycsi.net";
 
 // export const NODE_ENV = "production";
-export const NODE_ENV = "development";
+export let NODE_ENV = "development";
 export const buildNumber = "1000";
+
+if (import.meta.env.VITE_DEMO) {
+  NODE_ENV = "production";
+}
 
 export const BASE_URL = NODE_ENV == "production" ? PROD_URL : DEV_URL;
 
