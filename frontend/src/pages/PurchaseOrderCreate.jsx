@@ -13,7 +13,29 @@ import { useFilter } from "../store";
 import ModalOptions from "../components/ModalOptions";
 import { useNavigate } from "react-router";
 import ModalDetailPurchaseOrder from "@/components/ModalDetailPurchaseOrder";
-import { Download, DownloadIcon, PlusCircle, Upload } from "lucide-react";
+
+import {
+  Download,
+  Upload,
+  PlusCircle,
+  FileText,
+  Trash2,
+  X,
+  CheckCircle,
+  AlertCircle,
+  Info,
+  Edit,
+  Eye,
+  PackageIcon,
+  Truck,
+  Barcode,
+  FileSpreadsheet,
+  HelpCircle,
+  ChevronLeft,
+  ChevronRight,
+  Save,
+  RotateCw,
+} from "lucide-react";
 
 export default function PurchaseOrdersCreate() {
   const [file, setFile] = useState(null);
@@ -169,12 +191,12 @@ export default function PurchaseOrdersCreate() {
         setIsOpen(false);
         setFile(null);
         toast.success(
-          `Successfully created ${purchaseOrders.length} purchase orders`
+          `Successfully created ${purchaseOrders.length} purchase orders`,
         );
       } catch (error) {
         console.error("Error creating purchase orders:", error);
         toast.error(
-          error?.response?.data?.message || "Failed to create purchase orders"
+          error?.response?.data?.message || "Failed to create purchase orders",
         );
       }
     };
@@ -195,11 +217,11 @@ export default function PurchaseOrdersCreate() {
     // Hitung total request dan total received
     const totalRequest = order.items.reduce(
       (sum, item) => sum + (item.request || 0),
-      0
+      0,
     );
     const totalReceived = order.items.reduce(
       (sum, item) => sum + (item.received || 0),
-      0
+      0,
     );
 
     // Jika totalRequest adalah 0, kembalikan 0% untuk menghindari pembagian dengan 0
@@ -306,7 +328,7 @@ export default function PurchaseOrdersCreate() {
     }
 
     const confirmed = window.confirm(
-      "Are you sure you want to delete this purchase order? This action cannot be undone."
+      "Are you sure you want to delete this purchase order? This action cannot be undone.",
     );
 
     if (confirmed) {
@@ -370,388 +392,440 @@ export default function PurchaseOrdersCreate() {
   }
 
   return (
-    <div className="min-h-screen bg-white p-3">
-      {/* Top Buttons */}
-      <div className="flex mb-4 justify-between items-center space-x-2">
-        <div className="self-start flex justify-start"></div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50/30 to-gray-50 p-4">
+      {/* Header Actions */}
+      <div className="bg-white rounded-2xl shadow-xl border border-blue-100 mb-6 p-4">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg shadow-blue-500/25">
+              <PackageIcon className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-800">
+                Purchase Order
+              </h1>
+              <p className="text-sm text-gray-500">
+                Kelola dan monitor semua purchase order
+              </p>
+            </div>
+          </div>
 
-        <div className="flex flex-wrap justify-end items-center gap-3 md:gap-x-4 mb-6">
-          <button className="btn btn-info btn-outline px-6 py-2 rounded-md font-semibold text-sm">
-            Total Data:{" "}
-            <span className="font-bold ml-1">
-              {purchaseOrderList?.data?.length || 0}
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Total Data Badge */}
+            <div className="badge badge-lg bg-gradient-to-r from-blue-500 to-blue-600 text-white border-0 px-4 py-3">
+              <FileText className="w-4 h-4 mr-2" />
+              Total: {purchaseOrderList?.data?.length || 0}
+            </div>
+
+            {/* Download All Button */}
+            <button
+              onClick={downloadPurchaseOrderCsv}
+              className="btn bg-gradient-to-r from-green-500 to-green-600 text-white border-0 hover:from-green-600 hover:to-green-700 shadow-lg shadow-green-500/25"
+            >
+              <Download className="w-5 h-5 mr-2" />
+              Download Semua
+            </button>
+
+            {/* Create New PO Button */}
+            <button
+              onClick={() => {
+                setSelectedOrder(null);
+                setNewOrder({ Erp: "", plat: "" });
+              }}
+              className="btn bg-gradient-to-r from-blue-600 to-blue-700 text-white border-0 hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-500/25"
+            >
+              <PlusCircle className="w-5 h-5 mr-2" />
+              Buat PO Baru
+            </button>
+
+            {/* Import/Export Dropdown */}
+            <div className="dropdown dropdown-end">
+              <label
+                tabIndex={0}
+                className="btn btn-outline border-gray-300 hover:bg-blue-50 hover:border-blue-300"
+              >
+                <Download className="w-5 h-5 mr-2" />
+                Import/Export
+              </label>
+              <ul className="dropdown-content z-40 menu p-2 shadow-xl bg-white rounded-xl w-56 border border-blue-100">
+                <li>
+                  <button
+                    onClick={handleImportPurchaseOrder}
+                    className="flex items-center gap-2 text-gray-700 hover:bg-blue-50 rounded-lg p-3"
+                  >
+                    <Upload className="w-5 h-5 text-blue-600" />
+                    <span>Import CSV</span>
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={() => {
+                      const confirmed = window.confirm(
+                        "Anda akan meng-export template. Pastikan Anda membaca instruksi: " +
+                          "Ganti 'Purchase Code (Erp)' untuk membuat PO baru yang unik. " +
+                          "Jika 'Purchase Code (Erp)' sama dengan yang sudah ada, akan terjadi error.",
+                      );
+                      if (confirmed) handleExportPurchaseOrder();
+                    }}
+                    className="flex items-center gap-2 text-gray-700 hover:bg-blue-50 rounded-lg p-3"
+                  >
+                    <FileSpreadsheet className="w-5 h-5 text-green-600" />
+                    <span>Export Template</span>
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        {/* Info Badge */}
+        <div className="mt-4 flex items-center gap-2">
+          <div className="badge badge-info gap-2 p-3 bg-blue-50 text-blue-700 border-blue-200">
+            <Info className="w-4 h-4" />
+            <span
+              className="cursor-pointer hover:underline"
+              onClick={() => navigate("/artikel_documentation")}
+            >
+              Kunjungi artikel documentation untuk tutorial import/export
             </span>
-          </button>
-          <button
-            onClick={downloadPurchaseOrderCsv}
-            className="btn btn-primary rounded-md "
-          >
-            Download Semua: <DownloadIcon />
-          </button>
-          <button
-            className="btn bg-blue-500 px-6 py-2 rounded-md font-semibold text-sm transition-colors duration-200"
-            onClick={() => {
-              setSelectedOrder(null); // Set ke null daripada undefined untuk konsistensi
-              setNewOrder({
-                Erp: "",
-                plat: "",
-              });
-            }}
-          >
-            <PlusCircle className="w-5 h-5" />
-            <span>Buat PO Baru</span>
-          </button>
-          <div className="dropdown dropdown-end">
-            <label
-              tabIndex={0}
-              className="btn btn-neutral px-6 py-2 rounded-md m-1 font-semibold text-sm"
-            >
-              <Download className="w-5 h-5" />
-              <span>Import/Export</span>
-            </label>
-            <ul
-              tabIndex={0}
-              className="dropdown-content z-[1] menu p-3 shadow-lg bg-base-100 rounded-box w-52 gap-y-2 border border-gray-200" // Padding dan border lebih baik
-            >
-              <li>
-                <button
-                  className="btn btn-outline btn-success w-full"
-                  onClick={handleImportPurchaseOrder}
-                >
-                  <Upload className="w-5 h-5" />
-                  <span>Import</span>
-                </button>
-              </li>
-              <li>
-                <button
-                  className="btn btn-outline btn-info w-full" // Warna info untuk export
-                  onClick={() => {
-                    const confirmed = window.confirm(
-                      "Anda akan meng-export template. Pastikan Anda membaca instruksi: " +
-                        "Ganti 'Purchase Code (Erp)' untuk membuat PO baru yang unik. " +
-                        "Jika 'Purchase Code (Erp)' sama dengan yang sudah ada, akan terjadi error. " +
-                        "Konsep template: Pengisian item ke samping; setiap baris baru adalah Purchase Order yang berbeda."
-                    );
-                    if (confirmed) {
-                      handleExportPurchaseOrder();
-                    }
-                  }}
-                >
-                  <Download className="w-5 h-5" />
-                  <span>Export Template</span>
-                </button>
-              </li>
-            </ul>
           </div>
         </div>
       </div>
-      <div className="flex flex-col lg:flex-row gap-4 min-h-screen">
-        {/* Table Layout */}
+
+      {/* Main Content */}
+      <div className="flex flex-col lg:flex-row gap-6">
+        {/* Table Section */}
         <div
-          className={`transition-all ${
-            selectedOrder ? "lg:w-2/3" : "w-full"
-          } bg-white shadow rounded p-4`}
+          className={`transition-all duration-300 ${
+            selectedOrder || newOrder ? "lg:w-2/3" : "w-full"
+          }`}
         >
-          <div className="flex justify-between mb-4">
-            <div className="flex flex-col gap-y-2">
-              <div className="badge badge-accent">
-                <span
-                  className="text-xs text-black cursor-pointer"
-                  onClick={() => {
-                    navigate("/artikel_documentation");
-                  }}
-                >
-                  (Anda bisa kunjungi artikel documentation untuk melihat
-                  melihat tutorial import/export)
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <table className="table w-full border-collapse">
-            <thead>
-              <tr className="bg-gradient-to-r from-blue-400 to-blue-600 text-white">
-                {" "}
-                {/* Gradasi biru langit ke biru laut */}
-                <th className="p-4 text-left font-semibold text-base">
-                  Purchase Code (Erp)
-                </th>
-                <th className="p-4 text-left font-semibold text-base">Plat</th>
-                <th className="p-4 text-left font-semibold text-base">
-                  Jumlah Item
-                </th>
-                <th className="p-4 text-center font-semibold text-base">
-                  Status
-                </th>{" "}
-                {/* Text-center untuk kolom status */}
-              </tr>
-            </thead>
-            <tbody>
-              {purchaseOrderList?.data?.length > 0 ? (
-                purchaseOrderList.data.map((order, index) => (
-                  <tr
-                    key={order._id || index} // Sangat disarankan menggunakan ID unik dari data (order._id)
-                    className={`
-              ${
-                index % 2 === 0 ? "bg-white" : "bg-blue-50"
-              } {/* Zebra stripe */}
-              hover:bg-blue-100 transition-colors duration-200
-              cursor-pointer
-            `}
-                    onClick={() => handleClickRow(order)}
-                  >
-                    <td className="p-4 text-sm text-gray-800 font-medium">
-                      {order.Erp}
-                    </td>
-                    <td className="p-4 text-sm text-gray-700">
-                      {order.plat || "-"}
-                    </td>
-                    <td className="p-4 text-sm text-gray-700 text-center">
-                      {order.items?.length || 0}
-                    </td>
-                    <td className="p-4 text-center">
-                      <div className="w-full bg-blue-100 rounded-full h-3 relative overflow-hidden">
-                        {" "}
-                        {/* Background progress bar */}
-                        <div
-                          className="bg-gradient-to-r from-cyan-400 to-blue-500 h-full rounded-full transition-all duration-500 ease-out"
-                          style={{
-                            width: `${statusPercentage(order)}%`,
-                          }}
-                        ></div>
-                        <p className="absolute inset-0 flex items-center justify-center text-xs font-bold text-gray-700">
-                          {" "}
-                          {/* Teks persentase di tengah */}
-                          {statusPercentage(order)}%
-                        </p>
-                      </div>
-                    </td>
+          <div className="bg-white rounded-2xl shadow-xl border border-blue-100 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gradient-to-r from-blue-600 to-blue-700">
+                  <tr>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-white uppercase tracking-wider">
+                      Purchase Code (ERP)
+                    </th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-white uppercase tracking-wider">
+                      Plat
+                    </th>
+                    <th className="px-6 py-4 text-center text-sm font-semibold text-white uppercase tracking-wider">
+                      Jumlah Item
+                    </th>
+                    <th className="px-6 py-4 text-center text-sm font-semibold text-white uppercase tracking-wider">
+                      Status
+                    </th>
                   </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="4" className="text-center p-4 text-gray-500">
-                    Tidak ada data Purchase Order ditemukan.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Form Layout */}
-        {(selectedOrder || newOrder) && (
-          <div className="lg:w-1/3 shadow rounded p-4 bg-white">
-            <h2 className="font-light text-lg mb-2">
-              {selectedOrder ? "Edit Purchase Order" : "Buat Purchase Order"}
-            </h2>
-            <div className="flex p-3 w-full">
-              <div className="flex flex-col gap-2 justify-center w-full md:flex-row md:gap-4 md:justify-between">
-                <button
-                  type="button"
-                  className="flex flex-col items-center px-4 py-2 border rounded text-red-600 hover:text-red-900 hover:border-red-900 focus:outline-none transition-colors"
-                  onClick={handleDelete}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 mb-2"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                    />
-                  </svg>
-                  Hapus
-                </button>
-                <button
-                  type="button"
-                  className="flex flex-col items-center px-4 py-2 border rounded text-gray-600 hover:text-gray-900 hover:border-gray-900 focus:outline-none transition-colors"
-                  onClick={() => {
-                    setSelectedOrder(null);
-                    setNewOrder(null);
-                    setIsOpen(false);
-                  }}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 mb-2"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                  Batal
-                </button>
-                <button
-                  type="button"
-                  className="flex flex-col items-center px-4 py-2 border rounded text-green-600 hover:text-green-900 hover:border-green-900 focus:outline-none transition-colors flex-1"
-                  onClick={() => {
-                    selectedOrder
-                      ? handleUpdatePurchaseOrder(selectedOrder)
-                      : handleCreatePurchaseOrder(newOrder);
-                  }}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 mb-2"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                  {selectedOrder ? "Konfirmasi" : "Buat Baru"}
-                </button>
-              </div>
-            </div>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium">
-                  Purchase Code (Erp)
-                </label>
-                <input
-                  type="text"
-                  value={selectedOrder?.Erp || newOrder?.Erp || ""}
-                  className="w-full border rounded px-2 py-1"
-                  onChange={(e) =>
-                    selectedOrder
-                      ? setSelectedOrder({
-                          ...selectedOrder,
-                          Erp: e.target.value,
-                        })
-                      : setNewOrder({ ...newOrder, Erp: e.target.value })
-                  }
-                  placeholder="Masukkan kode ERP"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium">
-                  Plat(opsional)
-                </label>
-                <input
-                  type="text"
-                  value={selectedOrder?.plat || newOrder?.plat || ""}
-                  className="w-full border rounded px-2 py-1"
-                  onChange={(e) =>
-                    selectedOrder
-                      ? setSelectedOrder({
-                          ...selectedOrder,
-                          plat: e.target.value,
-                        })
-                      : setNewOrder({ ...newOrder, plat: e.target.value })
-                  }
-                  placeholder="Masukkan nomor plat (opsional)"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium">Items</label>
-                {(selectedOrder?.items || newOrder?.items || []).map(
-                  (item, index) => (
-                    <div
-                      key={index}
-                      className="border p-2 mb-2 rounded space-y-2"
-                    >
-                      <div
-                        onClick={() => {
-                          setSelectedItemIndex(index);
-                          setTempSkuTerplih(item?.sku);
-                          document
-                            .getElementById("picksingleinventoriesdialog")
-                            .showModal();
-                        }}
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {purchaseOrderList?.data?.length > 0 ? (
+                    purchaseOrderList.data.map((order, index) => (
+                      <tr
+                        key={order._id || index}
+                        onClick={() => handleClickRow(order)}
+                        className={`
+                                                ${index % 2 === 0 ? "bg-white" : "bg-blue-50/30"}
+                                                hover:bg-blue-100/50 transition-colors cursor-pointer group
+                                            `}
                       >
-                        <label className="block text-sm">Sku</label>
-                        <div className="flex gap-2">
-                          <input
-                            type="text"
-                            value={item.sku ?? ""}
-                            className="w-full border rounded px-2 py-1"
-                            readOnly
-                            placeholder="Klik untuk memilih SKU"
-                          />
-                          <button type="button" className="btn btn-sm">
-                            Pilih
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white shadow-sm group-hover:scale-110 transition-transform">
+                              <PackageIcon className="w-4 h-4" />
+                            </div>
+                            <span className="font-medium text-blue-700">
+                              {order.Erp}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-600">
+                          {order.plat || "-"}
+                        </td>
+                        <td className="px-6 py-4 text-center">
+                          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+                            {order.items?.length || 0} item
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="relative w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                            <div
+                              className="absolute left-0 top-0 h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transition-all duration-500"
+                              style={{ width: `${statusPercentage(order)}%` }}
+                            ></div>
+                          </div>
+                          <p className="text-xs text-center mt-1 font-medium text-gray-600">
+                            {statusPercentage(order)}% selesai
+                          </p>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="4" className="text-center py-12">
+                        <div className="flex flex-col items-center">
+                          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-3">
+                            <PackageIcon className="w-8 h-8 text-gray-400" />
+                          </div>
+                          <p className="text-gray-500">
+                            Tidak ada data Purchase Order
+                          </p>
+                          <button
+                            onClick={() => setNewOrder({ Erp: "", plat: "" })}
+                            className="mt-4 btn btn-sm bg-gradient-to-r from-blue-600 to-blue-700 text-white"
+                          >
+                            <PlusCircle className="w-4 h-4 mr-2" />
+                            Buat PO Pertama
                           </button>
                         </div>
-                      </div>
-                      <div>
-                        <label className="block text-sm">Request</label>
-                        <input
-                          type="text"
-                          value={item.request ?? ""}
-                          className="w-full border rounded px-2 py-1"
-                          onChange={(e) => {
-                            const updatedItems = [
-                              ...(selectedOrder?.items || newOrder?.items),
-                            ];
-                            updatedItems[index].request = e.target.value
-                              ? Number(e.target.value)
-                              : null;
-                            selectedOrder
-                              ? setSelectedOrder({
-                                  ...selectedOrder,
-                                  items: updatedItems,
-                                })
-                              : setNewOrder({
-                                  ...newOrder,
-                                  items: updatedItems,
-                                });
-                          }}
-                          placeholder="Masukkan Jumlah yang Diperlukan"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm">Barcode</label>
-                        <input
-                          type="text"
-                          value={item.barcodeItem || ""}
-                          className="w-full border rounded px-2 py-1"
-                          onChange={(e) => {
-                            const updatedItems = [
-                              ...(selectedOrder?.items || newOrder?.items),
-                            ];
-                            updatedItems[index].barcodeItem = e.target.value;
-                            selectedOrder
-                              ? setSelectedOrder({
-                                  ...selectedOrder,
-                                  items: updatedItems,
-                                })
-                              : setNewOrder({
-                                  ...newOrder,
-                                  items: updatedItems,
-                                });
-                          }}
-                          placeholder="Masukkan barcode"
-                        />
-                      </div>
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
 
-                      <div>
-                        <label className="block text-sm">Keterangan</label>
-                        <textarea
-                          value={item.keterangan || ""}
-                          className="w-full border rounded px-2 py-1"
-                          onChange={(e) => {
+        {/* Form Section */}
+        {(selectedOrder || newOrder) && (
+          <div className="lg:w-1/3">
+            <div className="bg-white rounded-2xl shadow-xl border border-blue-100 overflow-hidden sticky top-4">
+              {/* Form Header */}
+              <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
+                <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+                  {selectedOrder ? (
+                    <Edit className="w-5 h-5" />
+                  ) : (
+                    <PlusCircle className="w-5 h-5" />
+                  )}
+                  {selectedOrder
+                    ? "Edit Purchase Order"
+                    : "Buat Purchase Order Baru"}
+                </h2>
+              </div>
+
+              {/* Form Actions */}
+              <div className="p-4 border-b border-gray-100 bg-gray-50">
+                <div className="grid grid-cols-3 gap-2">
+                  <button
+                    onClick={handleDelete}
+                    className="flex flex-col items-center p-3 rounded-xl border-2 border-red-200 text-red-600 hover:bg-red-50 transition-colors"
+                  >
+                    <Trash2 className="w-5 h-5 mb-1" />
+                    <span className="text-xs font-medium">Hapus</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      setSelectedOrder(null);
+                      setNewOrder(null);
+                    }}
+                    className="flex flex-col items-center p-3 rounded-xl border-2 border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
+                  >
+                    <X className="w-5 h-5 mb-1" />
+                    <span className="text-xs font-medium">Batal</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      selectedOrder
+                        ? handleUpdatePurchaseOrder(selectedOrder)
+                        : handleCreatePurchaseOrder(newOrder);
+                    }}
+                    className="flex flex-col items-center p-3 rounded-xl border-2 border-green-200 text-green-600 hover:bg-green-50 transition-colors"
+                  >
+                    <Save className="w-5 h-5 mb-1" />
+                    <span className="text-xs font-medium">
+                      {selectedOrder ? "Simpan" : "Buat"}
+                    </span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Form Fields */}
+              <div className="p-6 space-y-6 max-h-[600px] overflow-y-auto">
+                {/* ERP Field */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                    <PackageIcon className="w-4 h-4 text-blue-500" />
+                    Purchase Code (ERP)
+                  </label>
+                  <input
+                    type="text"
+                    value={selectedOrder?.Erp || newOrder?.Erp || ""}
+                    onChange={(e) =>
+                      selectedOrder
+                        ? setSelectedOrder({
+                            ...selectedOrder,
+                            Erp: e.target.value,
+                          })
+                        : setNewOrder({ ...newOrder, Erp: e.target.value })
+                    }
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200"
+                    placeholder="Masukkan kode ERP"
+                    required
+                  />
+                </div>
+
+                {/* Plat Field */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                    <Truck className="w-4 h-4 text-blue-500" />
+                    Plat (Opsional)
+                  </label>
+                  <input
+                    type="text"
+                    value={selectedOrder?.plat || newOrder?.plat || ""}
+                    onChange={(e) =>
+                      selectedOrder
+                        ? setSelectedOrder({
+                            ...selectedOrder,
+                            plat: e.target.value,
+                          })
+                        : setNewOrder({ ...newOrder, plat: e.target.value })
+                    }
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200"
+                    placeholder="Contoh: B 1234 XYZ"
+                  />
+                </div>
+
+                {/* Items Section */}
+                <div className="space-y-4">
+                  <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                    <Barcode className="w-4 h-4 text-blue-500" />
+                    Daftar Item
+                  </label>
+
+                  {(selectedOrder?.items || newOrder?.items || []).map(
+                    (item, index) => (
+                      <div
+                        key={index}
+                        className="bg-gray-50 rounded-xl p-4 border border-gray-200 space-y-3"
+                      >
+                        {/* SKU Selector */}
+                        <div className="space-y-2">
+                          <label className="text-xs text-gray-500">SKU</label>
+                          <div className="flex gap-2">
+                            <div className="flex-1 relative">
+                              <PackageIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                              <input
+                                type="text"
+                                value={item.sku ?? ""}
+                                className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg bg-white"
+                                readOnly
+                                placeholder="Pilih SKU"
+                              />
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSelectedItemIndex(index);
+                                setTempSkuTerplih(item?.sku);
+                                document
+                                  .getElementById("picksingleinventoriesdialog")
+                                  .showModal();
+                              }}
+                              className="px-3 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700"
+                            >
+                              Pilih
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Request Field */}
+                        <div className="space-y-2">
+                          <label className="text-xs text-gray-500">
+                            Jumlah Request
+                          </label>
+                          <input
+                            type="number"
+                            value={item.request ?? ""}
+                            onChange={(e) => {
+                              const updatedItems = [
+                                ...(selectedOrder?.items || newOrder?.items),
+                              ];
+                              updatedItems[index].request = e.target.value
+                                ? Number(e.target.value)
+                                : null;
+                              selectedOrder
+                                ? setSelectedOrder({
+                                    ...selectedOrder,
+                                    items: updatedItems,
+                                  })
+                                : setNewOrder({
+                                    ...newOrder,
+                                    items: updatedItems,
+                                  });
+                            }}
+                            className="w-full px-3 py-2 border border-gray-200 rounded-lg"
+                            placeholder="Masukkan jumlah"
+                          />
+                        </div>
+
+                        {/* Barcode Field */}
+                        <div className="space-y-2">
+                          <label className="text-xs text-gray-500">
+                            Barcode
+                          </label>
+                          <input
+                            type="text"
+                            value={item.barcodeItem || ""}
+                            onChange={(e) => {
+                              const updatedItems = [
+                                ...(selectedOrder?.items || newOrder?.items),
+                              ];
+                              updatedItems[index].barcodeItem = e.target.value;
+                              selectedOrder
+                                ? setSelectedOrder({
+                                    ...selectedOrder,
+                                    items: updatedItems,
+                                  })
+                                : setNewOrder({
+                                    ...newOrder,
+                                    items: updatedItems,
+                                  });
+                            }}
+                            className="w-full px-3 py-2 border border-gray-200 rounded-lg"
+                            placeholder="Masukkan barcode"
+                          />
+                        </div>
+
+                        {/* Keterangan Field */}
+                        <div className="space-y-2">
+                          <label className="text-xs text-gray-500">
+                            Keterangan
+                          </label>
+                          <textarea
+                            value={item.keterangan || ""}
+                            onChange={(e) => {
+                              const updatedItems = [
+                                ...(selectedOrder?.items || newOrder?.items),
+                              ];
+                              updatedItems[index].keterangan = e.target.value;
+                              selectedOrder
+                                ? setSelectedOrder({
+                                    ...selectedOrder,
+                                    items: updatedItems,
+                                  })
+                                : setNewOrder({
+                                    ...newOrder,
+                                    items: updatedItems,
+                                  });
+                            }}
+                            rows={2}
+                            className="w-full px-3 py-2 border border-gray-200 rounded-lg"
+                            placeholder="Masukkan keterangan (opsional)"
+                          />
+                        </div>
+
+                        {/* Delete Item Button */}
+                        <button
+                          type="button"
+                          onClick={() => {
                             const updatedItems = [
                               ...(selectedOrder?.items || newOrder?.items),
                             ];
-                            updatedItems[index].keterangan = e.target.value;
+                            updatedItems.splice(index, 1);
                             selectedOrder
                               ? setSelectedOrder({
                                   ...selectedOrder,
@@ -762,122 +836,105 @@ export default function PurchaseOrdersCreate() {
                                   items: updatedItems,
                                 });
                           }}
-                          rows={2}
-                          placeholder="Masukkan keterangan (opsional)"
-                        />
+                          className="text-sm text-red-600 hover:text-red-700 flex items-center gap-1"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                          Hapus Item
+                        </button>
                       </div>
-                      <button
-                        type="button"
-                        className="text-red-600 hover:text-red-900"
-                        onClick={() => {
-                          const updatedItems = [
-                            ...(selectedOrder?.items || newOrder?.items),
-                          ];
-                          updatedItems.splice(index, 1);
-                          selectedOrder
-                            ? setSelectedOrder({
-                                ...selectedOrder,
-                                items: updatedItems,
-                              })
-                            : setNewOrder({ ...newOrder, items: updatedItems });
-                        }}
-                      >
-                        Hapus Item
-                      </button>
-                    </div>
-                  )
-                )}
-                <button
-                  type="button"
-                  className="mt-2 text-blue-600 hover:text-blue-900"
-                  onClick={() => {
-                    const newItem = {
-                      received: null,
-                      barcodeItem: "",
-                      keterangan: "",
-                      tanggalTerpenuhi: null,
-                    };
-                    selectedOrder
-                      ? setSelectedOrder({
-                          ...selectedOrder,
-                          items: [...(selectedOrder.items || []), newItem],
-                        })
-                      : setNewOrder({
-                          ...newOrder,
-                          items: [...(newOrder?.items || []), newItem],
-                        });
-                  }}
-                >
-                  + Tambah Item
-                </button>
+                    ),
+                  )}
+
+                  {/* Add Item Button */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const newItem = {
+                        received: null,
+                        barcodeItem: "",
+                        keterangan: "",
+                        tanggalTerpenuhi: null,
+                      };
+                      selectedOrder
+                        ? setSelectedOrder({
+                            ...selectedOrder,
+                            items: [...(selectedOrder.items || []), newItem],
+                          })
+                        : setNewOrder({
+                            ...newOrder,
+                            items: [...(newOrder?.items || []), newItem],
+                          });
+                    }}
+                    className="w-full py-3 border-2 border-dashed border-blue-200 rounded-xl text-blue-600 hover:bg-blue-50 transition-colors flex items-center justify-center gap-2"
+                  >
+                    <PlusCircle className="w-5 h-5" />
+                    Tambah Item Baru
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         )}
       </div>
-      {/* upload csv  */}
-      {/* Modal */}
+
+      {/* Upload CSV Modal */}
       {isOpen && (
-        <div className="fixed inset-0 z-20 top-0 left-0 right-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-            <h2 className="text-2xl font-semibold text-gray-700 mb-4 text-center">
-              Upload CSV
-            </h2>
-            <form onSubmit={handleSubmitImportPO} className="space-y-4">
-              <div>
-                <label
-                  htmlFor="csvFile"
-                  className="block text-sm font-medium text-gray-600 mb-2"
-                >
-                  Select a CSV file:
-                </label>
-                <input
-                  type="file"
-                  id="csvFile"
-                  accept=".csv"
-                  name="file"
-                  onChange={handleFileChange}
-                  className="block w-full text-sm text-gray-500
-                    file:mr-4 file:py-2 file:px-4
-                    file:rounded file:border-0
-                    file:text-sm file:font-semibold
-                    file:bg-indigo-50 
-                    hover:file:bg-indigo-100"
-                />
-              </div>
-              <button
-                onSubmit={handleSubmitImportPO}
-                type="submit"
-                className="w-full text-white py-2 px-4text-white rounded-lg font-medium  focus:outline-none focus:ring-2 bg-primary focus:ring-offset-2"
-              >
-                Upload
-              </button>
-            </form>
-            {file && (
-              <div className="mt-4 text-sm text-gray-600">
-                Selected file: <span className="font-medium">{file.name}</span>
-              </div>
-            )}
-            {/* Close Button */}
-            <button
-              onClick={() => setIsOpen(false)}
-              className="mt-4 w-full py-2 px-4 bg-gray-500 text-white rounded-lg font-medium hover:bg-gray-600 focus:outline-none"
-            >
-              Close
-            </button>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-2xl w-96 overflow-hidden">
+            <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
+              <h2 className="text-lg font-semibold text-white">Upload CSV</h2>
+            </div>
+            <div className="p-6">
+              <form onSubmit={handleSubmitImportPO} className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">
+                    Pilih file CSV
+                  </label>
+                  <input
+                    type="file"
+                    accept=".csv"
+                    onChange={handleFileChange}
+                    className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                  />
+                </div>
+                {file && (
+                  <div className="text-sm text-gray-600 bg-blue-50 p-3 rounded-lg">
+                    <span className="font-medium">File terpilih:</span>{" "}
+                    {file.name}
+                  </div>
+                )}
+                <div className="flex gap-2">
+                  <button
+                    type="submit"
+                    className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 text-white py-2 rounded-lg hover:from-blue-700 hover:to-blue-800"
+                  >
+                    Upload
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsOpen(false)}
+                    className="flex-1 border border-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-50"
+                  >
+                    Batal
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}
 
-      {/* modal untuk menampilkan detail PO */}
+      {/* Modals */}
       <ModalDetailPurchaseOrder
         selectedOrder={selectedOrder}
         setSelectedOrder={setSelectedOrder}
       />
+
       <ModalOptions
         options={[
           {
             label: "Edit PO",
+            icon: <Edit className="w-4 h-4" />,
             onClick: () => {
               setSelectedOrder(tempSeelectedOrder);
               document.getElementById("clickrow").close();
@@ -885,6 +942,7 @@ export default function PurchaseOrdersCreate() {
           },
           {
             label: "Show Detail",
+            icon: <Eye className="w-4 h-4" />,
             onClick: () => {
               setSelectedOrder(tempSeelectedOrder);
               document.getElementById("modalDetailPurchaseOrder")?.showModal();
@@ -892,12 +950,11 @@ export default function PurchaseOrdersCreate() {
             },
           },
         ]}
-        onClose={() => {
-          setTempSelectedOrder(null);
-        }}
-        modalId={"clickrow"}
-        title={"Actions "}
+        onClose={() => setTempSelectedOrder(null)}
+        modalId="clickrow"
+        title="Pilih Aksi"
       />
+
       <PickSingleInventoriesDialog
         inventoryList={inventoriyList?.data}
         tempSkuTerpilih={tempSkuTerpilih}
@@ -907,10 +964,9 @@ export default function PurchaseOrdersCreate() {
             : setNewOrder({ ...newOrder, description: value });
         }}
         setTempSkuTerpilh={setTempSkuTerplih}
-        title="Pilih Sku untuk Purchase Order"
+        title="Pilih SKU untuk Purchase Order"
         handleKonfirmasi={handleKonfirmasiSkuPurchaseCode}
         searchKey=""
-        key={"picksingleinventoriesdialog"}
       />
     </div>
   );

@@ -47,7 +47,7 @@ const SideDrawer = ({ children }) => {
     },
     {
       title: "LIBRARY",
-      items: ["ITEM LIBRARY", "PROMO.", "DISKON", "VOUCHER.", "BRANDS"],
+      items: ["ITEM LIBRARY", "PROMO.", "DISKON", "VOUCHER." /*"BRANDS"*/],
     },
     {
       title: "INVENTORY",
@@ -185,8 +185,8 @@ const SideDrawer = ({ children }) => {
           nosidebar
             ? "hidden"
             : sidebarOpen
-            ? "translate-x-0"
-            : "-translate-x-full"
+              ? "translate-x-0"
+              : "-translate-x-full"
         } w-64 md:w-72 max-h-screen bg-gradient-to-b from-blue-600 to-blue-400 text-white flex flex-col max-md:fixed md:relative  h-full transition-transform z-50 duration-300 ease-in-out shadow-2xl `}
       >
         {/* Sidebar Header */}
@@ -305,7 +305,7 @@ const SideDrawer = ({ children }) => {
                             .replace(" ", "_")
                             .replace(" ", "_")
                             .replace("-", "")
-                            .toLowerCase()}`
+                            .toLowerCase()}`,
                         ) ? (
                           <Lock size={16} className="text-red-400" />
                         ) : (
@@ -318,7 +318,7 @@ const SideDrawer = ({ children }) => {
                         )}
                       </div>
                     </li>
-                  ) : null
+                  ) : null,
                 )}
               </ul>
             </div>

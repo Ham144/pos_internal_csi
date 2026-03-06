@@ -742,49 +742,48 @@ const ItemLibrary = () => {
         {/* Header with Notifications */}
         <div className="bg-white border-b border-blue-100 sticky top-0 z-30 shadow-sm">
           <div className="px-4 py-3 flex items-center justify-between">
-            {/* Notifications Dropdown */}
-            <div className="dropdown dropdown-end">
-              <label
-                tabIndex={0}
-                className="btn btn-ghost btn-circle hover:bg-blue-50 transition-colors"
-              >
-                <div className="relative">
-                  <BellRing className="w-6 h-6 text-blue-600" />
-                  <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse ring-2 ring-white"></span>
-                </div>
-              </label>
-              <div className="dropdown-content z-40 menu p-4 shadow-xl bg-white rounded-2xl w-96 mt-2 border border-blue-100">
-                <div className="space-y-3">
-                  <div className="bg-amber-50 rounded-xl p-4 border border-amber-200">
-                    <div className="flex gap-3">
-                      <div className="flex-shrink-0">
-                        <FileWarning className="w-5 h-5 text-amber-600" />
-                      </div>
-                      <p className="text-sm text-gray-700">
-                        Jika terdapat Brand maka sku yang terkait brand tersebut
-                        saja yang ditampilkan disini, hilangkan filter brand
-                        untuk melihat semua
-                      </p>
-                    </div>
+            {/* Actions */}
+            <div className="flex items-center gap-3 flex-1 justify-end">
+              {/* Notifications Dropdown */}
+              <div className="dropdown dropdown-end">
+                <label
+                  tabIndex={0}
+                  className="btn btn-ghost btn-circle hover:bg-blue-50 transition-colors"
+                >
+                  <div className="relative">
+                    <BellRing className="w-6 h-6 text-blue-600" />
+                    <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse ring-2 ring-white"></span>
                   </div>
-                  <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
-                    <div className="flex gap-3">
-                      <div className="flex-shrink-0">
-                        <Info className="w-5 h-5 text-blue-600" />
+                </label>
+                <div className="dropdown-content z-40 menu p-4 shadow-xl bg-white rounded-2xl w-96 mt-2 border border-blue-100">
+                  <div className="space-y-3">
+                    <div className="bg-amber-50 rounded-xl p-4 border border-amber-200">
+                      <div className="flex gap-3">
+                        <div className="flex-shrink-0">
+                          <FileWarning className="w-5 h-5 text-amber-600" />
+                        </div>
+                        <p className="text-sm text-gray-700">
+                          Jika terdapat Brand maka sku yang terkait brand
+                          tersebut saja yang ditampilkan disini, hilangkan
+                          filter brand untuk melihat semua
+                        </p>
                       </div>
-                      <p className="text-sm text-gray-700">
-                        Di mobile, barang tidak memiliki harga pun sekarang akan
-                        tetap muncul, karena user biasanya membuat barang bonus
-                        RP.0
-                      </p>
+                    </div>
+                    <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
+                      <div className="flex gap-3">
+                        <div className="flex-shrink-0">
+                          <Info className="w-5 h-5 text-blue-600" />
+                        </div>
+                        <p className="text-sm text-gray-700">
+                          Di mobile, barang tidak memiliki harga pun sekarang
+                          akan tetap muncul, karena user biasanya membuat barang
+                          bonus RP.0
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-
-            {/* Actions */}
-            <div className="flex items-center gap-3 flex-1 justify-end">
               <div className="badge badge-lg bg-gradient-to-r from-blue-500 to-blue-600 text-white border-0 px-4 py-3">
                 <Package className="w-4 h-4 mr-2" />
                 Total: {totalItems} Item

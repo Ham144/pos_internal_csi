@@ -85,16 +85,17 @@ export default function GeneratedVoucherList() {
                     className="py-4 px-4 text-sm font-medium text-gray-800 text-center   underline cursor-pointer"
                     onClick={() => handleClickRow(voucher)}
                   >
-                    {voucher.voucherReference.judulVoucher || "Tidak Ada Judul"}
+                    {voucher?.voucherReference?.judulVoucher ||
+                      "Tidak Ada Judul"}
                   </td>
                   <td className="py-4 px-4 text-sm text-gray-700 font-mono text-center">
-                    {voucher.privateVoucherCode}
+                    {voucher?.privateVoucherCode}
                   </td>
                   <td
                     className="py-4 px-4 text-sm text-gray-600 text-center cursor-pointer"
                     onClick={() => {
                       toast(
-                        "FITUR BELUM TERSEDIA: mengatur ulang outlet berlaku"
+                        "FITUR BELUM TERSEDIA: mengatur ulang outlet berlaku",
                       );
                     }}
                   >
@@ -164,7 +165,7 @@ export default function GeneratedVoucherList() {
                     <td>
                       {/* Format tanggal agar lebih mudah dibaca, contoh: "30 Mei 2025" */}
                       {new Date(
-                        selectedGenerated.berlakuDari
+                        selectedGenerated.berlakuDari,
                       ).toLocaleDateString("id-ID", {
                         day: "2-digit",
                         month: "short",
@@ -174,7 +175,7 @@ export default function GeneratedVoucherList() {
                     <td>
                       {/* Format tanggal agar lebih mudah dibaca */}
                       {new Date(
-                        selectedGenerated.berlakuHingga
+                        selectedGenerated.berlakuHingga,
                       ).toLocaleDateString("id-ID", {
                         day: "2-digit",
                         month: "short",

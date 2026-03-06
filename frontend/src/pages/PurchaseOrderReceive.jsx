@@ -1,5 +1,15 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { StepBack, StepForward, RefreshCcw } from "lucide-react";
+
+import {
+  StepBack,
+  StepForward,
+  RefreshCcw,
+  Package,
+  Truck,
+  Barcode,
+  CheckCircle,
+  AlertCircle,
+} from "lucide-react";
 import React, { useState } from "react";
 import {
   completeAllPurchaseOrder,
@@ -94,28 +104,44 @@ const PurchaseOrderReceive = () => {
     setSelectedItem(item);
   };
 
-  console.log(searchResult);
-
   return (
-    <div className="flex items-center justify-center min-h-[calc(100vh-4rem)] bg-base-200 p-4">
-      <div className="card bg-base-100 p-8 w-full max-w-2xl shadow-xl rounded-lg">
-        <div className="flex flex-col items-center justify-center">
-          <h1 className="font-bold text-2xl mb-6 text-center text-base-content">
-            Terima Purchase Order
-          </h1>
-          <div className="flex gap-x-3 justify-between items-center w-full mb-6">
+    <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-blue-50/30 to-gray-50 p-4 flex items-center justify-center">
+      <div className="w-full max-w-2xl">
+        {/* Header Card */}
+        <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-t-2xl p-6 text-white">
+          <div className="flex items-center gap-3">
+            <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm">
+              <Package className="w-8 h-8" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold">Terima Purchase Order</h1>
+              <p className="text-blue-100 mt-1">
+                Terima dan verifikasi item yang datang
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Card */}
+        <div className="bg-white rounded-b-2xl shadow-xl border-x border-b border-blue-100 p-8">
+          {/* Navigation Buttons */}
+          <div className="flex items-center gap-3 mb-8">
             <button
               disabled={currentForm === "Erp"}
               onClick={() => setCurrentForm("Erp")}
-              className={`btn btn-outline btn-primary flex-1 ${
-                currentForm === "Erp" ? "btn-disabled" : ""
-              }`}
+              className={`flex-1 py-3 px-4 rounded-xl font-medium transition-all duration-200 flex items-center justify-center gap-2
+                            ${
+                              currentForm === "Erp"
+                                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                : "bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-500/25"
+                            }`}
             >
-              <StepBack className="w-5 h-5 mr-1" /> ERP
+              <StepBack className="w-5 h-5" />
+              ERP
             </button>
+
             <button
               disabled={!searchResult?.items?.length && !barcode && !Erp}
-              className="btn btn-outline btn-error"
               onClick={() => {
                 setCurrentForm("Erp");
                 setSearchResult(null);
@@ -123,9 +149,12 @@ const PurchaseOrderReceive = () => {
                 setBarcode("");
                 setPlat("");
               }}
+              className="p-3 rounded-xl border-2 border-red-200 text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              title="Reset Form"
             >
               <RefreshCcw className="w-5 h-5" />
             </button>
+
             <button
               disabled={
                 (currentForm === "Erp" && !Erp) ||
@@ -134,165 +163,293 @@ const PurchaseOrderReceive = () => {
               onClick={() =>
                 currentForm === "Erp" ? handleScanErp() : handleScanBarcode()
               }
-              className="btn btn-primary flex-1"
+              className={`flex-1 py-3 px-4 rounded-xl font-medium transition-all duration-200 flex items-center justify-center gap-2
+                            ${
+                              (currentForm === "Erp" && !Erp) ||
+                              (currentForm === "barcode" && !barcode)
+                                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                : "bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-500/25"
+                            }`}
             >
-              {currentForm === "Erp" ? "Cari PO" : "Scan Barcode"}{" "}
-              <StepForward className="w-5 h-5 ml-1" />
+              {currentForm === "Erp" ? "Cari PO" : "Scan Barcode"}
+              <StepForward className="w-5 h-5" />
             </button>
           </div>
+
+          {/* ERP Form */}
           {currentForm === "Erp" && (
             <form
-              className="w-full space-y-4"
               onSubmit={(e) => {
                 e.preventDefault();
                 handleScanErp();
               }}
+              className="space-y-6"
             >
-              <div className="form-control">
-                <label className="label" htmlFor="Erp">
-                  <span className="label-text font-semibold">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label
+                    htmlFor="Erp"
+                    className="text-sm font-medium text-gray-700 flex items-center gap-2"
+                  >
+                    <Package className="w-4 h-4 text-blue-500" />
                     Purchase Code (ERP)
-                  </span>
-                </label>
-                <input
-                  id="Erp"
-                  type="text"
-                  value={Erp}
-                  onChange={(e) => setErp(e.target.value)}
-                  placeholder="Masukkan kode Purchase Order"
-                  className="input input-bordered w-full"
-                  autoFocus
-                />
-              </div>
-              <div className="form-control">
-                <label className="label" htmlFor="plat">
-                  <span className="label-text font-semibold">
+                  </label>
+                  <div className="relative">
+                    <Package className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-blue-400" />
+                    <input
+                      id="Erp"
+                      type="text"
+                      value={Erp}
+                      onChange={(e) => setErp(e.target.value)}
+                      placeholder="Masukkan kode Purchase Order"
+                      className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200"
+                      autoFocus
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label
+                    htmlFor="plat"
+                    className="text-sm font-medium text-gray-700 flex items-center gap-2"
+                  >
+                    <Truck className="w-4 h-4 text-blue-500" />
                     Plat Kendaraan (Opsional)
-                  </span>
-                </label>
-                <input
-                  id="plat"
-                  type="text"
-                  value={plat}
-                  onChange={(e) => setPlat(e.target.value)}
-                  placeholder="Contoh: B 1234 XYZ"
-                  className="input input-bordered w-full"
-                />
+                  </label>
+                  <div className="relative">
+                    <Truck className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-blue-400" />
+                    <input
+                      id="plat"
+                      type="text"
+                      value={plat}
+                      onChange={(e) => setPlat(e.target.value)}
+                      placeholder="Contoh: B 1234 XYZ"
+                      className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200"
+                    />
+                  </div>
+                </div>
               </div>
               <button type="submit" className="hidden">
                 Submit
               </button>
             </form>
           )}
+
+          {/* Barcode Form */}
           {currentForm === "barcode" && (
-            <div className="w-full space-y-4 mt-4">
+            <div className="space-y-6">
               <form
-                className="form-control"
                 onSubmit={(e) => {
                   e.preventDefault();
                   handleScanBarcode();
                 }}
+                className="space-y-2"
               >
-                <label className="label" htmlFor="barcodeScanner">
-                  <span className="label-text font-semibold">
-                    Scan Barcode Item{" "}
-                    <div className="badge badge-accent">
-                      BUG UMUM: hapus inventory yang memiliki barcode yang sama
-                    </div>
+                <label
+                  htmlFor="barcodeScanner"
+                  className="text-sm font-medium text-gray-700 flex items-center gap-2"
+                >
+                  <Barcode className="w-4 h-4 text-blue-500" />
+                  Scan Barcode Item
+                  <span className="badge badge-warning gap-1 ml-2">
+                    <AlertCircle className="w-3 h-3" />
+                    Bug: Hapus inventory dengan barcode sama
                   </span>
                 </label>
-                <input
-                  id="barcodeScanner"
-                  onChange={(e) => setBarcode(e.target.value)}
-                  value={barcode}
-                  type="text"
-                  placeholder="Arahkan scanner barcode ke sini"
-                  className="input input-bordered w-full"
-                  autoFocus
-                />
+                <div className="relative">
+                  <Barcode className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-blue-400" />
+                  <input
+                    id="barcodeScanner"
+                    value={barcode}
+                    onChange={(e) => setBarcode(e.target.value)}
+                    type="text"
+                    placeholder="Arahkan scanner barcode ke sini"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200"
+                    autoFocus
+                  />
+                </div>
               </form>
+
+              {/* PO Summary */}
               {searchResult?.items?.length > 0 && (
-                <div className="flex justify-between items-center bg-base-200 p-3 rounded-md">
-                  <span className="font-medium text-base-content">
-                    PO: {searchResult.Erp} ({searchResult.items.length} item)
-                  </span>
+                <div className="bg-gradient-to-r from-blue-50 to-white rounded-xl p-4 border border-blue-100 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-blue-100 rounded-lg">
+                      <Package className="w-5 h-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Purchase Order</p>
+                      <p className="font-semibold text-gray-800">
+                        {searchResult.Erp}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {searchResult.items.length} item
+                      </p>
+                    </div>
+                  </div>
                   <button
                     disabled
-                    className="btn btn-success btn-sm text-success-content"
+                    className="px-4 py-2 bg-green-500 text-white rounded-lg text-sm font-medium opacity-50 cursor-not-allowed flex items-center gap-2"
                     onClick={() =>
                       document.getElementById("modal_confirmation").showModal()
                     }
                   >
+                    <CheckCircle className="w-4 h-4" />
                     Selesaikan Semua
                   </button>
                 </div>
               )}
-              <div className="overflow-x-auto border border-base-300 rounded-md max-h-72">
-                <table className="table table-zebra table-sm w-full">
-                  <thead className="sticky top-0 bg-base-300 text-base-content z-10">
-                    <tr>
-                      <th className="p-3">SKU</th>
-                      <th className="p-3 text-center">Request</th>
-                      <th className="p-3 text-center">Barcode</th>
-                      <th className="p-3 text-center">Received</th>
-                      <th className="p-3">Keterangan</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {searchResult?.items?.length > 0 ? (
-                      searchResult.items.map((item, index) => (
-                        <tr
-                          key={item.sku || index}
-                          onClick={() => handlePickItem(item)}
-                          className={`text-center hover:bg-base-200 cursor-pointer ${
-                            item.request === item.received
-                              ? "opacity-50 bg-green-100"
-                              : ""
-                          }`}
-                        >
-                          <td className="p-3 text-left font-mono">
-                            {item.sku}
-                          </td>
-                          <td className="p-3 font-semibold">{item.request}</td>
-                          <td className="p-3 font-semibold">
-                            {item.barcodeItem}
-                          </td>
-                          <td className="p-3 font-semibold">{item.received}</td>
-                          <td className="p-3 text-left text-xs italic">
-                            {item.keterangan || "-"}
+
+              {/* Items Table */}
+              <div className="border border-gray-200 rounded-xl overflow-hidden">
+                <div className="overflow-x-auto max-h-96">
+                  <table className="w-full">
+                    <thead className="bg-gradient-to-r from-blue-50 to-blue-100/50 sticky top-0 z-10">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-blue-800 uppercase tracking-wider">
+                          SKU
+                        </th>
+                        <th className="px-4 py-3 text-center text-xs font-semibold text-blue-800 uppercase tracking-wider">
+                          Request
+                        </th>
+                        <th className="px-4 py-3 text-center text-xs font-semibold text-blue-800 uppercase tracking-wider">
+                          Barcode
+                        </th>
+                        <th className="px-4 py-3 text-center text-xs font-semibold text-blue-800 uppercase tracking-wider">
+                          Received
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-blue-800 uppercase tracking-wider">
+                          Keterangan
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {searchResult?.items?.length > 0 ? (
+                        searchResult.items.map((item, index) => {
+                          const isComplete = item.request === item.received;
+                          return (
+                            <tr
+                              key={item.sku || index}
+                              onClick={() => handlePickItem(item)}
+                              className={`hover:bg-blue-50/50 transition-colors cursor-pointer group
+                                                            ${isComplete ? "bg-green-50/50" : ""}
+                                                        `}
+                            >
+                              <td className="px-4 py-3">
+                                <div className="flex items-center gap-2">
+                                  <div
+                                    className={`w-8 h-8 rounded-lg flex items-center justify-center
+                                                                    ${isComplete ? "bg-green-100" : "bg-gradient-to-br from-blue-500 to-blue-600 text-white"}`}
+                                  >
+                                    {isComplete ? (
+                                      <CheckCircle className="w-4 h-4 text-green-600" />
+                                    ) : (
+                                      <Package className="w-4 h-4" />
+                                    )}
+                                  </div>
+                                  <span
+                                    className={`font-medium ${isComplete ? "text-gray-500" : "text-blue-700"}`}
+                                  >
+                                    {item.sku}
+                                  </span>
+                                </div>
+                              </td>
+                              <td className="px-4 py-3 text-center">
+                                <span
+                                  className={`font-semibold ${isComplete ? "text-gray-500" : "text-gray-800"}`}
+                                >
+                                  {item.request}
+                                </span>
+                              </td>
+                              <td className="px-4 py-3 text-center font-mono text-sm">
+                                {item.barcodeItem}
+                              </td>
+                              <td className="px-4 py-3 text-center">
+                                <span
+                                  className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium
+                                                                ${
+                                                                  isComplete
+                                                                    ? "bg-green-100 text-green-700"
+                                                                    : "bg-yellow-100 text-yellow-700"
+                                                                }`}
+                                >
+                                  {item.received} / {item.request}
+                                </span>
+                              </td>
+                              <td className="px-4 py-3 text-sm text-gray-600 max-w-[200px]">
+                                <div
+                                  className="line-clamp-1"
+                                  title={item.keterangan}
+                                >
+                                  {item.keterangan || "-"}
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })
+                      ) : (
+                        <tr>
+                          <td colSpan="5" className="text-center py-12">
+                            <div className="flex flex-col items-center">
+                              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-3">
+                                <Package className="w-8 h-8 text-gray-400" />
+                              </div>
+                              <p className="text-gray-500">
+                                {Erp
+                                  ? "Tidak ada item ditemukan untuk PO ini"
+                                  : "Scan barcode untuk melihat item"}
+                              </p>
+                            </div>
                           </td>
                         </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td
-                          colSpan="4"
-                          className="text-center p-4 text-base-content text-opacity-60"
-                        >
-                          {Erp
-                            ? "Tidak ada item ditemukan untuk PO ini atau PO sudah selesai."
-                            : "Scan barcode untuk melihat item."}
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
               </div>
+
+              {/* Progress Indicator */}
+              {searchResult?.items?.length > 0 && (
+                <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-gray-700">
+                      Progress Penerimaan
+                    </span>
+                    <span className="text-sm font-semibold text-blue-600">
+                      {
+                        searchResult.items.filter(
+                          (i) => i.request === i.received,
+                        ).length
+                      }{" "}
+                      / {searchResult.items.length} item
+                    </span>
+                  </div>
+                  <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transition-all duration-300"
+                      style={{
+                        width: `${(searchResult.items.filter((i) => i.request === i.received).length / searchResult.items.length) * 100}%`,
+                      }}
+                    ></div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
       </div>
+
+      {/* Modals */}
       <ModalItemEdit
-        key={"editItemModal"}
         selectedItem={selectedItem}
         setSelectedItem={setSelectedItem}
         onConfirm={handleManualEditPurchaseOrder}
       />
+
       <ModalConfirmation
         onConfirm={handleCompleteAllPurchaseOrder}
         title={`Selesaikan Semua Item untuk PO ${searchResult?.Erp}?`}
         message="Tindakan ini akan menandai semua item dalam Purchase Order ini sebagai telah diterima (received) sesuai jumlah request."
-        key={"confirmation-complete-all"}
         onCancel={() => {
           const modal = document.getElementById("modal_confirmation");
           if (modal) modal.close();
