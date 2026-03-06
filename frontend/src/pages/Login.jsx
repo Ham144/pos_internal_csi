@@ -137,7 +137,7 @@ export default function Login({ className, ...props }) {
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     type="text"
-                    placeholder="Input username anda"
+                    placeholder="ham"
                     required
                     className="border-base-content/20"
                     disabled={isPending || isVerifying}
@@ -150,6 +150,7 @@ export default function Login({ className, ...props }) {
                   <Input
                     id="password"
                     type="password"
+                    placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required

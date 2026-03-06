@@ -72,7 +72,7 @@ export const downloadRangkingPaymentMethodDetail = async (body) => {
     },
     { withCredentials: true }
   );
-  return response.data;
+  return response.data;  
 };
 
 export const endOfDayBySku = async (params) => {

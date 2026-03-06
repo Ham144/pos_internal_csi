@@ -10,7 +10,6 @@ import { Upload, Loader, Download, Lock, Search, Filter } from "lucide-react";
 import { toast } from "react-hot-toast";
 import "./Artikel_Documentation.css";
 import { useUserInfo } from "@/store";
-import { useSearchParams } from "react-router-dom";
 
 const Artikel_Documentation = () => {
   const [selectedFile, setSelectedFile] = useState(null);

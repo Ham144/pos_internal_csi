@@ -18,19 +18,35 @@ import PickVoucherDialog from "../components/pickVoucherDialog";
 import { useNavigate, useLocation } from "react-router-dom";
 import FilterInventories from "../components/filterInventories";
 import { useFilter, useUserInfo } from "../store";
+
 import {
-  ArrowDown,
-  ArrowDownIcon,
+  BellRing,
+  FileWarning,
+  Info,
+  Filter,
+  Plus,
+  Upload,
+  Download,
+  RefreshCw,
   ArrowUp,
-  ArrowUpDownIcon,
-  ArrowUpIcon,
-  BadgeHelp,
-  BellRingIcon,
+  ArrowDown,
+  ArrowUpDown,
+  Eye,
   Binoculars,
-  FileWarningIcon,
-  InfoIcon,
-  LucideShieldCheck,
-  Trash2Icon,
+  Trash2,
+  ShieldCheck,
+  X,
+  Check,
+  AlertCircle,
+  Package,
+  Tag,
+  Percent,
+  Gift,
+  Image as ImageIcon,
+  ChevronLeft,
+  ChevronRight,
+  HelpCircle,
+  Save,
 } from "lucide-react";
 import { getImage, uploadThumbail } from "../api/thumbnailApi";
 import StackTraceBySku from "@/components/StackTraceBySku";
@@ -192,7 +208,7 @@ const ItemLibrary = () => {
   useEffect(() => {
     if (searchFromUrl && inventories) {
       const matchingInventory = inventories.find(
-        (inv) => inv.sku === searchFromUrl
+        (inv) => inv.sku === searchFromUrl,
       );
       if (matchingInventory) {
         setselectedInventory(matchingInventory);
@@ -346,7 +362,7 @@ const ItemLibrary = () => {
     link.setAttribute("href", encodedUri);
     link.setAttribute(
       "download",
-      "contoh_csv_untuk_create_or_update_inventory_tak_menerima_quantity.csv"
+      "contoh_csv_untuk_create_or_update_inventory_tak_menerima_quantity.csv",
     ); // Nama file template yang lebih sesuai
     document.body.appendChild(link);
     link.click();
@@ -363,10 +379,10 @@ const ItemLibrary = () => {
       const rows = text.split("\n");
       const headers = rows[0].split(";");
       const skuIndex = headers.findIndex(
-        (h) => h.trim().toLowerCase() === "sku"
+        (h) => h.trim().toLowerCase() === "sku",
       );
       const priceIndex = headers.findIndex(
-        (h) => h.trim().toLowerCase() === "harga dasar"
+        (h) => h.trim().toLowerCase() === "harga dasar",
       );
 
       if (skuIndex === -1 || priceIndex === -1) {
@@ -393,7 +409,7 @@ const ItemLibrary = () => {
         .filter((update) => {
           if (!update.sku || isNaN(update.RpHargaDasar)) {
             console.warn(
-              `Invalid row skipped: SKU=${update.sku}, Price=${update.RpHargaDasar}`
+              `Invalid row skipped: SKU=${update.sku}, Price=${update.RpHargaDasar}`,
             );
             return false;
           }
@@ -451,7 +467,7 @@ const ItemLibrary = () => {
     const promoListFound = promoList.data.find((promo) => promo._id === id);
     if (promoListFound) {
       promoListFound.skuList = promoListFound.skuList.filter(
-        (sku) => sku !== selectedInventory.sku
+        (sku) => sku !== selectedInventory.sku,
       );
     }
   };
@@ -463,17 +479,17 @@ const ItemLibrary = () => {
       diskonsToDelete: [...(prev.diskonsToDelete || []), id],
       // Hapus dari daftar diskon yang akan ditambahkan jika ada
       diskonsToAdd: (prev.diskonsToAdd || []).filter(
-        (diskonId) => diskonId !== id
+        (diskonId) => diskonId !== id,
       ),
     }));
 
     // Update UI langsung
     const diskonListFound = diskonList?.data?.data?.find(
-      (diskon) => diskon._id === id
+      (diskon) => diskon._id === id,
     );
     if (diskonListFound) {
       diskonListFound.skuTanpaSyarat = diskonListFound.skuTanpaSyarat.filter(
-        (sku) => sku !== selectedInventory.sku
+        (sku) => sku !== selectedInventory.sku,
       );
     }
   };
@@ -485,17 +501,17 @@ const ItemLibrary = () => {
       vouchersToDelete: [...(prev.vouchersToDelete || []), id],
       // Hapus dari daftar voucher yang akan ditambahkan jika ada
       vouchersToAdd: (prev.vouchersToAdd || []).filter(
-        (voucherId) => voucherId !== id
+        (voucherId) => voucherId !== id,
       ),
     }));
 
     // Update UI langsung
     const voucherListFound = voucherList?.data?.find(
-      (voucher) => voucher._id === id
+      (voucher) => voucher._id === id,
     );
     if (voucherListFound) {
       voucherListFound.skuList = voucherListFound.skuList.filter(
-        (sku) => sku !== selectedInventory.sku
+        (sku) => sku !== selectedInventory.sku,
       );
     }
   };
@@ -523,7 +539,7 @@ const ItemLibrary = () => {
           return {
             ...promo,
             skuList: (promo.skuList || []).filter(
-              (sku) => sku !== selectedInventory?.sku
+              (sku) => sku !== selectedInventory?.sku,
             ),
           };
         }
@@ -562,7 +578,7 @@ const ItemLibrary = () => {
           return {
             ...diskon,
             skuTanpaSyarat: (diskon.skuTanpaSyarat || []).filter(
-              (sku) => sku !== selectedInventory?.sku
+              (sku) => sku !== selectedInventory?.sku,
             ),
           };
         }
@@ -598,7 +614,7 @@ const ItemLibrary = () => {
           return {
             ...voucher,
             skuList: (voucher.skuList || []).filter(
-              (sku) => sku !== selectedInventory?.sku
+              (sku) => sku !== selectedInventory?.sku,
             ),
           };
         }
@@ -611,7 +627,7 @@ const ItemLibrary = () => {
       (voucher) =>
         tempVoucherTerhubung?.includes(voucher._id) ||
         (voucher.skuList?.includes(selectedInventory?.sku) &&
-          !tempVoucherTerputus?.includes(voucher._id))
+          !tempVoucherTerputus?.includes(voucher._id)),
     );
 
     setselectedInventory((prev) => ({
@@ -627,12 +643,12 @@ const ItemLibrary = () => {
   const generatePaginationNumbers = (
     currentPage,
     totalPages,
-    maxVisiblePages = 5
+    maxVisiblePages = 5,
   ) => {
     const pages = [];
     const startPage = Math.max(
       1,
-      currentPage - Math.floor(maxVisiblePages / 2)
+      currentPage - Math.floor(maxVisiblePages / 2),
     );
     const endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
 
@@ -713,558 +729,548 @@ const ItemLibrary = () => {
 
   return (
     <div
-      className={`${
+      className={`min-h-screen bg-gradient-to-br from-blue-50/30 to-gray-50 ${
         selectedInventory || newSingleInventory
           ? "grid grid-cols-4 gap-3"
           : "flex"
-      } min-h-screen bg-gray-100`}
+      }`}
     >
+      {/* Main Content */}
       <div
-        className={`${
-          selectedInventory || newSingleInventory ? "col-span-3" : "w-full"
-        }`}
+        className={`${selectedInventory || newSingleInventory ? "col-span-3" : "w-full"}`}
       >
-        <div className="dropdown dropdown-end w-full">
-          <label
-            tabIndex={0}
-            className="btn m-1 btn-ghost btn-circle hover:bg-gray-100 transition-colors duration-200"
-            aria-label="Notifications"
-          >
-            <div className="relative">
-              <BellRingIcon className="w-6 h-6 text-gray-600" />
-              <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+        {/* Header with Notifications */}
+        <div className="bg-white border-b border-blue-100 sticky top-0 z-30 shadow-sm">
+          <div className="px-4 py-3 flex items-center justify-between">
+            {/* Notifications Dropdown */}
+            <div className="dropdown dropdown-end">
+              <label
+                tabIndex={0}
+                className="btn btn-ghost btn-circle hover:bg-blue-50 transition-colors"
+              >
+                <div className="relative">
+                  <BellRing className="w-6 h-6 text-blue-600" />
+                  <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse ring-2 ring-white"></span>
+                </div>
+              </label>
+              <div className="dropdown-content z-40 menu p-4 shadow-xl bg-white rounded-2xl w-96 mt-2 border border-blue-100">
+                <div className="space-y-3">
+                  <div className="bg-amber-50 rounded-xl p-4 border border-amber-200">
+                    <div className="flex gap-3">
+                      <div className="flex-shrink-0">
+                        <FileWarning className="w-5 h-5 text-amber-600" />
+                      </div>
+                      <p className="text-sm text-gray-700">
+                        Jika terdapat Brand maka sku yang terkait brand tersebut
+                        saja yang ditampilkan disini, hilangkan filter brand
+                        untuk melihat semua
+                      </p>
+                    </div>
+                  </div>
+                  <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
+                    <div className="flex gap-3">
+                      <div className="flex-shrink-0">
+                        <Info className="w-5 h-5 text-blue-600" />
+                      </div>
+                      <p className="text-sm text-gray-700">
+                        Di mobile, barang tidak memiliki harga pun sekarang akan
+                        tetap muncul, karena user biasanya membuat barang bonus
+                        RP.0
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-          </label>
-          <ul className="dropdown-content z-40 menu p-4 shadow-lg bg-white rounded-xl w-full mt-2 border border-gray-100 transform transition-all duration-300 ease-in-out">
-            <li>
-              <div
-                role="alert"
-                className="alert alert-warning flex items-start gap-3 p-3 rounded-lg mb-3 hover:bg-amber-50 transition-colors"
-              >
-                <FileWarningIcon className="w-5 h-5 text-amber-600 flex-shrink-0 mt-1" />
-                <span className="text-sm text-gray-700">
-                  Jika terdapat Brand maka sku yang terkait brand tersebut saja
-                  yang ditampilkan disini, hilang kan filter brand untuk melihat
-                  semua
-                </span>
+
+            {/* Actions */}
+            <div className="flex items-center gap-3 flex-1 justify-end">
+              <div className="badge badge-lg bg-gradient-to-r from-blue-500 to-blue-600 text-white border-0 px-4 py-3">
+                <Package className="w-4 h-4 mr-2" />
+                Total: {totalItems} Item
               </div>
-            </li>
-            <li>
-              <div
-                role="alert"
-                className="alert alert-info flex items-start gap-3 p-3 rounded-lg hover:bg-blue-50 transition-colors"
+
+              <button
+                onClick={() => {
+                  setselectedInventory(null);
+                  setNewSingleInventory(null);
+                  setTimeout(() => setNewSingleInventory({}), 400);
+                }}
+                className="btn bg-gradient-to-r from-blue-600 to-blue-700 text-white border-0 hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-500/25"
               >
-                <InfoIcon className="w-5 h-5 text-blue-600 flex-shrink-0 mt-1" />
-                <span className="text-sm text-gray-700">
-                  Di mobile, barang tidak memiliki harga pun sekarang akan tetap
-                  muncul, karena user biasanya membuat barang bonus RP.0
-                  sehingga, untuk tetap memunculkannya dalam pencarian maka
-                  barang barang Rp.0 pun akan didownload juga ke mobile
-                </span>
+                <Plus className="w-5 h-5" />
+                Tambah Item
+              </button>
+
+              <div className="dropdown dropdown-hover">
+                <label
+                  tabIndex={0}
+                  className="btn btn-outline border-gray-300 hover:bg-blue-50 hover:border-blue-300"
+                >
+                  <Upload className="w-4 h-4 mr-2" />
+                  Import / Export
+                </label>
+                <ul className="dropdown-content z-40 menu p-2 shadow-xl bg-white rounded-xl w-52 border border-blue-100">
+                  <li>
+                    <label className="flex items-center gap-2 text-gray-700 hover:bg-blue-50 rounded-lg p-2 cursor-pointer">
+                      <Upload className="w-4 h-4 text-blue-600" />
+                      Import CSV
+                      <input
+                        type="file"
+                        accept=".csv"
+                        className="hidden"
+                        onChange={handleCSVUpload}
+                        onClick={(e) => (e.target.value = null)}
+                      />
+                    </label>
+                  </li>
+                  <li>
+                    <a
+                      onClick={() => exportCSV(inventories)}
+                      className="flex items-center gap-2 text-gray-700 hover:bg-blue-50 rounded-lg p-2 cursor-pointer"
+                    >
+                      <Download className="w-4 h-4 text-blue-600" />
+                      Export CSV Template
+                    </a>
+                  </li>
+                </ul>
               </div>
-            </li>
-          </ul>
-        </div>
-        <div className="px-4 py-3 flex lg:justify-between justify-center items-center flex-wrap gap-y-2 ">
-          <div className="flex lg:w-full max-lg:w-full z-20">
+
+              <button
+                onClick={refetchInventories}
+                className="btn btn-circle btn-ghost hover:bg-blue-50"
+              >
+                <RefreshCw className="w-5 h-5 text-blue-600" />
+              </button>
+            </div>
+          </div>
+
+          {/* Filter */}
+          <div className="px-4 pb-3">
             <FilterInventories
-              onChange={(value) => {
-                setFilter({ ...filter, searchKey: value.searchKey });
-              }}
+              onChange={(value) =>
+                setFilter({ ...filter, searchKey: value.searchKey })
+              }
             />
           </div>
-          <div className="flex flex-1  gap-x-2 flex-wrap gap-3 justify-end">
-            <button className="btn btn-sm text-sm">Total: {totalItems}</button>
-            <button
-              className="btn btn-sm btn-primary text-white"
-              onClick={() => {
-                setselectedInventory(null);
-                setNewSingleInventory(null);
-                setTimeout(() => {
-                  setNewSingleInventory({});
-                }, 400);
-              }}
-            >
-              <span style={{ fontSize: "1em" }}>➕</span> Tambah Item
-            </button>
-            <div className="dropdown dropdown-hover">
-              <label tabIndex={0} className="btn btn-sm">
-                <span style={{ fontSize: "1em" }}>📤</span> Import / Export
-              </label>
-              <ul
-                tabIndex={0}
-                className="dropdown-content z-[1] menu p-2 shadow bg-white rounded-box w-52 border border-gray-200"
-              >
-                <li>
-                  <label className="cursor-pointer text-sm text-gray-700 hover:bg-gray-100 rounded-md p-2">
-                    Import CSV
-                    <input
-                      type="file"
-                      accept=".csv"
-                      className="hidden"
-                      onChange={handleCSVUpload}
-                      onClick={(e) => (e.target.value = null)}
-                    />
-                  </label>
-                </li>
-                <li>
-                  <a
-                    onClick={() => exportCSV(inventories)}
-                    className="text-sm text-gray-700 hover:bg-gray-100 rounded-md p-2"
-                  >
-                    Export CSV Template
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <button className="btn btn-sm" onClick={refetchInventories}>
-              <span style={{ fontSize: "1em" }}>🔄</span> Refresh
-            </button>
-          </div>
         </div>
-        <div className="overflow-auto flex-1">
-          <div className="badge badge-primary text-white rounded-md mb-2">
-            Klik 2 klik untuk mengedit
-          </div>
-          <table className="table ">
-            <thead className="sticky top-0 bg-white shadow-sm">
-              <tr className="border-b border-gray-200">
-                {/* SKU Column */}
-                <th
-                  onClick={() => requestSort("sku")}
-                  className="py-3 px-4 text-sm font-semibold text-gray-700 cursor-pointer hover:bg-gray-50 transition-colors group"
-                >
-                  <div className="flex items-center gap-1">
-                    <span>SKU</span>
-                    <div>
-                      {sortConfig.field === "sku" ? (
-                        sortConfig.direction === "asc" ? (
-                          <ArrowUp className="w-4 h-4 text-blue-500" />
-                        ) : (
-                          <ArrowDown className="w-4 h-4 text-blue-500" />
-                        )
-                      ) : (
-                        <ArrowUpDownIcon className="w-4 h-4 text-gray-400" />
-                      )}
-                    </div>
-                  </div>
-                </th>
 
-                {/* Description Column */}
-                <th className="py-3 px-4 text-sm font-semibold text-gray-700">
-                  Deskripsi
-                </th>
+        {/* Table Section */}
+        <div className="p-4">
+          <div className="bg-white rounded-2xl shadow-xl border border-blue-100 overflow-hidden">
+            <div className="badge badge-primary m-4 bg-blue-100 text-blue-700 border-blue-200">
+              <Info className="w-4 h-4 mr-1" />
+              Klik 2x untuk mengedit
+            </div>
 
-                {/* Barcode Column */}
-                <th className="py-3 px-4 text-sm font-semibold text-gray-700">
-                  Barcode
-                </th>
-
-                {/* Quantity Column */}
-                <th
-                  onClick={() => requestSort("quantity")}
-                  className="py-3 px-4 text-sm font-semibold text-gray-700 text-center cursor-pointer hover:bg-gray-50 transition-colors group"
-                >
-                  <div className="flex items-center justify-center gap-1">
-                    <span>Qty</span>
-                    <div>
-                      {sortConfig.field === "quantity" ? (
-                        sortConfig.direction === "asc" ? (
-                          <ArrowUpIcon className="w-4 h-4 text-blue-500" />
-                        ) : (
-                          <ArrowDownIcon className="w-4 h-4 text-blue-500" />
-                        )
-                      ) : (
-                        <ArrowUpDownIcon className="w-4 h-4 text-gray-400" />
-                      )}
-                    </div>
-                  </div>
-                </th>
-
-                {/* Sold Column */}
-                <th
-                  onClick={() => requestSort("terjual")}
-                  className="py-3 px-4 text-sm font-semibold text-gray-700 text-center cursor-pointer hover:bg-gray-50 transition-colors group"
-                >
-                  <div className="flex items-center justify-center gap-1">
-                    <span>Terjual</span>
-                    <div>
-                      {sortConfig.field === "terjual" ? (
-                        sortConfig.direction === "asc" ? (
-                          <ArrowUpIcon className="w-4 h-4 text-blue-500" />
-                        ) : (
-                          <ArrowDownIcon className="w-4 h-4 text-blue-500" />
-                        )
-                      ) : (
-                        <ArrowUpDownIcon className="w-4 h-4 text-gray-400" />
-                      )}
-                    </div>
-                  </div>
-                </th>
-
-                {/* Status Column */}
-                <th className="py-3 px-4 text-sm font-semibold text-gray-700 text-center">
-                  Status
-                </th>
-
-                {/* Base Price Column */}
-                <th
-                  onClick={() => requestSort("RpHargaDasar")}
-                  className="py-3 px-4 text-sm font-semibold text-gray-700 text-right cursor-pointer hover:bg-gray-50 transition-colors group"
-                >
-                  <div className="flex items-center justify-end gap-1">
-                    <span>Harga Dasar</span>
-                    <div>
-                      {sortConfig.field === "RpHargaDasar" ? (
-                        sortConfig.direction === "asc" ? (
-                          <ArrowUpIcon className="w-4 h-4 text-blue-500" />
-                        ) : (
-                          <ArrowDownIcon className="w-4 h-4 text-blue-500" />
-                        )
-                      ) : (
-                        <ArrowUpDownIcon className="w-4 h-4 text-gray-400" />
-                      )}
-                    </div>
-                  </div>
-                </th>
-
-                {/* Brand Column */}
-                <th
-                  onClick={() => requestSort("brand")}
-                  className="py-3 px-4 text-sm font-semibold text-gray-700 cursor-pointer hover:bg-gray-50 transition-colors group"
-                >
-                  <div className="flex items-center gap-1">
-                    <span>Brand</span>
-                    <div>
-                      {sortConfig.field === "brand" ? (
-                        sortConfig.direction === "asc" ? (
-                          <ArrowUpIcon className="w-4 h-4 text-blue-500" />
-                        ) : (
-                          <ArrowDownIcon className="w-4 h-4 text-blue-500" />
-                        )
-                      ) : (
-                        <ArrowUpDownIcon className="w-4 h-4 text-gray-400" />
-                      )}
-                    </div>
-                  </div>
-                </th>
-
-                {/* Promo Column */}
-                <th className="py-3 px-4 text-sm font-semibold text-gray-700 text-center">
-                  Promo
-                </th>
-
-                {/* Discount Column */}
-                <th className="py-3 px-4 text-sm font-semibold text-gray-700 text-center">
-                  Diskon
-                </th>
-              </tr>
-            </thead>
-
-            {sortedInventories?.length ? (
-              <tbody className="overflow-x-auto ">
-                {sortedInventories?.map((item, index) => (
-                  <tr
-                    key={index}
-                    className="cursor-pointer hover:bg-gray-100 transition-colors text-sm text-gray-700"
-                    onDoubleClick={() => {
-                      handleItemClick(item);
-                      setSkuToTrace(null);
-                    }}
-                  >
-                    <td className="py-3 px-4">
-                      <div
-                        onClick={() => {
-                          setSkuToTrace(item.sku);
-                          document
-                            .getElementById("stack-trace-single-sku")
-                            .showModal();
-                        }}
-                        className="flex items-center gap-2"
+            <div className="overflow-x-auto max-h-[calc(100vh-250px)] overflow-y-auto">
+              <table className="w-full">
+                <thead className="bg-gradient-to-r from-blue-50 to-blue-100/50 sticky top-0 z-10">
+                  <tr>
+                    {[
+                      { label: "SKU", field: "sku", sortable: true },
+                      {
+                        label: "Deskripsi",
+                        field: "description",
+                        sortable: false,
+                      },
+                      { label: "Barcode", field: "barcode", sortable: false },
+                      {
+                        label: "Qty",
+                        field: "quantity",
+                        sortable: true,
+                        align: "center",
+                      },
+                      {
+                        label: "Terjual",
+                        field: "terjual",
+                        sortable: true,
+                        align: "center",
+                      },
+                      {
+                        label: "Status",
+                        field: null,
+                        sortable: false,
+                        align: "center",
+                      },
+                      {
+                        label: "Harga Dasar",
+                        field: "RpHargaDasar",
+                        sortable: true,
+                        align: "right",
+                      },
+                      { label: "Brand", field: "brand", sortable: true },
+                      {
+                        label: "Promo",
+                        field: null,
+                        sortable: false,
+                        align: "center",
+                      },
+                      {
+                        label: "Diskon",
+                        field: null,
+                        sortable: false,
+                        align: "center",
+                      },
+                    ].map((col, idx) => (
+                      <th
+                        key={idx}
+                        onClick={() => col.sortable && requestSort(col.field)}
+                        className={`px-4 py-4 text-xs font-semibold text-blue-800 uppercase tracking-wider whitespace-nowrap
+                                                ${col.sortable ? "cursor-pointer hover:bg-blue-200/50" : ""}
+                                                ${col.align === "center" ? "text-center" : col.align === "right" ? "text-right" : "text-left"}
+                                            `}
                       >
                         <div
-                          className="tooltip tooltip-right"
-                          data-tip="Stack trace item ini"
+                          className={`flex items-center gap-1 ${col.align === "right" ? "justify-end" : ""}`}
                         >
-                          <Binoculars
-                            size={20}
-                            className="text-gray-500 hover:text-blue-500 transition-colors"
-                          />
+                          {col.label}
+                          {col.sortable && (
+                            <div className="inline-flex">
+                              {sortConfig.field === col.field ? (
+                                sortConfig.direction === "asc" ? (
+                                  <ArrowUp className="w-4 h-4 text-blue-600" />
+                                ) : (
+                                  <ArrowDown className="w-4 h-4 text-blue-600" />
+                                )
+                              ) : (
+                                <ArrowUpDown className="w-4 h-4 text-gray-400" />
+                              )}
+                            </div>
+                          )}
                         </div>
-                        <span className="font-medium text-gray-800">
-                          {item.sku}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="py-2 px-3">{item.description}</td>
-                    <td className="py-2 px-3">{item.barcodeItem}</td>
-                    <td className="py-2 px-3 text-center">{item?.quantity}</td>
-                    <td className="py-2 px-3 text-center">
-                      {item.terjual || 0}
-                    </td>
-                    <td className="py-2 px-3 text-center">
-                      {item.isDisabled ? (
-                        <span className="text-red-500">🔴</span>
-                      ) : (
-                        <span className="text-green-500">🟢</span>
-                      )}
-                    </td>
-                    <td className="py-2 px-3 text-right font-mono">
-                      {Intl.NumberFormat("id-ID", {
-                        style: "currency",
-                        currency: "IDR",
-                        minimumFractionDigits: 0,
-                        maximumFractionDigits: 0,
-                      }).format(item.RpHargaDasar?.$numberDecimal)}
-                    </td>
-                    <td className="py-2 px-3">{item.brand}</td>
-
-                    <td className="py-2 px-3 text-center">
-                      {promoList?.data.find((pro) =>
-                        pro.skuList?.includes(item.sku)
-                      ) ? (
-                        <span className="text-green-500">🟢</span>
-                      ) : (
-                        <span className="text-red-500">🔴</span>
-                      )}
-                    </td>
-                    <td className="py-2 px-3 text-center">
-                      {diskonList?.data?.data.find((dis) =>
-                        dis.skuTanpaSyarat?.includes(item?.sku)
-                      ) ? (
-                        <span className="text-green-500">🟢</span>
-                      ) : (
-                        <span className="text-red-500">🔴</span>
-                      )}
-                    </td>
+                      </th>
+                    ))}
                   </tr>
-                ))}
-              </tbody>
-            ) : (
-              <tbody>
-                <tr>
-                  <td colSpan={9} className="text-center py-6">
-                    <div className="alert alert-warning">
-                      <span style={{ fontSize: "1em" }}>⚠️</span>
-                      <span>Peringatan: Tidak ada data.</span>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            )}
-          </table>
-
-          {/* Loading indicator */}
-          {inventoryLoading && (
-            <div className="flex justify-center my-4">
-              <span className="loading loading-spinner loading-lg text-blue-700"></span>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {sortedInventories?.length ? (
+                    sortedInventories.map((item, index) => (
+                      <tr
+                        key={index}
+                        onDoubleClick={() => {
+                          handleItemClick(item);
+                          setSkuToTrace(null);
+                        }}
+                        className="hover:bg-blue-50/50 transition-colors cursor-pointer group"
+                      >
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSkuToTrace(item.sku);
+                                document
+                                  .getElementById("stack-trace-single-sku")
+                                  .showModal();
+                              }}
+                              className="p-1.5 rounded-lg hover:bg-blue-100 transition-colors opacity-0 group-hover:opacity-100"
+                              title="Lihat Stack Trace"
+                            >
+                              <Binoculars className="w-4 h-4 text-blue-600" />
+                            </button>
+                            <span className="font-medium text-blue-700">
+                              {item.sku}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 text-sm text-gray-700">
+                          {item.description}
+                        </td>
+                        <td className="px-4 py-3 text-sm font-mono text-gray-600">
+                          {item.barcodeItem}
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                            {item?.quantity}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            {item.terjual || 0}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          {item.isDisabled ? (
+                            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">
+                              <AlertCircle className="w-3 h-3" />
+                              Nonaktif
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                              <Check className="w-3 h-3" />
+                              Aktif
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3 text-right font-mono">
+                          <span className="text-blue-600 font-semibold">
+                            {Intl.NumberFormat("id-ID", {
+                              style: "currency",
+                              currency: "IDR",
+                              minimumFractionDigits: 0,
+                            }).format(item.RpHargaDasar?.$numberDecimal)}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-sm">
+                          <span className="px-2 py-1 bg-purple-100 text-purple-700 rounded-md text-xs">
+                            {item.brand || "-"}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          {promoList?.data.find((p) =>
+                            p.skuList?.includes(item.sku),
+                          ) ? (
+                            <span className="inline-flex items-center justify-center w-6 h-6 bg-green-100 rounded-full">
+                              <Gift className="w-4 h-4 text-green-600" />
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center justify-center w-6 h-6 bg-red-100 rounded-full">
+                              <X className="w-4 h-4 text-red-600" />
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          {diskonList?.data?.data.find((d) =>
+                            d.skuTanpaSyarat?.includes(item?.sku),
+                          ) ? (
+                            <span className="inline-flex items-center justify-center w-6 h-6 bg-green-100 rounded-full">
+                              <Percent className="w-4 h-4 text-green-600" />
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center justify-center w-6 h-6 bg-red-100 rounded-full">
+                              <X className="w-4 h-4 text-red-600" />
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={10} className="text-center py-12">
+                        <div className="flex flex-col items-center">
+                          <Package className="w-12 h-12 text-gray-400 mb-3" />
+                          <p className="text-gray-500">
+                            Tidak ada data inventori
+                          </p>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
             </div>
-          )}
-        </div>
 
-        {totalPages >= 1 && (
-          <div className="flex justify-center py-4 bg-gray-50 rounded-b-lg border-t border-gray-200">
-            <div className="join">
-              <div className="join">
-                {/* Tombol Previous */}
-                <button
-                  className="join-item btn btn-sm"
-                  onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
-                  disabled={currentPage === 1}
-                >
-                  «
-                </button>
+            {/* Loading */}
+            {inventoryLoading && (
+              <div className="flex justify-center py-8">
+                <div className="relative">
+                  <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+                </div>
+              </div>
+            )}
 
-                {/* Pagination numbers */}
-                {paginationItems.map((item, index) => {
-                  if (item === "...") {
+            {/* Pagination */}
+            {totalPages >= 1 && (
+              <div className="flex justify-center py-4 bg-gradient-to-r from-blue-50/50 to-white border-t border-blue-100">
+                <div className="flex gap-2">
+                  <button
+                    className="p-2 rounded-lg border border-gray-200 hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    onClick={() =>
+                      handlePageChange(Math.max(1, currentPage - 1))
+                    }
+                    disabled={currentPage === 1}
+                  >
+                    <ChevronLeft className="w-5 h-5 text-gray-600" />
+                  </button>
+
+                  {paginationItems.map((item, index) => {
+                    if (item === "...") {
+                      return (
+                        <span
+                          key={`ellipsis-${index}`}
+                          className="px-3 py-2 text-gray-500"
+                        >
+                          ...
+                        </span>
+                      );
+                    }
                     return (
                       <button
-                        key={`ellipsis-${index}`} // Key unik untuk ellipsis
-                        className="join-item btn btn-sm btn-disabled"
+                        key={item}
+                        className={`w-10 h-10 rounded-lg font-medium transition-colors ${
+                          item === currentPage
+                            ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg"
+                            : "border border-gray-200 hover:bg-blue-50 text-gray-700"
+                        }`}
+                        onClick={() => handlePageChange(item)}
                       >
-                        ...
+                        {item}
                       </button>
                     );
-                  }
-                  return (
-                    <button
-                      key={item} // Page number is unique, use it as key
-                      className={`join-item btn btn-sm ${
-                        item === currentPage
-                          ? "btn-active bg-blue-700 text-white" // Gunakan btn-active DaisyUI
-                          : "btn-ghost"
-                      }`}
-                      onClick={() => handlePageChange(item)}
-                    >
-                      {item}
-                    </button>
-                  );
-                })}
+                  })}
 
-                {/* Tombol Next */}
-                <button
-                  className="join-item btn btn-sm"
-                  onClick={() =>
-                    handlePageChange(Math.min(totalPages, currentPage + 1))
-                  }
-                  disabled={currentPage === totalPages}
-                >
-                  »
-                </button>
+                  <button
+                    className="p-2 rounded-lg border border-gray-200 hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    onClick={() =>
+                      handlePageChange(Math.min(totalPages, currentPage + 1))
+                    }
+                    disabled={currentPage === totalPages}
+                  >
+                    <ChevronRight className="w-5 h-5 text-gray-600" />
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
 
-      {/* Right Panel: General Information */}
+      {/* Right Panel */}
       {(selectedInventory || newSingleInventory) && (
-        <div className="col-span-1">
-          <div className="sticky top-0 z-10 bg-white p-4 text-xl font-bold border-b border-gray-300 h-[900px] ">
-            <h2 className="  font-light">General Information</h2>{" "}
-            <div className="flex  justify-between items-center ">
-              <div className="flex max-lg:flex-col flex-wrap gap-2 justify-center w-full pb-3">
-                <button
-                  type="button"
-                  className="flex items-center px-4 py-2 border rounded text-red-600 hover:text-red-900 hover:border-red-900 focus:outline-none transition-colors flex-1 duration-300 ease-in-out"
-                  onClick={() => {
-                    if (
-                      window.confirm(
-                        "Disabled Produk ini? Produk tidak akan bisa dijual dan tidak tampil di mobile"
-                      )
-                    ) {
-                      handleToggleDisableInventory(selectedInventory._id);
-                    }
-                  }}
-                >
-                  {selectedInventory?.isDisabled ? (
-                    <LucideShieldCheck className="w-5 h-5 mr-2" />
-                  ) : (
-                    <Trash2Icon className="w-5 h-5 mr-2" />
-                  )}
-                  {selectedInventory?.isDisabled ? "Enable" : "Disable"}
-                </button>
-                <button
-                  type="button"
-                  className="flex flex-1 items-center px-4 py-2 border rounded text-gray-600 hover:text-gray-900 hover:border-gray-900 focus:outline-none transition-colors duration-300 ease-in-out"
-                  onClick={() => {
-                    setselectedInventory(null);
-                    setNewSingleInventory(null);
-                  }}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 mr-2"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                  Batal
-                </button>
-                <button
-                  type="button"
-                  className="flex flex-1 items-center px-4 py-2 border rounded text-green-600 hover:text-green-900 hover:border-green-900 focus:outline-none transition-colors duration-300 ease-in-out"
-                  onClick={async () => {
-                    if (newSingleInventory) {
-                      handleCreateSingleInventory(newSingleInventory);
-                    } else {
-                      if (selectedImage) {
-                        try {
-                          await handleUploadImage();
-                          await handleUpdateInventory(selectedInventory);
-                          toast.success("");
-                        } catch (err) {
-                          toast.error("gagal");
-                        }
-                      } else {
-                        handleUpdateInventory(selectedInventory);
+        <div className="col-span-1 bg-white border-l border-blue-100 shadow-xl overflow-y-auto">
+          <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-blue-700 p-4">
+            <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+              <Package className="w-5 h-5" />
+              General Information
+            </h2>
+          </div>
+
+          <div className="p-4 space-y-4">
+            {/* Action Buttons */}
+            <div className="grid grid-cols-3 gap-2">
+              <button
+                onClick={() => {
+                  if (
+                    window.confirm(
+                      "Disabled Produk ini? Produk tidak akan bisa dijual dan tidak tampil di mobile",
+                    )
+                  ) {
+                    handleToggleDisableInventory(selectedInventory._id);
+                  }
+                }}
+                className={`flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 ${
+                  selectedInventory?.isDisabled
+                    ? "bg-green-500 text-white hover:bg-green-600"
+                    : "bg-red-500 text-white hover:bg-red-600"
+                }`}
+              >
+                {selectedInventory?.isDisabled ? (
+                  <ShieldCheck className="w-5 h-5" />
+                ) : (
+                  <Trash2 className="w-5 h-5" />
+                )}
+                {selectedInventory?.isDisabled ? "Enable" : "Disable"}
+              </button>
+
+              <button
+                onClick={() => {
+                  setselectedInventory(null);
+                  setNewSingleInventory(null);
+                }}
+                className="flex items-center justify-center gap-2 px-4 py-2.5 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors text-gray-700"
+              >
+                <X className="w-5 h-5" />
+                Batal
+              </button>
+
+              <button
+                onClick={async () => {
+                  if (newSingleInventory) {
+                    handleCreateSingleInventory(newSingleInventory);
+                  } else {
+                    if (selectedImage) {
+                      try {
+                        await handleUploadImage();
+                        await handleUpdateInventory(selectedInventory);
+                      } catch (err) {
+                        console.error(err);
                       }
+                    } else {
+                      handleUpdateInventory(selectedInventory);
                     }
-                  }}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 mr-2"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                  {newSingleInventory ? "Register" : "Update"}{" "}
-                </button>
-              </div>
+                  }
+                }}
+                className="flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-500/25"
+              >
+                <Save className="w-5 h-5" />
+                {newSingleInventory ? "Register" : "Update"}
+              </button>
             </div>
-            <div className=" overflow-y-auto h-[90%] flex flex-col gap-y-3">
+
+            {/* Form Fields */}
+            <div className="space-y-4">
               {newSingleInventory && (
-                <div className="">
-                  <label className="block text-sm font-bold mb-2">sku</label>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">
+                    SKU
+                  </label>
                   <input
                     type="text"
-                    value={handleShowValue().sku}
-                    className="w-full p-2 border rounded"
                     name="sku"
-                    onChange={(e) => handleOnChange(e)}
+                    value={handleShowValue().sku}
+                    onChange={handleOnChange}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200"
+                    placeholder="Masukkan SKU"
                   />
                 </div>
               )}
-              <div>
-                <label className="block text-sm font-bold mb-2">
-                  Description (Nama produk)
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">
+                  Deskripsi (Nama Produk)
                 </label>
                 <input
                   type="text"
-                  value={handleShowValue().description}
-                  className="w-full p-2 border rounded"
                   name="description"
-                  onChange={(e) => handleOnChange(e)}
+                  value={handleShowValue().description}
+                  onChange={handleOnChange}
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200"
+                  placeholder="Masukkan deskripsi"
                 />
               </div>
-              <div className="">
-                <label className="block text-sm font-bold mb-2">Quantity</label>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">
+                  Quantity
+                </label>
                 <input
                   type="text"
                   name="quantity"
                   value={handleShowValue().quantity}
-                  onChange={(e) => handleOnChange(e)}
-                  className="w-full p-2 border rounded"
+                  onChange={handleOnChange}
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200"
+                  placeholder="0"
                 />
               </div>
-              <div className="">
-                <label className="block text-sm font-bold mb-2">
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">
                   Barcode Item
                 </label>
                 <input
                   type="text"
                   name="barcodeItem"
                   value={handleShowValue().barcodeItem}
-                  onChange={(e) => handleOnChange(e)}
-                  className="w-full p-2 border rounded"
+                  onChange={handleOnChange}
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200"
+                  placeholder="Masukkan barcode"
                 />
               </div>
-              <div className="">
-                <label className="block text-sm font-bold mb-2">Brand</label>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">
+                  Brand
+                </label>
                 <select
-                  className="w-full p-2 border rounded"
                   name="brand"
-                  onChange={(e) => {
-                    handleOnChange(e);
-                  }}
+                  value={handleShowValue().brand}
+                  onChange={handleOnChange}
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200 appearance-none bg-white"
                 >
-                  <option selected>{handleShowValue().brand}</option>
+                  <option value={handleShowValue().brand}>
+                    {handleShowValue().brand || "Pilih Brand"}
+                  </option>
                   {brandList?.data?.data?.map((b) => (
                     <option key={b._id} value={b.name}>
                       {b?.name}
@@ -1272,323 +1278,201 @@ const ItemLibrary = () => {
                   ))}
                 </select>
               </div>
-              <div className="">
-                <label className="block text-sm font-bold mb-2">
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">
                   Harga Dasar
                 </label>
                 <input
                   type="text"
                   name="RpHargaDasar"
                   value={handleShowValue()?.RpHargaDasar?.$numberDecimal}
-                  onChange={(e) => handleOnChange(e)}
-                  className="w-full p-2 border rounded"
+                  onChange={handleOnChange}
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200"
+                  placeholder="0"
                 />
               </div>
 
-              {/* Promo */}
-              <div className="flex flex-col p-3 gap-y-2 border rounded">
-                <div className="text-lg font-bold mb-2 gap-x-3 flex items-center justify-between">
-                  Implementasi Promo{" "}
-                  <div className="dropdown dropdown-hover">
-                    <BadgeHelp />
-                    <ul
-                      tabIndex={0}
-                      className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52 font-mono font-light"
-                    >
-                      Jika beberapa aturan (logic) PROMO terpenuhi maka akan
-                      diterapkan yang paling menguntungkan untuk customer
-                    </ul>
+              {/* Promo Section */}
+              <div className="bg-gradient-to-r from-blue-50 to-white rounded-xl p-4 border border-blue-100">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <Gift className="w-5 h-5 text-blue-600" />
+                    <h3 className="font-semibold text-gray-800">
+                      Promo Terhubung
+                    </h3>
                   </div>
-                  <span className={`text-sm  font-light`}>
-                    <span
-                      className="text-blue-600 cursor-pointer"
-                      onClick={() => navigate("/promo")}
-                    >
-                      {" "}
-                      atau ke promo page{" "}
-                    </span>{" "}
-                  </span>
-                </div>
-                <div className="form-control px-2">
-                  {!promoList?.data?.length ? (
-                    <p className="text-sm">
-                      Belum Ada Promo Tersedia{" "}
-                      <span className={`font-semibold`}>Buat Promo</span>
-                    </p>
-                  ) : (
-                    <div className="flex flex-wrap gap-2">
-                      {promoList?.data.map(
-                        (promo) =>
-                          (promo.skuList.includes(handleShowValue().sku) ||
-                            tempPromoTerhubung?.includes(promo._id)) && (
-                            <span
-                              key={promo._id}
-                              className="bg-blue-200 text-blue-800 px-3 py-1 rounded flex items-center gap-2"
-                            >
-                              {promo?.judulPromo}
-                              <button
-                                onClick={() => {
-                                  handleDirectPromoTerputus(promo._id);
-                                }}
-                                className="bg-red-500 text-white rounded-full px-2 text-sm"
-                              >
-                                x
-                              </button>
-                            </span>
-                          )
-                      )}
-                    </div>
-                  )}
-
-                  <div className="flex gap-2 mt-4 ">
-                    <button
-                      onClick={() => {
-                        document.getElementById("pickpromo").showModal();
-                        setTempPromoTerhubung(
-                          selectedInventoryPromoList?.data?.data.map(
-                            (item) => item._id
-                          )
-                        );
-                      }}
-                      className="px-4 py-2 bg-blue-500 flex-1 text-white rounded"
-                    >
-                      Atur Ulang Promo Terhubung
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Diskon */}
-              <div className="flex flex-col p-3 gap-y-2 border rounded">
-                <div className="text-lg font-bold mb-2 flex items-center justify-between gap-x-3">
-                  Implementasi Diskon{" "}
-                  <div className="dropdown dropdown-hover">
-                    <BadgeHelp />
-                    <ul
-                      tabIndex={0}
-                      className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52 font-mono font-light"
-                    >
-                      Jika beberapa aturan (logic) diskon terpenuhi maka akan
-                      diterapkan yang paling menguntungkan untuk customer
-                    </ul>
-                  </div>
-                  <span className={`text-sm font-light`}>
-                    <span
-                      className="text-blue-600 cursor-pointer"
-                      onClick={() => navigate("/diskon")}
-                    >
-                      {" "}
-                      atau ke diskon page{" "}
-                    </span>{" "}
-                  </span>
-                </div>
-                <div className="form-control px-2">
-                  {!diskonList?.data?.data?.length ? (
-                    <p className="text-sm">
-                      Belum Ada Diskon Tersedia{" "}
-                      <span className={`font-semibold`}>Buat Diskon</span>
-                    </p>
-                  ) : (
-                    <div className="flex flex-wrap gap-2">
-                      {diskonList?.data?.data?.map(
-                        (diskon) =>
-                          (diskon.skuTanpaSyarat.includes(
-                            handleShowValue().sku
-                          ) ||
-                            tempDiskonTerhubung?.includes(diskon._id)) && (
-                            <span
-                              key={diskon._id}
-                              className="bg-blue-200 text-blue-800 px-3 py-1 rounded flex items-center gap-2"
-                            >
-                              {diskon?.judulDiskon}
-                              <button
-                                onClick={() => {
-                                  handleDirectDiskonTerputus(diskon._id);
-                                }}
-                                className="bg-red-500 text-white rounded-full px-2 text-sm"
-                              >
-                                x
-                              </button>
-                            </span>
-                          )
-                      )}
-                    </div>
-                  )}
-
-                  <div className="flex gap-2 mt-4">
-                    <button
-                      onClick={() => {
-                        document.getElementById("pickdiskon").showModal();
-                        setTempDiskonTerhubung(
-                          selectedInventoryDiskonList?.data?.data.map(
-                            (item) => item._id
-                          )
-                        );
-                      }}
-                      className="px-4 py-2 bg-blue-500 flex-1 text-white rounded"
-                    >
-                      Atur Ulang Diskon Terhubung
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Voucher */}
-              {/* <div className="flex flex-col p-3 gap-y-2 border rounded">
-                <div className="text-lg flex-col font-bold mb-2">
-                  <div className="text-lg font-bold mb-2 flex items-center justify-between gap-x-3">
-                    Implementasi Voucher{" "}
-                    <div className="dropdown dropdown-hover">
-                      <BadgeHelp />
-                      <ul
-                        tabIndex={0}
-                        className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52 font-mono font-light"
-                      >
-                        <li>
-                          Jika beberapa aturan (logic) voucher terpenuhi maka
-                          akan diterapkan yang paling menguntungkan untuk
-                          customer
-                        </li>
-                      </ul>
-                    </div>
-                    <span className={`text-sm  font-light`}>
-                      <span
-                        className="text-blue-600 cursor-pointer"
-                        onClick={() => navigate("/voucher")}
-                      >
-                        atau ke voucher page
-                      </span>
-                    </span>
-                  </div>
-                </div>
-                <div className="form-control px-2">
-                  {!voucherList?.data?.length ? (
-                    <p className="text-sm">
-                      Belum Ada Voucher Tersedia{" "}
-                      <span
-                        className={`font-semibold text-blue-400 cursor-pointer`}
-                        onClick={() => navigate("/diskon")}
-                      >
-                        Buat Voucher?
-                      </span>
-                    </p>
-                  ) : (
-                    <div className="flex flex-wrap gap-2">
-                      {voucherList?.data?.map(
-                        (voucher) =>
-                          (voucher.skuList?.includes(handleShowValue().sku) ||
-                            tempVoucherTerhubung?.includes(voucher._id)) &&
-                          !tempVoucherTerputus?.includes(voucher._id) && (
-                            <span
-                              key={voucher._id}
-                              className="bg-blue-200 text-blue-800 px-3 py-1 rounded flex items-center gap-2"
-                            >
-                              {voucher?.judulVoucher}
-                              <button
-                                onClick={() => {
-                                  handleDirectVoucherTerputus(voucher._id);
-                                }}
-                                className="bg-red-500 text-white rounded-full px-2 text-sm"
-                              >
-                                x
-                              </button>
-                            </span>
-                          )
-                      )}
-                    </div>
-                  )}
-
                   <button
-                    onClick={() => {
-                      document.getElementById("pickvoucher").showModal();
-                      setTempVoucherTerhubung(
-                        selectedInventoryVoucherList?.data?.data.map(
-                          (item) => item._id
-                        )
-                      );
-                    }}
-                    className="mt-4 px-4 py-2 bg-blue-500 text-white rounded"
+                    onClick={() => navigate("/promo")}
+                    className="text-sm text-blue-600 hover:text-blue-700"
                   >
-                    Atur Ulang Voucher Terhubung
+                    Kelola Promo
                   </button>
                 </div>
-              </div> */}
+                <div className="flex flex-wrap gap-2 min-h-[40px]">
+                  {promoList?.data?.map(
+                    (promo) =>
+                      (promo.skuList.includes(handleShowValue().sku) ||
+                        tempPromoTerhubung?.includes(promo._id)) && (
+                        <span
+                          key={promo._id}
+                          className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 rounded-lg text-xs"
+                        >
+                          {promo?.judulPromo}
+                          <button
+                            onClick={() => handleDirectPromoTerputus(promo._id)}
+                            className="ml-1 p-0.5 hover:bg-blue-200 rounded-full"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </span>
+                      ),
+                  )}
+                </div>
+                <button
+                  onClick={() => {
+                    document.getElementById("pickpromo").showModal();
+                    setTempPromoTerhubung(
+                      selectedInventoryPromoList?.data?.data.map(
+                        (item) => item._id,
+                      ),
+                    );
+                  }}
+                  className="mt-3 w-full px-3 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition-colors"
+                >
+                  Atur Promo
+                </button>
+              </div>
 
-              <div className="mb-4">
-                <label className=" flex items-center gap-x-2 text-sm font-bold mb-2">
-                  <p>Status</p>
-                  {selectedInventory?.isDisabled ? "(Tidak Aktif)" : "(Aktif)"}
+              {/* Diskon Section */}
+              <div className="bg-gradient-to-r from-orange-50 to-white rounded-xl p-4 border border-orange-100">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <Percent className="w-5 h-5 text-orange-600" />
+                    <h3 className="font-semibold text-gray-800">
+                      Diskon Terhubung
+                    </h3>
+                  </div>
+                  <button
+                    onClick={() => navigate("/diskon")}
+                    className="text-sm text-orange-600 hover:text-orange-700"
+                  >
+                    Kelola Diskon
+                  </button>
+                </div>
+                <div className="flex flex-wrap gap-2 min-h-[40px]">
+                  {diskonList?.data?.data?.map(
+                    (diskon) =>
+                      (diskon.skuTanpaSyarat.includes(handleShowValue().sku) ||
+                        tempDiskonTerhubung?.includes(diskon._id)) && (
+                        <span
+                          key={diskon._id}
+                          className="inline-flex items-center gap-1 px-2 py-1 bg-orange-100 text-orange-700 rounded-lg text-xs"
+                        >
+                          {diskon?.judulDiskon}
+                          <button
+                            onClick={() =>
+                              handleDirectDiskonTerputus(diskon._id)
+                            }
+                            className="ml-1 p-0.5 hover:bg-orange-200 rounded-full"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </span>
+                      ),
+                  )}
+                </div>
+                <button
+                  onClick={() => {
+                    document.getElementById("pickdiskon").showModal();
+                    setTempDiskonTerhubung(
+                      selectedInventoryDiskonList?.data?.data.map(
+                        (item) => item._id,
+                      ),
+                    );
+                  }}
+                  className="mt-3 w-full px-3 py-2 bg-orange-600 text-white rounded-lg text-sm hover:bg-orange-700 transition-colors"
+                >
+                  Atur Diskon
+                </button>
+              </div>
+
+              {/* Status */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                  Status
+                  <span
+                    className={`text-xs ${selectedInventory?.isDisabled ? "text-red-500" : "text-green-500"}`}
+                  >
+                    {selectedInventory?.isDisabled
+                      ? "(Tidak Aktif)"
+                      : "(Aktif)"}
+                  </span>
                   <div className="dropdown dropdown-hover">
-                    <BadgeHelp />
-                    <ul
-                      tabIndex={0}
-                      className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52 font-mono font-light"
-                    >
+                    <HelpCircle className="w-4 h-4 text-gray-400 cursor-help" />
+                    <div className="dropdown-content z-40 p-2 shadow-xl bg-white rounded-lg text-xs w-48">
                       Jika Barang Disabled, tidak akan bisa terjual di aplikasi
                       mobile
-                    </ul>
+                    </div>
                   </div>
                 </label>
-                <div className="flex items-center space-x-2">
+                <div className="flex gap-2">
                   <button
-                    onClick={() => {
+                    onClick={() =>
                       setselectedInventory((prev) => ({
                         ...prev,
                         isDisabled: true,
-                      }));
-                    }}
-                    className={`px-4 py-2 rounded ${
+                      }))
+                    }
+                    className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                       selectedInventory?.isDisabled
-                        ? "bg-red-500"
-                        : "bg-gray-500"
+                        ? "bg-red-500 text-white"
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                     }`}
                   >
                     Disable
                   </button>
                   <button
-                    onClick={() => {
+                    onClick={() =>
                       setselectedInventory((prev) => ({
                         ...prev,
                         isDisabled: false,
-                      }));
-                    }}
-                    className={`px-4 py-2 rounded ${
+                      }))
+                    }
+                    className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                       !selectedInventory?.isDisabled
-                        ? "bg-green-500"
-                        : "bg-gray-500"
+                        ? "bg-green-500 text-white"
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                     }`}
                   >
                     Enable
                   </button>
                 </div>
-                {/* Thumbanail */}
-                <div className="flex flex-col items-center p-6 bg-white rounded-lg gap-x-2 shadow-md">
-                  <h2 className="font-light text-center mb-4">
-                    Thumbnail section
-                  </h2>
-                  <div className="flex justify-center">
-                    <div className="overflow-hidden rounded-md shadow-lg">
+              </div>
+
+              {/* Thumbnail */}
+              <div className="space-y-3">
+                <label className="text-sm font-medium text-gray-700">
+                  Thumbnail
+                </label>
+                <div className="border-2 border-dashed border-gray-300 rounded-xl p-4 hover:border-blue-400 transition-colors">
+                  <div className="flex flex-col items-center">
+                    <div className="w-32 h-32 bg-gray-100 rounded-lg overflow-hidden mb-3">
                       <img
-                        alt="Inventory Preview"
+                        alt="Preview"
                         src={
                           selectedImage
                             ? URL.createObjectURL(selectedImage)
                             : thumbnail?.data?.base64
                         }
-                        width={300}
-                        height={300}
+                        className="w-full h-full object-cover"
                       />
                     </div>
-                  </div>
-                  <div className="w-full max-w-xs mt-4">
                     <input
                       type="file"
                       accept="image/*"
-                      onChange={(e) => {
-                        const img = e.target.files[0];
-                        setSelectedImage(img);
-                      }}
-                      className="file-input w-full bg-gray-100 text-gray-800 border-2 border-gray-300 rounded-md p-2 transition-all hover:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      onChange={(e) => setSelectedImage(e.target.files[0])}
+                      className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                     />
                   </div>
                 </div>
@@ -1598,6 +1482,7 @@ const ItemLibrary = () => {
         </div>
       )}
 
+      {/* Modals */}
       <PickPromoDialog
         promoList={promoList?.data}
         selectedInventory={selectedInventory}
@@ -1606,7 +1491,6 @@ const ItemLibrary = () => {
         setTempPromoTerputus={setTempPromoTerputus}
         tempPromoTerputus={tempPromoTerputus}
         handleKonfirmasiPromoTerhubung={handleKonfirmasiPromoTerhubung}
-        key={"pickpromo"}
       />
 
       <PickDiskonDialog
@@ -1614,10 +1498,8 @@ const ItemLibrary = () => {
         selectedInventory={selectedInventory}
         tempDiskonTerhubung={tempDiskonTerhubung}
         setTempDiskonTerhubung={setTempDiskonTerhubung}
-        setTempPromoTerputus={setTempDiskonTerputus}
         handleKonfirmasiDiskonTerhubung={handleKonfirmasiDiskonTerhubung}
         setTempDiskonTerputus={setTempDiskonTerputus}
-        key={"pickdiskon"}
       />
 
       <PickVoucherDialog
@@ -1628,8 +1510,8 @@ const ItemLibrary = () => {
         handleKonfirmasiVoucherTerhubung={handleKonfirmasiVoucherTerhubung}
         voucherList={voucherList?.data}
         selectedInventory={selectedInventory}
-        key={"pickvoucher"}
       />
+
       <StackTraceBySku skuToTrace={skuToTrace} />
     </div>
   );

@@ -2,11 +2,18 @@ import { getInvoicesByPaymentMethod } from "@/api/invoiceApi";
 import { useQuery } from "@tanstack/react-query";
 import { Toaster } from "react-hot-toast";
 import React, { Fragment, useState } from "react";
-import { MailWarning } from "lucide-react";
-import { formatDate } from "@/pages/Invoices";
 import { getAllAccount } from "@/api/authApi";
 import { getAllSpg } from "@/api/spgApi";
 import ModalDetailInvoice from "./ModalDetailInvoice";
+import {
+  CreditCard,
+  Info,
+  CheckCircle,
+  Eye,
+  ShoppingCart,
+  Tag,
+  Gift,
+} from "lucide-react";
 
 export default function ModalDetailInvoicesByPaymentMethod({
   onClose,
@@ -45,6 +52,8 @@ export default function ModalDetailInvoicesByPaymentMethod({
   const [showDetail, setShowDetail] = useState(null);
   const [invoice, setInvoice] = useState(null);
 
+  console.log(invoiceData);
+
   const toggleExpandRow = (invoiceId) => {
     setExpandedRows((prev) => ({
       ...prev,
@@ -68,7 +77,7 @@ export default function ModalDetailInvoicesByPaymentMethod({
   const getKasirName = (salesPerson) => {
     if (!accountsData?.data) return salesPerson || "-";
     const account = accountsData.data.find(
-      (item) => item.email === salesPerson || item.name === salesPerson
+      (item) => item.email === salesPerson || item.name === salesPerson,
     );
     return account ? account.name : salesPerson || "-";
   };
@@ -81,584 +90,534 @@ export default function ModalDetailInvoicesByPaymentMethod({
   };
 
   return (
-    <dialog id="ModalDetailInvoicesByPaymentMethod" className="modal ">
+    <dialog id="ModalDetailInvoicesByPaymentMethod" className="modal">
       <Toaster />
-      <div className="modal-box lg:max-w-[80vw] md:max-w-[90vw] max-md:w-full">
-        <div className="space-y-4">
-          {/* Header section */}
+      <div className="modal-box lg:max-w-[80vw] md:max-w-[90vw] max-md:w-full p-0 overflow-hidden bg-gradient-to-br from-blue-50/50 to-white">
+        {/* Header dengan gradient blue */}
+        <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
           <div className="flex justify-between items-center">
-            <h3 className="font-bold text-lg">
-              Detil Invoice dengan Metode Pembayaran{" "}
-              {paymentMethodToGetDetailInvoices}
-            </h3>
-
-            <div className="badge badge-warning text-xs gap-2">
-              <MailWarning className="w-4 h-4" />
-              Click to see detail
-            </div>
-          </div>
-
-          {/* Button section */}
-          <button
-            className="btn w-full rounded-md bg-blue-400 hover:bg-blue-500 text-white transition-colors"
-            onClick={onClose}
-          >
-            Tutup
-          </button>
-        </div>
-        {isLoading && (
-          <div className="text-center py-4">
-            <span className="loading loading-bars loading-lg"></span>
-            <p>Memuat data...</p>
-          </div>
-        )}
-        {error && (
-          <div className="alert alert-error shadow-lg mb-4">
-            <div>
-              <span>Error: {error.message}</span>
-            </div>
-          </div>
-        )}
-        {/* Invoice Table */}
-        <div className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-100">
-          {isLoading ? (
-            <div className="flex justify-center items-center p-12">
-              <div className="flex flex-col items-center gap-2">
-                <span className="loading loading-spinner loading-lg text-blue-700"></span>
-                <p className="text-gray-600 text-sm">
-                  Memuat data transaksi...
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
+                <CreditCard className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h3 className="font-bold text-lg text-white">
+                  Detail Transaksi
+                </h3>
+                <p className="text-sm text-blue-100">
+                  Metode Pembayaran:{" "}
+                  <span className="font-semibold">
+                    {paymentMethodToGetDetailInvoices}
+                  </span>
                 </p>
               </div>
             </div>
-          ) : error ? (
-            <div className="flex justify-center items-center p-12 text-center">
-              <div className="bg-red-100 p-4 rounded-full mb-4">
-                <span style={{ fontSize: "2em", color: "#dc2626" }}>❌</span>
+
+            <div className="flex items-center gap-3">
+              <div className="badge badge-warning gap-2 py-3 bg-yellow-400/20 text-yellow-100 border-yellow-400/30">
+                <Info className="w-4 h-4" />
+                Klik baris untuk detail
               </div>
-              <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                Gagal Memuat Data
-              </h3>
-              <p className="text-gray-600 text-sm mb-4">
-                {error?.message ||
-                  "Terjadi kesalahan saat memuat data. Silakan coba lagi."}
+              <button
+                onClick={onClose}
+                className="btn btn-sm btn-circle btn-ghost text-white hover:bg-white/20"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="p-6">
+          {isLoading && (
+            <div className="flex flex-col items-center justify-center py-16">
+              <div className="relative">
+                <div className="w-20 h-20 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <CreditCard className="w-8 h-8 text-blue-600 animate-pulse" />
+                </div>
+              </div>
+              <p className="mt-4 text-blue-600 font-medium animate-pulse">
+                Memuat data transaksi...
               </p>
             </div>
-          ) : invoiceData?.data?.length === 0 ? (
-            <div className="flex flex-col justify-center items-center p-12 text-center">
-              <div className="bg-gray-100 p-4 rounded-full mb-4">
-                <span style={{ fontSize: "2em", color: "#718096" }}>💳</span>
+          )}
+
+          {error && (
+            <div className="bg-red-50 border-l-4 border-red-500 rounded-lg p-4 mb-4">
+              <div className="flex items-start gap-3">
+                <div className="p-2 bg-red-100 rounded-full">
+                  <AlertCircle className="w-5 h-5 text-red-600" />
+                </div>
+                <div>
+                  <h4 className="font-semibold text-red-800">
+                    Gagal Memuat Data
+                  </h4>
+                  <p className="text-red-600 text-sm mt-1">{error.message}</p>
+                </div>
               </div>
-              <h3 className="text-xl font-semibold text-gray-800 mb-2">
+            </div>
+          )}
+
+          {!isLoading && !error && invoiceData?.data?.length === 0 && (
+            <div className="flex flex-col items-center justify-center py-16">
+              <div className="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                <CreditCard className="w-12 h-12 text-blue-400" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-700 mb-2">
                 Tidak Ada Data Transaksi
               </h3>
-              <p className="text-gray-600 text-sm mb-4">
-                Tidak ditemukan transaksi dengan filter yang dipilih.
+              <p className="text-gray-500 text-center max-w-md">
+                Tidak ditemukan transaksi dengan metode pembayaran{" "}
+                <span className="font-semibold text-blue-600">
+                  {paymentMethodToGetDetailInvoices}
+                </span>{" "}
+                pada periode yang dipilih.
               </p>
             </div>
-          ) : (
-            <div className="overflow-x-auto w-full">
-              <table className="table table-zebra w-full">
-                <thead className="bg-gray-100 text-gray-700 font-semibold text-sm uppercase tracking-wider">
-                  <tr>
-                    <th style={{ width: "40px" }}></th>
-                    <th className="text-left">Kode Invoice</th>
-                    <th className="text-left">Tanggal</th>
-                    <th className="text-left">Kasir</th>
-                    <th className="text-left">SPG</th>
-                    <th className="text-left">Harga Asli</th>
-                    <th className="text-left">Total</th>
-                    <th className="text-center">Billing</th>
-                    <th className="text-center">Bayar</th>
-                    <th className="text-center">Kwitansi</th>
-                    <th className="text-center">Status</th>
-                    <th className="text-center">Aksi</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {invoiceData?.data?.map((invoice) => (
-                    <Fragment key={invoice._id}>
-                      <tr className="hover:bg-gray-50 transition-colors">
-                        <td className="text-center">
-                          <button
-                            className="btn btn-circle btn-sm btn-ghost"
-                            onClick={() => toggleExpandRow(invoice._id)}
-                          >
-                            <span style={{ fontSize: "1em" }}>
-                              {expandedRows[invoice._id] ? "⬆️" : "⬇️"}
-                            </span>
-                          </button>
-                        </td>
-                        <td>
-                          <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700">
-                              <span style={{ fontSize: "0.8em" }}>💳</span>
-                            </div>
-                            <span className="font-medium text-gray-800 text-sm">
-                              {invoice.kodeInvoice}
-                            </span>
-                          </div>
-                        </td>
-                        <td className="text-gray-700 text-sm">
-                          {formatDate(invoice.createdAt)}
-                        </td>
-                        <td className="font-medium text-gray-800 text-sm">
-                          {getKasirName(invoice.salesPerson)}
-                        </td>
-                        <td className="text-gray-700 text-sm">
-                          {getSpgNameById(invoice?.spg)}
-                        </td>
-                        <td className="font-mono text-sm">
-                          {invoice.subTotal ? (
-                            <span className="text-green-600 font-semibold">
-                              Rp {invoice.subTotal.toLocaleString("id-ID")}
-                            </span>
-                          ) : (
-                            <span className="text-gray-500">-</span>
-                          )}
-                        </td>
-                        <td className="font-mono text-sm">
-                          {invoice.total ? (
-                            <span className="text-blue-600 font-semibold">
-                              Rp {invoice.total.toLocaleString("id-ID")}
-                            </span>
-                          ) : (
-                            <span className="text-gray-500">-</span>
-                          )}
-                        </td>
-                        <td className="text-center">
-                          {invoice.isPrintedCustomerBilling ? (
-                            <div
-                              className="tooltip"
-                              data-tip="Sudah Cetak Billing"
-                            >
-                              <div className="badge badge-success badge-sm">
-                                <span style={{ fontSize: "0.7em" }}>✅</span>{" "}
-                                Cetak
-                              </div>
-                            </div>
-                          ) : (
-                            <span className="text-gray-500">-</span>
-                          )}
-                        </td>
-                        <td className="text-center">
-                          {invoice.done ? (
-                            <div className="tooltip" data-tip="Sudah Bayar">
-                              <div className="badge badge-success badge-sm">
-                                <span style={{ fontSize: "0.7em" }}>✅</span>{" "}
-                                Lunas
-                              </div>
-                            </div>
-                          ) : (
-                            <span className="text-gray-500">-</span>
-                          )}
-                        </td>
-                        <td className="text-center">
-                          {invoice.isPrintedKwitansi ? (
-                            <div
-                              className="tooltip"
-                              data-tip="Sudah Cetak Kwitansi"
-                            >
-                              <div className="badge badge-success badge-sm">
-                                <span style={{ fontSize: "0.7em" }}>✅</span>{" "}
-                                Cetak
-                              </div>
-                            </div>
-                          ) : (
-                            <span className="text-gray-500">-</span>
-                          )}
-                        </td>
-                        <td className="text-center">
-                          <span
-                            className={`badge rounded-full px-3 py-1 font-medium text-xs ${
-                              invoice.isVoid
-                                ? "bg-red-500 text-white"
-                                : invoice.done
-                                ? "bg-green-500 text-white"
-                                : "bg-yellow-500 text-white"
-                            }`}
-                          >
-                            {invoice.isVoid
-                              ? "Dibatalkan"
-                              : invoice.done
-                              ? "Selesai"
-                              : "Tertunda"}
-                          </span>
-                        </td>
-                        <td className="text-center">
-                          <div className="flex justify-center gap-2">
-                            <button
-                              className="btn btn-sm btn-outline btn-primary tooltip"
-                              data-tip="Detail"
-                              onClick={() => {
-                                document
-                                  .getElementById("modalDetailInvoice")
-                                  .showModal();
-                                setShowDetail(invoice);
-                              }}
-                            >
-                              <span style={{ fontSize: "1em" }}>🔍</span>
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
+          )}
 
-                      {/* Detail Invoice yang Expand */}
-                      {expandedRows[invoice._id] && (
-                        <tr>
-                          <td colSpan="12" className="p-0">
-                            <div className="bg-gray-100/50 p-6 border-t border-b border-gray-200">
-                              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                                {/* Items Purchased */}
-                                <div className="col-span-2 card bg-white shadow-sm rounded-lg border border-gray-100">
-                                  <div className="card-body p-4">
-                                    <h3 className="card-title text-sm flex items-center gap-2 text-blue-700 font-semibold">
-                                      <span style={{ fontSize: "1em" }}>
-                                        🛒
-                                      </span>{" "}
-                                      Item Pembelian
-                                    </h3>
-                                    {invoice.currentBill?.length > 0 ? (
-                                      <div className="overflow-x-auto">
-                                        <table className="table table-xs table-zebra w-full">
-                                          <thead className="bg-gray-100/50 text-xs uppercase text-gray-600">
-                                            <tr>
-                                              <th className="text-left">
-                                                Item
-                                              </th>
-                                              <th className="text-left">
-                                                Harga
-                                              </th>
-                                              <th className="text-center">
-                                                Qty
-                                              </th>
-                                              <th className="text-right">
-                                                Subtotal
-                                              </th>
-                                            </tr>
-                                          </thead>
-                                          <tbody>
-                                            {invoice.currentBill.map(
-                                              (item, idx) => (
-                                                <tr
-                                                  key={`<span class="math-inline">\{invoice\.\_id\}\-item\-</span>{idx}`}
-                                                  className="hover:bg-gray-50"
-                                                >
-                                                  <td className="font-medium text-sm">
-                                                    {item.description}
-                                                  </td>
-                                                  <td className="font-mono text-sm">
-                                                    Rp{" "}
-                                                    {item.RpHargaDasar?.toLocaleString(
-                                                      "id-ID"
-                                                    )}
-                                                  </td>
-                                                  <td className="text-center text-sm">
-                                                    {item.quantity}
-                                                  </td>
-                                                  <td className="font-mono font-semibold text-right text-sm">
-                                                    Rp{" "}
-                                                    {item.totalRp?.toLocaleString(
-                                                      "id-ID"
-                                                    )}
-                                                  </td>
-                                                </tr>
-                                              )
-                                            )}
-                                          </tbody>
-                                        </table>
-                                      </div>
-                                    ) : (
-                                      <div className="text-center py-4 text-gray-500 bg-gray-100/50 rounded-lg text-sm">
-                                        Tidak ada item
-                                      </div>
-                                    )}
+          {!isLoading && !error && invoiceData?.data?.length > 0 && (
+            <div className="space-y-4">
+              {/* Info Summary Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-4 text-white shadow-lg">
+                  <p className="text-blue-100 text-sm">Total Transaksi</p>
+                  <p className="text-2xl font-bold">
+                    {invoiceData.pagination?.total || 0}
+                  </p>
+                </div>
+                <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-4 text-white shadow-lg">
+                  <p className="text-green-100 text-sm">Total Pendapatan</p>
+                  <p className="text-2xl font-bold">
+                    Rp{" "}
+                    {invoiceData.data
+                      .reduce((sum, inv) => sum + (inv.total || 0), 0)
+                      .toLocaleString("id-ID")}
+                  </p>
+                </div>
+                <div className="bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-xl p-4 text-white shadow-lg">
+                  <p className="text-yellow-100 text-sm">
+                    Rata-rata per Transaksi
+                  </p>
+                  <p className="text-2xl font-bold">
+                    Rp{" "}
+                    {Math.round(
+                      invoiceData.data.reduce(
+                        (sum, inv) => sum + (inv.total || 0),
+                        0,
+                      ) / invoiceData.data.length,
+                    ).toLocaleString("id-ID")}
+                  </p>
+                </div>
+                <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-4 text-white shadow-lg">
+                  <p className="text-purple-100 text-sm">Total</p>
+                  <p className="text-2xl font-bold">
+                    {invoiceData.data.reduce(
+                      (sum, inv) => sum + (inv.currentBill?.length || 0),
+                      0,
+                    )}
+                  </p>
+                </div>
+              </div>
+
+              {/* Table */}
+              <div className="bg-white rounded-xl shadow-lg border border-blue-100 overflow-hidden">
+                <div className="overflow-x-auto max-h-[500px] overflow-y-auto">
+                  <table className="table table-pin-rows w-full">
+                    <thead className="bg-gradient-to-r from-blue-50 to-blue-100/50 sticky top-0 z-10">
+                      <tr>
+                        <th className="w-12 text-center"></th>
+                        <th className="text-blue-800 font-semibold">
+                          Kode Invoice
+                        </th>
+                        <th className="text-blue-800 font-semibold">Tanggal</th>
+                        <th className="text-blue-800 font-semibold">Kasir</th>
+                        <th className="text-blue-800 font-semibold">SPG</th>
+                        <th className="text-right text-blue-800 font-semibold">
+                          Sub Total
+                        </th>
+                        <th className="text-right text-blue-800 font-semibold">
+                          Total
+                        </th>
+                        <th className="text-center text-blue-800 font-semibold">
+                          Billing
+                        </th>
+                        <th className="text-center text-blue-800 font-semibold">
+                          Bayar
+                        </th>
+                        <th className="text-center text-blue-800 font-semibold">
+                          Kwitansi
+                        </th>
+                        <th className="text-center text-blue-800 font-semibold">
+                          Status
+                        </th>
+                        <th className="text-center text-blue-800 font-semibold">
+                          Aksi
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {invoiceData?.data?.map((invoice) => (
+                        <Fragment key={invoice._id}>
+                          <tr className="hover:bg-blue-50/50 transition-colors border-b border-blue-50">
+                            <td className="text-center">
+                              <button
+                                className="btn btn-circle btn-xs btn-ghost text-blue-600 hover:bg-blue-100"
+                                onClick={() => toggleExpandRow(invoice._id)}
+                              >
+                                {expandedRows[invoice._id] ? "▼" : "▶"}
+                              </button>
+                            </td>
+                            <td>
+                              <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white shadow-sm">
+                                  <CreditCard className="w-4 h-4" />
+                                </div>
+                                <span className="font-medium text-blue-900">
+                                  {invoice.kodeInvoice}
+                                </span>
+                              </div>
+                            </td>
+                            <td className="text-gray-600 text-sm">
+                              {new Date(invoice.createdAt).toLocaleDateString(
+                                "id-ID",
+                                {
+                                  day: "2-digit",
+                                  month: "short",
+                                  year: "numeric",
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                },
+                              )}
+                            </td>
+                            <td className="font-medium text-gray-800">
+                              {getKasirName(invoice.salesPerson)}
+                            </td>
+                            <td className="text-gray-600">
+                              {getSpgNameById(invoice?.spg) || "-"}
+                            </td>
+                            <td className="text-right font-mono">
+                              <span className="text-green-600 font-semibold">
+                                Rp{" "}
+                                {invoice.subTotal?.toLocaleString("id-ID") || 0}
+                              </span>
+                            </td>
+                            <td className="text-right font-mono">
+                              <span className="text-blue-600 font-semibold">
+                                Rp {invoice.total?.toLocaleString("id-ID") || 0}
+                              </span>
+                            </td>
+                            <td className="text-center">
+                              {invoice.isPrintedCustomerBilling ? (
+                                <div
+                                  className="tooltip"
+                                  data-tip="Sudah Cetak Billing"
+                                >
+                                  <div className="badge badge-success badge-sm gap-1 text-white">
+                                    <CheckCircle className="w-3 h-3" />
+                                    Cetak
                                   </div>
                                 </div>
-                                {invoice?.diskon?.length > 0 && (
-                                  <div className="card bg-white shadow-sm rounded-lg border border-gray-100">
-                                    <div className="card-body p-4">
-                                      <h3 className="card-title text-sm flex items-center gap-2 text-blue-700 font-semibold">
-                                        <span style={{ fontSize: "1em" }}>
-                                          🏷️
-                                        </span>{" "}
-                                        Diskon
-                                      </h3>
-                                      {invoice.diskon?.length > 0 ? (
-                                        <div className="overflow-x-auto">
-                                          <table className="table table-xs table-zebra w-full">
-                                            <thead className="bg-gray-100/50 text-xs uppercase text-gray-600">
-                                              <tr>
-                                                <th className="text-left">
-                                                  Item
-                                                </th>
-                                                <th className="text-left">
-                                                  Judul Diskon
-                                                </th>
-                                                <th className="text-right">
-                                                  Potongan
-                                                </th>
-                                              </tr>
-                                            </thead>
-                                            <tbody>
-                                              {invoice.diskon.map(
-                                                (item, idx) => (
-                                                  <tr
-                                                    key={`<span class="math-inline">\{invoice\.\_id\}\-diskon\-</span>{idx}`}
-                                                    className="hover:bg-gray-50"
-                                                  >
-                                                    <td className="font-medium text-sm">
-                                                      {item.description}
-                                                    </td>
-                                                    <td className="text-sm">
-                                                      {item.diskonInfo
-                                                        ?.judulDiskon || "-"}
-                                                    </td>
-                                                    <td className="font-mono text-right text-sm">
-                                                      {item.diskonInfo
-                                                        ?.RpPotonganHarga
-                                                        ? `Rp ${item.diskonInfo.RpPotonganHarga.toLocaleString(
-                                                            "id-ID"
-                                                          )}`
-                                                        : `${item.diskonInfo?.percentPotonganHarga}%`}
-                                                    </td>
-                                                  </tr>
-                                                )
-                                              )}
-                                            </tbody>
-                                          </table>
-                                        </div>
-                                      ) : (
-                                        <div className="text-center py-4 text-gray-500 bg-gray-100/50 rounded-lg text-sm">
-                                          Tidak ada diskon
-                                        </div>
-                                      )}
-                                    </div>
+                              ) : (
+                                <span className="text-gray-300">-</span>
+                              )}
+                            </td>
+                            <td className="text-center">
+                              {invoice.done ? (
+                                <div className="tooltip" data-tip="Sudah Bayar">
+                                  <div className="badge badge-success badge-sm gap-1 text-white">
+                                    <CheckCircle className="w-3 h-3" />
+                                    Lunas
                                   </div>
-                                )}
-                                {invoice?.futureVoucher?.length > 0 && (
-                                  <div className="card bg-white shadow-sm rounded-lg border border-gray-100">
-                                    <div className="card-body p-4">
-                                      <h3 className="card-title text-sm flex items-center gap-2 text-blue-700 font-semibold">
-                                        <span style={{ fontSize: "1em" }}>
-                                          🎁
-                                        </span>{" "}
-                                        Future Voucher
-                                      </h3>
-                                      {invoice.futureVoucher?.length > 0 ? (
-                                        <div className="overflow-x-auto">
-                                          <table className="table table-xs table-zebra w-full">
-                                            <thead className="bg-gray-100/50 text-xs uppercase text-gray-600">
-                                              <tr>
-                                                <th className="text-left">
-                                                  Item
-                                                </th>
-                                                <th className="text-left">
-                                                  Judul Voucher
-                                                </th>
-                                                <th className="text-right">
-                                                  Potongan
-                                                </th>
-                                              </tr>
-                                            </thead>
-                                            <tbody>
-                                              {invoice.futureVoucher.map(
-                                                (item, idx) => (
-                                                  <tr
-                                                    key={`<span class="math-inline">\{invoice\.\_id\}\-voucher\-</span>{idx}`}
-                                                    className="hover:bg-gray-50"
-                                                  >
-                                                    <td className="font-medium text-sm">
+                                </div>
+                              ) : (
+                                <span className="text-gray-300">-</span>
+                              )}
+                            </td>
+                            <td className="text-center">
+                              {invoice.isPrintedKwitansi ? (
+                                <div
+                                  className="tooltip"
+                                  data-tip="Sudah Cetak Kwitansi"
+                                >
+                                  <div className="badge badge-success badge-sm gap-1 text-white">
+                                    <CheckCircle className="w-3 h-3" />
+                                    Cetak
+                                  </div>
+                                </div>
+                              ) : (
+                                <span className="text-gray-300">-</span>
+                              )}
+                            </td>
+                            <td className="text-center">
+                              <span
+                                className={`badge rounded-full px-3 py-2 font-medium text-xs ${
+                                  invoice.isVoid
+                                    ? "bg-red-100 text-red-700 border-red-200"
+                                    : invoice.done
+                                      ? "bg-green-100 text-green-700 border-green-200"
+                                      : "bg-yellow-100 text-yellow-700 border-yellow-200"
+                                }`}
+                              >
+                                {invoice.isVoid
+                                  ? "Dibatalkan"
+                                  : invoice.done
+                                    ? "Selesai"
+                                    : "Tertunda"}
+                              </span>
+                            </td>
+                            <td className="text-center">
+                              <button
+                                className="btn btn-xs btn-ghost text-blue-600 hover:bg-blue-100"
+                                onClick={() => {
+                                  document
+                                    .getElementById("modalDetailInvoice")
+                                    .showModal();
+                                  setShowDetail(invoice);
+                                }}
+                              >
+                                <Eye className="w-4 h-4" />
+                              </button>
+                            </td>
+                          </tr>
+
+                          {/* Detail Expand */}
+                          {expandedRows[invoice._id] && (
+                            <tr>
+                              <td colSpan="12" className="p-0 bg-blue-50/30">
+                                <div className="p-6 border-t border-b border-blue-100">
+                                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                    {/* Items Purchased */}
+                                    <div className="bg-white rounded-xl shadow-sm border border-blue-100 overflow-hidden">
+                                      <div className="bg-gradient-to-r from-blue-500 to-blue-600 px-4 py-2">
+                                        <h3 className="text-sm font-semibold text-white flex items-center gap-2">
+                                          <ShoppingCart className="w-4 h-4" />
+                                          Item Pembelian
+                                        </h3>
+                                      </div>
+                                      <div className="p-4">
+                                        {invoice.currentBill?.length > 0 ? (
+                                          <div className="space-y-2 max-h-[300px] overflow-y-auto">
+                                            {invoice.currentBill.map(
+                                              (item, idx) => (
+                                                <div
+                                                  key={idx}
+                                                  className="flex justify-between items-center p-2 bg-gray-50 rounded-lg"
+                                                >
+                                                  <div>
+                                                    <p className="font-medium text-sm">
                                                       {item.description}
-                                                    </td>
-                                                    <td className="text-sm">
-                                                      {item.voucherInfo
-                                                        ?.judulVoucher || "-"}
-                                                    </td>
-                                                    <td className="font-mono text-right text-sm">
-                                                      {Intl.NumberFormat(
+                                                    </p>
+                                                    <p className="text-xs text-gray-500">
+                                                      Rp{" "}
+                                                      {item.RpHargaDasar?.toLocaleString(
                                                         "id-ID",
-                                                        {
-                                                          style: "currency",
-                                                          currency: "IDR",
-                                                          minimumFractionDigits: 0,
-                                                        }
-                                                      ).format(
-                                                        item.voucherInfo
-                                                          ?.potongan
-                                                          ?.$numberDecimal
-                                                      )}
-                                                    </td>
-                                                  </tr>
-                                                )
-                                              )}
-                                            </tbody>
-                                          </table>
+                                                      )}{" "}
+                                                      x {item.quantity}
+                                                    </p>
+                                                  </div>
+                                                  <p className="font-semibold text-blue-600 text-sm">
+                                                    Rp{" "}
+                                                    {item.totalRp?.toLocaleString(
+                                                      "id-ID",
+                                                    )}
+                                                  </p>
+                                                </div>
+                                              ),
+                                            )}
+                                          </div>
+                                        ) : (
+                                          <p className="text-center text-gray-500 py-4 text-sm">
+                                            Tidak ada item
+                                          </p>
+                                        )}
+                                      </div>
+                                    </div>
+
+                                    {/* Diskon & Promo */}
+                                    <div className="space-y-4">
+                                      {invoice?.diskon?.length > 0 && (
+                                        <div className="bg-white rounded-xl shadow-sm border border-green-100 overflow-hidden">
+                                          <div className="bg-gradient-to-r from-green-500 to-green-600 px-4 py-2">
+                                            <h3 className="text-sm font-semibold text-white flex items-center gap-2">
+                                              <Tag className="w-4 h-4" />
+                                              Diskon
+                                            </h3>
+                                          </div>
+                                          <div className="p-4 max-h-[200px] overflow-y-auto">
+                                            {invoice.diskon.map((item, idx) => (
+                                              <div
+                                                key={idx}
+                                                className="flex justify-between items-center p-2 bg-green-50 rounded-lg mb-2 last:mb-0"
+                                              >
+                                                <div>
+                                                  <p className="font-medium text-sm">
+                                                    {item.description}
+                                                  </p>
+                                                  <p className="text-xs text-gray-500">
+                                                    {
+                                                      item.diskonInfo
+                                                        ?.judulDiskon
+                                                    }
+                                                  </p>
+                                                </div>
+                                                <p className="font-semibold text-green-600 text-sm">
+                                                  {item.diskonInfo
+                                                    ?.RpPotonganHarga
+                                                    ? `Rp ${item.diskonInfo.RpPotonganHarga.toLocaleString("id-ID")}`
+                                                    : `${item.diskonInfo?.percentPotonganHarga}%`}
+                                                </p>
+                                              </div>
+                                            ))}
+                                          </div>
                                         </div>
-                                      ) : (
-                                        <div className="text-center py-4 text-gray-500 bg-gray-100/50 rounded-lg text-sm">
-                                          Tidak ada Voucher
+                                      )}
+
+                                      {invoice?.promo?.length > 0 && (
+                                        <div className="bg-white rounded-xl shadow-sm border border-purple-100 overflow-hidden">
+                                          <div className="bg-gradient-to-r from-purple-500 to-purple-600 px-4 py-2">
+                                            <h3 className="text-sm font-semibold text-white flex items-center gap-2">
+                                              <Gift className="w-4 h-4" />
+                                              Promo
+                                            </h3>
+                                          </div>
+                                          <div className="p-4 max-h-[200px] overflow-y-auto">
+                                            {invoice.promo.map((item, idx) => (
+                                              <div
+                                                key={idx}
+                                                className="flex justify-between items-center p-2 bg-purple-50 rounded-lg mb-2 last:mb-0"
+                                              >
+                                                <div>
+                                                  <p className="font-medium text-sm">
+                                                    {item.description}
+                                                  </p>
+                                                  <p className="text-xs text-gray-500">
+                                                    {item.promoInfo?.judulPromo}
+                                                  </p>
+                                                </div>
+                                                <div className="text-right">
+                                                  <p className="text-sm font-medium">
+                                                    {
+                                                      item.promoInfo
+                                                        ?.skuBarangBonus
+                                                    }
+                                                  </p>
+                                                  <p className="text-xs text-gray-500">
+                                                    x
+                                                    {
+                                                      item.promoInfo
+                                                        ?.quantityBonus
+                                                    }
+                                                  </p>
+                                                </div>
+                                              </div>
+                                            ))}
+                                          </div>
                                         </div>
                                       )}
                                     </div>
                                   </div>
-                                )}
-                                {invoice?.promo?.length > 0 && (
-                                  <div className="card bg-white shadow-sm rounded-lg border border-gray-100">
-                                    <div className="card-body p-4">
-                                      <h3 className="card-title text-sm flex items-center gap-2 text-blue-700 font-semibold">
-                                        <span style={{ fontSize: "1em" }}>
-                                          🎁
-                                        </span>{" "}
-                                        Promo
-                                      </h3>
-                                      {invoice.promo?.length > 0 ? (
-                                        <div className="overflow-x-auto">
-                                          <table className="table table-xs table-zebra w-full">
-                                            <thead className="bg-gray-100/50 text-xs uppercase text-gray-600">
-                                              <tr>
-                                                <th className="text-left">
-                                                  Item
-                                                </th>
-                                                <th className="text-left">
-                                                  Judul Promo
-                                                </th>
-                                                <th className="text-left">
-                                                  Bonus
-                                                </th>
-                                                <th className="text-center">
-                                                  Qty Bonus
-                                                </th>
-                                              </tr>
-                                            </thead>
-                                            <tbody>
-                                              {invoice.promo.map(
-                                                (item, idx) => (
-                                                  <tr
-                                                    key={`<span class="math-inline">\{invoice\.\_id\}\-voucher\-</span>{idx}`}
-                                                    className="hover:bg-gray-50"
-                                                  >
-                                                    <td className="font-medium text-sm">
-                                                      {item.description}
-                                                    </td>
-                                                    <td className="font-medium text-sm">
-                                                      {
-                                                        item.promoInfo
-                                                          ?.judulPromo
-                                                      }
-                                                    </td>
-                                                    <td className="text-sm">
-                                                      {item.promoInfo
-                                                        ?.skuBarangBonus || "-"}
-                                                    </td>
-                                                    <td className="font-mono text-center text-sm">
-                                                      {
-                                                        item.promoInfo
-                                                          ?.quantityBonus
-                                                      }
-                                                    </td>
-                                                  </tr>
-                                                )
-                                              )}
-                                            </tbody>
-                                          </table>
-                                        </div>
-                                      ) : (
-                                        <div className="text-center py-4 text-gray-500 bg-gray-100/50 rounded-lg text-sm">
-                                          Tidak ada Promo
-                                        </div>
-                                      )}
-                                    </div>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          </td>
-                        </tr>
-                      )}
-                    </Fragment>
-                  ))}
-                </tbody>
-              </table>
-
-              {/* Pagination Controls */}
-              {invoiceData?.pagination && (
-                <div className="flex justify-between items-center p-4 border-t border-gray-200">
-                  <div className="text-sm text-gray-600">
-                    Menampilkan {invoiceData.data.length} dari{" "}
-                    {invoiceData.pagination.total} data
-                  </div>
-
-                  <div className="join">
-                    <button
-                      className="join-item btn btn-sm"
-                      onClick={() =>
-                        setCurrentPage((prev) => Math.max(prev - 1, 1))
-                      }
-                      disabled={currentPage <= 1}
-                    >
-                      «
-                    </button>
-
-                    {/* Generate page buttons */}
-                    {Array.from(
-                      {
-                        length: Math.min(5, invoiceData.pagination.totalPages),
-                      },
-                      (_, i) => {
-                        let pageNum;
-                        if (invoiceData.pagination.totalPages <= 5) {
-                          // If 5 or fewer pages, show all
-                          pageNum = i + 1;
-                        } else if (currentPage <= 3) {
-                          // If near start
-                          pageNum = i + 1;
-                        } else if (
-                          currentPage >=
-                          invoiceData.pagination.totalPages - 2
-                        ) {
-                          // If near end
-                          pageNum = invoiceData.pagination.totalPages - 4 + i;
-                        } else {
-                          // In the middle
-                          pageNum = currentPage - 2 + i;
-                        }
-
-                        return (
-                          <button
-                            key={pageNum}
-                            className={`join-item btn btn-sm ${
-                              currentPage === pageNum
-                                ? "btn-active bg-blue-700 text-white border-blue-700"
-                                : ""
-                            }`}
-                            onClick={() => setCurrentPage(pageNum)}
-                          >
-                            {pageNum}
-                          </button>
-                        );
-                      }
-                    )}
-
-                    <button
-                      className="join-item btn btn-sm"
-                      onClick={() =>
-                        setCurrentPage((prev) =>
-                          Math.min(prev + 1, invoiceData.pagination.totalPages)
-                        )
-                      }
-                      disabled={
-                        currentPage >= invoiceData.pagination.totalPages
-                      }
-                    >
-                      »
-                    </button>
-                  </div>
+                                </div>
+                              </td>
+                            </tr>
+                          )}
+                        </Fragment>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
-              )}
+
+                {/* Pagination */}
+                {invoiceData?.pagination && (
+                  <div className="flex justify-between items-center p-4 border-t border-blue-100 bg-gradient-to-r from-blue-50/50 to-white">
+                    <div className="text-sm text-gray-600">
+                      Menampilkan{" "}
+                      <span className="font-semibold text-blue-600">
+                        {invoiceData.data.length}
+                      </span>{" "}
+                      dari{" "}
+                      <span className="font-semibold text-blue-600">
+                        {invoiceData.pagination.total}
+                      </span>{" "}
+                      data
+                    </div>
+
+                    <div className="join">
+                      <button
+                        className="join-item btn btn-sm bg-white border-blue-200 hover:bg-blue-50"
+                        onClick={() =>
+                          setCurrentPage((prev) => Math.max(prev - 1, 1))
+                        }
+                        disabled={currentPage <= 1}
+                      >
+                        «
+                      </button>
+
+                      {Array.from(
+                        {
+                          length: Math.min(
+                            5,
+                            invoiceData.pagination.totalPages,
+                          ),
+                        },
+                        (_, i) => {
+                          let pageNum;
+                          if (invoiceData.pagination.totalPages <= 5) {
+                            pageNum = i + 1;
+                          } else if (currentPage <= 3) {
+                            pageNum = i + 1;
+                          } else if (
+                            currentPage >=
+                            invoiceData.pagination.totalPages - 2
+                          ) {
+                            pageNum = invoiceData.pagination.totalPages - 4 + i;
+                          } else {
+                            pageNum = currentPage - 2 + i;
+                          }
+
+                          return (
+                            <button
+                              key={pageNum}
+                              className={`join-item btn btn-sm ${
+                                currentPage === pageNum
+                                  ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white border-blue-600 hover:from-blue-700 hover:to-blue-800"
+                                  : "bg-white border-blue-200 hover:bg-blue-50"
+                              }`}
+                              onClick={() => setCurrentPage(pageNum)}
+                            >
+                              {pageNum}
+                            </button>
+                          );
+                        },
+                      )}
+
+                      <button
+                        className="join-item btn btn-sm bg-white border-blue-200 hover:bg-blue-50"
+                        onClick={() =>
+                          setCurrentPage((prev) =>
+                            Math.min(
+                              prev + 1,
+                              invoiceData.pagination.totalPages,
+                            ),
+                          )
+                        }
+                        disabled={
+                          currentPage >= invoiceData.pagination.totalPages
+                        }
+                      >
+                        »
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </div>
       </div>
+
       <ModalDetailInvoice
         showDetail={showDetail}
         onClose={() => setShowDetail(null)}
