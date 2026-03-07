@@ -13,10 +13,10 @@ import Promo from "./pages/Promo.jsx";
 import Voucher from "./pages/Voucher.jsx";
 import Artikel_Documentation from "./pages/Artikel_Documentation.jsx";
 import Profile from "./pages/Profile.jsx";
-import SpgList from "./pages/SpgList.jsx";
+// import SpgList from "./pages/SpgList.jsx";
 import NotFound from "./pages/not-found.jsx";
 import Outlet from "./pages/Outlet.jsx";
-import KasirList from "./pages/KasirList.jsx";
+// import KasirList from "./pages/KasirList.jsx";
 import AllAccounts from "./pages/AllAccounts.jsx";
 import PurchaseOrderReceive from "./pages/PurchaseOrderReceive.jsx";
 import PurchaseOrdersCreate from "./pages/PurchaseOrderCreate.jsx";
@@ -31,7 +31,6 @@ import EmailConfig from "./pages/EmailConfig";
 import KwitansiPembayaranTertunda from "./pages/KwitansiPembayaranTertunda";
 import Customer_list from "./pages/Customer_list";
 import About from "./pages/About";
-import DatabaseFeature from "./pages/DatabaseFeature";
 import ConvertVoucherToGenerated from "./pages/ConvertVoucherToGenerated";
 import DownloadApkPage from "./pages/DownloadsApkPage";
 // import BackupSalesReport from "../src/pages/TELAH_DIHAPUS/backup_SalesReport";
@@ -64,9 +63,9 @@ const router = createBrowserRouter(
         <Route path="/dashboard" element={<Home />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/stack_trace" element={<StackTraceSkuPage />} />
-        <Route path="/spg_list" element={<SpgList />} />
+        {/* <Route path="/spg_list" element={<SpgList />} /> */}
         <Route path="/all_account" element={<AllAccounts />} />
-        <Route path="/kasir_list" element={<KasirList />} />
+        {/* <Route path="/kasir_list" element={<KasirList />} /> */}
         <Route path="/outlet_list" element={<Outlet />} />
         <Route path="/brands" element={<BrandList />} />
         <Route path="/report_list" element={<ReportList />} />
@@ -76,7 +75,6 @@ const router = createBrowserRouter(
         <Route path="/sales_report" element={<SaleReport />} />
         <Route path="/email_config" element={<EmailConfig />} />
         <Route path="/about" element={<About />} />
-        <Route path="/database_feature" element={<DatabaseFeature />} />
         <Route
           path="/kwitansi_pembayaran_tertunda"
           element={<KwitansiPembayaranTertunda />}
@@ -90,8 +88,8 @@ const router = createBrowserRouter(
       </Route>
       <Route index={true} path="/login" element={<Login />} />
       <Route path="*" element={<NotFound />} />
-    </Route>
-  )
+    </Route>,
+  ),
 );
 
 const queryClient = new QueryClient();
@@ -99,5 +97,5 @@ const queryClient = new QueryClient();
 createRoot(document.getElementById("root")).render(
   <QueryClientProvider client={queryClient}>
     <RouterProvider router={router} />
-  </QueryClientProvider>
+  </QueryClientProvider>,
 );

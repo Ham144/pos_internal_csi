@@ -1,16 +1,28 @@
 import React, { useState, useCallback, useMemo, lazy, Suspense } from "react";
 import MenuNavigation from "../components/MenuNavigation";
 import { mockPages } from "../api/constant";
+
 import {
-  BarChart,
-  Box,
-  Gift,
-  Percent,
-  Presentation,
   Search,
   ShoppingCart,
+  Package,
+  Percent,
+  Gift,
+  BarChart3,
+  Users,
+  Presentation,
   Store,
-  User2,
+  FileText,
+  HelpCircle,
+  BookOpen,
+  Bug,
+  Star,
+  ChevronRight,
+  Grid,
+  Mail,
+  Phone,
+  MapPin,
+  ExternalLink,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { Helmet } from "react-helmet-async";
@@ -53,7 +65,7 @@ const Home = () => {
         "/customer_list",
       ],
     }),
-    []
+    [],
   );
 
   // Halaman populer yang sering diakses pengguna
@@ -66,7 +78,7 @@ const Home = () => {
       "/diskon",
       "/sales_report",
     ],
-    []
+    [],
   );
 
   // Mendapatkan detail halaman dari path
@@ -91,7 +103,7 @@ const Home = () => {
     const filteredPages = mockPages.filter(
       (page) =>
         page.originalPath.toLowerCase().includes(query.toLowerCase()) ||
-        page.description.toLowerCase().includes(query.toLowerCase())
+        page.description.toLowerCase().includes(query.toLowerCase()),
     );
 
     setSearchResults(filteredPages);
@@ -108,7 +120,7 @@ const Home = () => {
       if (e.key === "ArrowDown") {
         e.preventDefault();
         setSelectedResultIndex((prev) =>
-          prev < searchResults.length - 1 ? prev + 1 : prev
+          prev < searchResults.length - 1 ? prev + 1 : prev,
         );
       }
 
@@ -122,7 +134,7 @@ const Home = () => {
         navigateToPage(searchResults[selectedResultIndex].originalPath);
       }
     },
-    [searchResults, selectedResultIndex, navigateToPage]
+    [searchResults, selectedResultIndex, navigateToPage],
   );
 
   // Mendapatkan label kategori dalam bahasa Indonesia
@@ -164,7 +176,7 @@ const Home = () => {
         />
         <meta
           name="keywords"
-          content="Catur sukses internasional, catur sukses,  Catur POS, Point of Sale, POS System, Retail Management, Inventory Management"
+          content="Catur sukses internasional, catur sukses, Catur POS, Point of Sale, POS System, Retail Management, Inventory Management"
         />
         <meta property="og:title" content="Catur POS" />
         <meta
@@ -174,323 +186,388 @@ const Home = () => {
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://pos.mycsi.net" />
         <link rel="canonical" href="https://pos.mycsi.net" />
-        {/* Preload critical assets */}
-        <link
-          rel="preload"
-          href="/fonts/Poppins-Regular.ttf"
-          as="font"
-          type="font/ttf"
-          crossOrigin="anonymous"
-        />
         <link rel="preconnect" href="https://pos.mycsi.net" />
       </Helmet>
 
       <div className="md:mt-20 max-md:mt-20">
         <MenuNavigation />
-        {/* below here home page */}
-        <div className="min-h-screen bg-gray-50 p-4 md:p-6 lg:pt-20">
-          <div className="max-w-7xl mx-auto">
-            {/* Header */}
-            <div className="text-center mb-6 md:mb-8">
-              <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2 font-mono">
-                CATUR POS
-              </h1>
-              <p className="text-sm md:text-base text-gray-600">
-                CMS CATUR POS APP
-              </p>
+
+        {/* Main Content */}
+        <div className="min-h-screen bg-gradient-to-br from-blue-50/30 via-white to-gray-50">
+          {/* Hero Section */}
+          <div className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800">
+            {/* Decorative Elements */}
+            <div className="absolute inset-0 overflow-hidden">
+              <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-400 rounded-full opacity-20 blur-3xl"></div>
+              <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-300 rounded-full opacity-20 blur-3xl"></div>
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full">
+                <div className="absolute top-0 left-0 w-full h-full bg-[url('/grid.svg')] opacity-10"></div>
+              </div>
             </div>
 
-            {/* Search Bar */}
-            <div className="relative mb-8 md:mb-10 max-w-2xl mx-auto">
-              <div className="relative">
-                <div className="absolute inset-y-0 right-3 flex items-center pl-3 pointer-events-none">
-                  <Search className="h-4 w-4 md:h-5 md:w-5 text-gray-500" />
+            <div className="relative max-w-7xl mx-auto px-4 py-12 md:py-16">
+              <div className="text-center">
+                {/* Logo/Brand */}
+                <div className="flex justify-center mb-6">
+                  <div className="p-4 bg-white/10 rounded-3xl backdrop-blur-sm border border-white/20">
+                    <img
+                      src="/csi-logo2.png"
+                      alt="Catur POS"
+                      className="w-16 h-16 md:w-20 md:h-20"
+                    />
+                  </div>
                 </div>
-                <input
-                  type="text"
-                  className="block w-full py-2 px-3 md:py-3 md:px-4 text-sm bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary shadow-md transition-all"
-                  placeholder="Cari fitur atau halaman..."
-                  value={searchQuery}
-                  onChange={(e) => handleSearch(e.target.value)}
-                  onFocus={() => setIsSearchFocused(true)}
-                  onBlur={() =>
-                    setTimeout(() => setIsSearchFocused(false), 200)
-                  }
-                  onKeyDown={handleKeyDown}
-                />
+
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 tracking-tight">
+                  CATUR POS
+                </h1>
+                <p className="text-xl md:text-2xl text-blue-100 mb-8 max-w-3xl mx-auto">
+                  Sistem Manajemen Point of Sale Terintegrasi
+                </p>
+
+                {/* Quick Stats */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto mt-8">
+                  <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+                    <div className="flex items-center justify-center gap-2 text-white">
+                      <ShoppingCart className="w-5 h-5" />
+                      <span className="text-2xl font-bold">1.2K+</span>
+                    </div>
+                    <p className="text-xs text-blue-200 mt-1">
+                      Transaksi Hari Ini
+                    </p>
+                  </div>
+                  <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+                    <div className="flex items-center justify-center gap-2 text-white">
+                      <Package className="w-5 h-5" />
+                      <span className="text-2xl font-bold">5K+</span>
+                    </div>
+                    <p className="text-xs text-blue-200 mt-1">Total Produk</p>
+                  </div>
+                  <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+                    <div className="flex items-center justify-center gap-2 text-white">
+                      <Users className="w-5 h-5" />
+                      <span className="text-2xl font-bold">50+</span>
+                    </div>
+                    <p className="text-xs text-blue-200 mt-1">Pengguna Aktif</p>
+                  </div>
+                  <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+                    <div className="flex items-center justify-center gap-2 text-white">
+                      <Store className="w-5 h-5" />
+                      <span className="text-2xl font-bold">10</span>
+                    </div>
+                    <p className="text-xs text-blue-200 mt-1">Outlet</p>
+                  </div>
+                </div>
               </div>
+            </div>
+          </div>
 
-              {/* Search Results */}
-              {isSearchFocused && searchResults.length > 0 && (
-                <div className="absolute z-10 w-full mt-2 bg-white rounded-lg shadow-lg max-h-80 md:max-h-96 overflow-y-auto border border-gray-100">
-                  <ul className="divide-y divide-gray-100">
-                    {searchResults.map((page, index) => (
-                      <li
-                        key={index}
-                        className={`p-3 md:p-4 hover:bg-gray-50 cursor-pointer transition-colors ${
-                          selectedResultIndex === index ? "bg-gray-100" : ""
-                        }`}
-                        onClick={() => navigateToPage(page.originalPath)}
-                        onMouseEnter={() => setSelectedResultIndex(index)}
-                      >
-                        <div className="flex items-center flex-col md:flex-row">
-                          <div className="flex-shrink-0 bg-primary/10 p-2 rounded-full mb-2 md:mb-0">
-                            <Search className="h-4 w-4 md:h-5 md:w-5 text-primary" />
-                          </div>
-                          <div className="ml-0 md:ml-4 text-center md:text-left">
-                            <p className="text-xs md:text-sm font-medium text-gray-900">
-                              {page.originalPath.replace("/", "")}
-                            </p>
-                            <p className="text-xs md:text-sm text-gray-500">
-                              {page.description}
-                            </p>
-                          </div>
-                          {/* Kategori badge */}
-                          {Object.entries(pageCategories).map(
-                            ([category, paths]) =>
-                              paths.includes(page.originalPath) ? (
-                                <span
-                                  key={category}
-                                  className={`mt-2 md:mt-0 md:ml-auto text-xs px-2 py-1 rounded-full ${getCategoryColor(
-                                    category
-                                  )}`}
-                                >
-                                  {getCategoryLabel(category)}
-                                </span>
-                              ) : null
-                          )}
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
+          {/* Search Section */}
+          <div className="max-w-7xl mx-auto px-4 py-8">
+            <div className="relative -mt-12 mb-8">
+              <div className="max-w-2xl mx-auto">
+                <div className="relative group">
+                  <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-blue-800 rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-1000"></div>
+                  <div className="relative">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <input
+                      type="text"
+                      className="w-full pl-12 pr-4 py-4 bg-white border-0 rounded-2xl shadow-xl focus:ring-4 focus:ring-blue-200 transition-all duration-200 text-gray-800 placeholder-gray-400"
+                      placeholder="Cari fitur atau halaman..."
+                      value={searchQuery}
+                      onChange={(e) => handleSearch(e.target.value)}
+                      onFocus={() => setIsSearchFocused(true)}
+                      onBlur={() =>
+                        setTimeout(() => setIsSearchFocused(false), 200)
+                      }
+                      onKeyDown={handleKeyDown}
+                    />
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded-md">
+                      ⌘K
+                    </div>
+                  </div>
                 </div>
-              )}
 
-              {/* No Results Message */}
-              {isSearchFocused &&
-                searchQuery.trim() !== "" &&
-                searchResults.length === 0 && (
-                  <div className="absolute z-10 w-full mt-2 bg-white rounded-lg shadow-lg p-4 border border-gray-100 text-center">
-                    <p className="text-gray-500 text-sm">
-                      Tidak ada hasil yang ditemukan untuk "{searchQuery}"
-                    </p>
-                    <p className="text-xs text-gray-400 mt-1">
-                      Coba kata kunci lain
-                    </p>
+                {/* Search Results */}
+                {isSearchFocused && (
+                  <div className="absolute z-50 w-full mt-2 bg-white rounded-2xl shadow-2xl border border-blue-100 overflow-hidden">
+                    {searchResults.length > 0 ? (
+                      <>
+                        <div className="max-h-96 overflow-y-auto divide-y divide-gray-100">
+                          {searchResults.map((page, index) => (
+                            <div
+                              key={index}
+                              className={`p-4 hover:bg-blue-50/50 cursor-pointer transition-all ${
+                                selectedResultIndex === index
+                                  ? "bg-blue-50"
+                                  : ""
+                              }`}
+                              onClick={() => navigateToPage(page.originalPath)}
+                              onMouseEnter={() => setSelectedResultIndex(index)}
+                            >
+                              <div className="flex items-start gap-4">
+                                <div className="flex-shrink-0">
+                                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white shadow-md">
+                                    <FileText className="w-5 h-5" />
+                                  </div>
+                                </div>
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2 mb-1">
+                                    <h4 className="font-semibold text-gray-800">
+                                      {page.originalPath
+                                        .replace("/", "")
+                                        .replace(/_/g, " ")}
+                                    </h4>
+                                    {Object.entries(pageCategories).map(
+                                      ([category, paths]) =>
+                                        paths.includes(page.originalPath) ? (
+                                          <span
+                                            key={category}
+                                            className={`text-xs px-2 py-0.5 rounded-full ${getCategoryColor(category)}`}
+                                          >
+                                            {getCategoryLabel(category)}
+                                          </span>
+                                        ) : null,
+                                    )}
+                                  </div>
+                                  <p className="text-sm text-gray-500">
+                                    {page.description}
+                                  </p>
+                                </div>
+                                <ChevronRight className="w-5 h-5 text-gray-400" />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="p-3 bg-gray-50 border-t border-gray-100 text-xs text-gray-500 flex justify-between">
+                          <span>Tekan ↑ ↓ untuk navigasi</span>
+                          <span>Enter untuk memilih</span>
+                        </div>
+                      </>
+                    ) : searchQuery.trim() !== "" ? (
+                      <div className="p-8 text-center">
+                        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                          <Search className="w-6 h-6 text-gray-400" />
+                        </div>
+                        <p className="text-gray-600">
+                          Tidak ada hasil untuk "{searchQuery}"
+                        </p>
+                        <p className="text-xs text-gray-400 mt-1">
+                          Coba kata kunci lain
+                        </p>
+                      </div>
+                    ) : (
+                      <>
+                        {/* Category Filters */}
+                        <div className="p-4 border-b border-gray-100">
+                          <p className="text-xs font-medium text-gray-500 mb-3">
+                            FILTER KATEGORI
+                          </p>
+                          <div className="flex flex-wrap gap-2">
+                            {Object.entries(pageCategories).map(
+                              ([category, paths]) => (
+                                <button
+                                  key={category}
+                                  className={`text-xs px-3 py-1.5 rounded-full ${getCategoryColor(category)} transition-all hover:shadow-md`}
+                                  onClick={() => {
+                                    const categoryPages = mockPages.filter(
+                                      (page) =>
+                                        paths.includes(page.originalPath),
+                                    );
+                                    setSearchResults(categoryPages);
+                                  }}
+                                >
+                                  {getCategoryLabel(category)} ({paths.length})
+                                </button>
+                              ),
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Popular Pages */}
+                        <div className="p-4">
+                          <p className="text-xs font-medium text-gray-500 mb-3">
+                            HALAMAN POPULER
+                          </p>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                            {getPopularPagesWithDetails()
+                              .slice(0, 4)
+                              .map((page, index) => (
+                                <button
+                                  key={index}
+                                  className="flex items-center gap-2 p-2 hover:bg-blue-50 rounded-lg transition-colors text-left"
+                                  onClick={() =>
+                                    navigateToPage(page.originalPath)
+                                  }
+                                >
+                                  <span className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-white text-xs flex items-center justify-center font-medium">
+                                    {index + 1}
+                                  </span>
+                                  <span className="text-sm truncate flex-1">
+                                    {page.originalPath
+                                      .replace("/", "")
+                                      .replace(/_/g, " ")}
+                                  </span>
+                                </button>
+                              ))}
+                          </div>
+                        </div>
+                      </>
+                    )}
                   </div>
                 )}
-
-              {/* Category Filter Chips */}
-              {isSearchFocused && searchQuery.trim() === "" && (
-                <div className="absolute z-10 w-full mt-2 bg-white rounded-lg shadow-lg border border-gray-100">
-                  <div className="p-4">
-                    <p className="text-xs md:text-sm font-medium text-gray-500 mb-3">
-                      Kategori Halaman
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                      {Object.entries(pageCategories).map(
-                        ([category, paths]) => (
-                          <button
-                            key={category}
-                            className={`text-xs px-2 py-1 md:px-3 md:py-1.5 rounded-full ${getCategoryColor(
-                              category
-                            )} transition-all hover:shadow-sm`}
-                            onClick={() => {
-                              const categoryPages = mockPages.filter((page) =>
-                                paths.includes(page.originalPath)
-                              );
-                              setSearchResults(categoryPages);
-                            }}
-                          >
-                            {getCategoryLabel(category)} ({paths.length})
-                          </button>
-                        )
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="px-4 pb-4">
-                    <p className="text-xs  md:text-sm font-medium text-gray-500 mb-3">
-                      Halaman Populer
-                    </p>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                      {getPopularPagesWithDetails()
-                        .slice(0, 4)
-                        .map((page, index) => (
-                          <button
-                            key={index}
-                            className="text-left flex items-center p-2 hover:bg-gray-50 rounded-md"
-                            onClick={() => navigateToPage(page.originalPath)}
-                          >
-                            <span className="text-primary mr-2 text-xs md:text-sm">
-                              #{index + 1}
-                            </span>
-                            <span className="text-xs md:text-sm truncate">
-                              {page.originalPath
-                                .replace("/", "")
-                                .replace(/_/g, " ")}
-                            </span>
-                          </button>
-                        ))}
-                    </div>
-                  </div>
-                </div>
-              )}
+              </div>
             </div>
 
             {/* Category Navigation */}
-            <div className="mb-8 md:mb-10 flex justify-center">
-              <div className="flex lg:w-[70vw] justify-center flex-wrap gap-4">
-                {/* Sales Category */}
-                <div
-                  className="bg-white p-3 md:p-4 rounded-lg shadow-md hover:shadow-lg transition-all cursor-pointer flex flex-col items-center text-center"
-                  onClick={() => navigateToPage("/invoices")}
-                >
-                  <div className="p-2 md:p-3 bg-blue-100 rounded-full mb-2">
-                    <ShoppingCart color="blue" />
-                  </div>
-                  <span className="text-xs md:text-sm font-medium">
-                    Penjualan
-                  </span>
-                </div>
-
-                {/* Inventory Category */}
-                <div
-                  className="bg-white p-3 md:p-4 rounded-lg shadow-md hover:shadow-lg transition-all cursor-pointer flex flex-col items-center text-center"
-                  onClick={() => navigateToPage("/item_library")}
-                >
-                  <div className="p-2 md:p-3 bg-green-100 rounded-full mb-2">
-                    <Box color="green" />
-                  </div>
-                  <span className="text-xs md:text-sm font-medium">
-                    Inventori
-                  </span>
-                </div>
-                <div
-                  className="bg-white p-3 md:p-4 rounded-lg shadow-md hover:shadow-lg transition-all cursor-pointer flex flex-col items-center text-center"
-                  onClick={() => navigateToPage("/voucher")}
-                >
-                  <div className="p-2 md:p-3 bg-green-100 rounded-full mb-2">
-                    <Percent color="green" />
-                  </div>
-                  <span className="text-xs md:text-sm font-medium">
-                    Voucher
-                  </span>
-                </div>
-
-                {/* Promotions Category */}
-                <div
-                  className="bg-white p-3 md:p-4 rounded-lg shadow-md hover:shadow-lg transition-all cursor-pointer flex flex-col items-center text-center"
-                  onClick={() => navigateToPage("/promo")}
-                >
-                  <div className="p-2 md:p-3 bg-yellow-100 rounded-full mb-2">
-                    <Gift color="green" />
-                  </div>
-                  <span className="text-xs md:text-sm font-medium">Promo</span>
-                </div>
-
-                {/* Discount Category */}
-                <div
-                  className="bg-white p-3 md:p-4 rounded-lg shadow-md hover:shadow-lg transition-all cursor-pointer flex flex-col items-center text-center"
-                  onClick={() => navigateToPage("/diskon")}
-                >
-                  <div className="p-2 md:p-3 bg-red-100 rounded-full mb-2">
-                    <Percent color="red" />
-                  </div>
-                  <span className="text-xs md:text-sm font-medium">Diskon</span>
-                </div>
-
-                {/* Reports Category */}
-                <div
-                  className="bg-white p-3 md:p-4 rounded-lg shadow-md hover:shadow-lg transition-all cursor-pointer flex flex-col items-center text-center"
-                  onClick={() => navigateToPage("/sales_report")}
-                >
-                  <div className="p-2 md:p-3 bg-purple-100 rounded-full mb-2">
-                    <BarChart color="purple" />
-                  </div>
-                  <span className="text-xs md:text-sm font-medium">
-                    Laporan
-                  </span>
-                </div>
-
-                {/* User Management Category */}
-                <div
-                  className="bg-white p-3 md:p-4 rounded-lg shadow-md hover:shadow-lg transition-all cursor-pointer flex flex-col items-center text-center"
-                  onClick={() => navigateToPage("/all_account")}
-                >
-                  <div className="p-2 md:p-3 bg-indigo-100 rounded-full mb-2">
-                    <User2 color="indigo" />
-                  </div>
-                  <span className="text-xs md:text-sm font-medium">Kasir</span>
-                </div>
-                <div
-                  className="bg-white p-3 md:p-4 rounded-lg shadow-md hover:shadow-lg transition-all cursor-pointer flex flex-col items-center text-center"
-                  onClick={() => navigateToPage("/spg")}
-                >
-                  <div className="p-2 md:p-3 bg-indigo-100 rounded-full mb-2">
-                    <Presentation color="indigo" />
-                  </div>
-                  <span className="text-xs md:text-sm font-medium">SPG</span>
-                </div>
-                <div
-                  className="bg-white p-3 md:p-4 rounded-lg shadow-md hover:shadow-lg transition-all cursor-pointer flex flex-col items-center text-center"
-                  onClick={() => navigateToPage("/outlet_list")}
-                >
-                  <div className="p-2 md:p-3 bg-indigo-100 rounded-full mb-2">
-                    <Store color="indigo" />
-                  </div>
-                  <span className="text-xs md:text-sm font-medium">Outlet</span>
-                </div>
+            <div className="mb-12">
+              <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                <Grid className="w-5 h-5 text-blue-600" />
+                Akses Cepat Berdasarkan Kategori
+              </h2>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                {[
+                  {
+                    path: "/invoices",
+                    icon: ShoppingCart,
+                    label: "Penjualan",
+                    color: "blue",
+                  },
+                  {
+                    path: "/item_library",
+                    icon: Package,
+                    label: "Inventori",
+                    color: "green",
+                  },
+                  {
+                    path: "/voucher",
+                    icon: Percent,
+                    label: "Voucher",
+                    color: "green",
+                  },
+                  {
+                    path: "/promo",
+                    icon: Gift,
+                    label: "Promo",
+                    color: "yellow",
+                  },
+                  {
+                    path: "/diskon",
+                    icon: Percent,
+                    label: "Diskon",
+                    color: "red",
+                  },
+                  {
+                    path: "/sales_report",
+                    icon: BarChart3,
+                    label: "Laporan",
+                    color: "purple",
+                  },
+                  {
+                    path: "/all_account",
+                    icon: Users,
+                    label: "Kasir",
+                    color: "indigo",
+                  },
+                  {
+                    path: "/spg",
+                    icon: Presentation,
+                    label: "SPG",
+                    color: "indigo",
+                  },
+                  {
+                    path: "/outlet_list",
+                    icon: Store,
+                    label: "Outlet",
+                    color: "indigo",
+                  },
+                ].map((item, index) => {
+                  const Icon = item.icon;
+                  return (
+                    <div
+                      key={index}
+                      onClick={() => navigateToPage(item.path)}
+                      className="group bg-white rounded-xl shadow-md hover:shadow-xl border border-gray-100 p-4 cursor-pointer transition-all duration-200 hover:-translate-y-1"
+                    >
+                      <div
+                        className={`w-12 h-12 rounded-xl bg-${item.color}-100 group-hover:bg-${item.color}-200 flex items-center justify-center mb-3 transition-colors`}
+                      >
+                        <Icon className={`w-6 h-6 text-${item.color}-600`} />
+                      </div>
+                      <h3 className="font-medium text-gray-800 text-sm">
+                        {item.label}
+                      </h3>
+                      <p className="text-xs text-gray-400 mt-1">
+                        Lihat detail →
+                      </p>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
-            {/* Lazy loaded components */}
-            <Suspense
-              fallback={
-                <div className="loading loading-spinner loading-lg"></div>
-              }
-            >
-              <DashboardPreview />
-            </Suspense>
-            {/* Popular Pages */}
-            <div className="mb-8 md:mb-10">
-              <div className="flex items-center mb-4 md:mb-6 flex-col md:flex-row">
-                <h2 className="text-xl md:text-2xl font-semibold text-gray-800">
+            {/* Popular Pages Section */}
+            <div className="mb-12">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="p-2 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-lg shadow-lg">
+                  <Star className="w-5 h-5 text-white" />
+                </div>
+                <h2 className="text-xl font-bold text-gray-800">
                   Halaman Populer
                 </h2>
-                <div className="mt-2 md:mt-0 md:ml-4 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
+                <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
                   Akses Cepat
-                </div>
+                </span>
               </div>
 
-              <div className="grid grid-cols-1 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {getPopularPagesWithDetails().map((page, index) => (
                   <div
                     key={index}
-                    className="flex  items-center bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-all cursor-pointer border border-gray-100"
                     onClick={() => navigateToPage(page.originalPath)}
+                    className="group bg-white rounded-xl shadow-md hover:shadow-xl border border-gray-100 p-4 cursor-pointer transition-all duration-200 hover:-translate-y-1"
                   >
-                    <div className="rounded-lg  flex items-center justify-center h-8 w-8 md:h-10 md:w-10 flex-shrink-0 bg-primary/10">
-                      <span className="font-bold text-primary text-sm md:text-base">
-                        {index + 1}
-                      </span>
-                    </div>
-                    <div className="ml-3 md:ml-4">
-                      <h3 className="font-medium text-sm md:text-base">
-                        {page.originalPath.replace("/", "").replace(/_/g, " ")}
-                      </h3>
-                      <p className="text-xs md:text-sm text-gray-500 ">
-                        {page.description}
-                      </p>
+                    <div className="flex items-start gap-4">
+                      <div className="flex-shrink-0">
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-lg shadow-md">
+                          {index + 1}
+                        </div>
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-gray-800 group-hover:text-blue-600 transition-colors">
+                          {page.originalPath
+                            .replace("/", "")
+                            .replace(/_/g, " ")}
+                        </h3>
+                        <p className="text-sm text-gray-500 mt-1">
+                          {page.description}
+                        </p>
+                      </div>
+                      <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all" />
                     </div>
                   </div>
                 ))}
               </div>
             </div>
 
+            {/* Lazy Loaded Components */}
             <Suspense
               fallback={
-                <div className="loading loading-spinner loading-lg"></div>
+                <div className="flex justify-center py-12">
+                  <div className="relative">
+                    <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+                  </div>
+                </div>
+              }
+            >
+              <DashboardPreview />
+            </Suspense>
+
+            <Suspense
+              fallback={
+                <div className="flex justify-center py-8">
+                  <div className="loading loading-spinner loading-lg text-blue-600"></div>
+                </div>
               }
             >
               <QuickAccessCards />
@@ -498,34 +575,59 @@ const Home = () => {
 
             <Suspense
               fallback={
-                <div className="loading loading-spinner loading-lg"></div>
+                <div className="flex justify-center py-8">
+                  <div className="loading loading-spinner loading-lg text-blue-600"></div>
+                </div>
               }
             >
               <ToolsAndResources />
             </Suspense>
 
             {/* Support Section */}
-            <div className="bg-white p-4 md:p-6 rounded-lg shadow-md">
-              <h2 className="text-xl md:text-2xl font-semibold text-gray-800 mb-4">
-                Butuh Bantuan?
-              </h2>
-              <p className="mb-4 text-sm md:text-base">
-                Temukan panduan penggunaan sistem dan informasi terkini
-              </p>
+            <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl shadow-xl p-8 text-white mt-8">
+              <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
+                    <HelpCircle className="w-8 h-8" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-bold mb-1">Butuh Bantuan?</h2>
+                    <p className="text-blue-100">
+                      Temukan panduan penggunaan sistem dan informasi terkini
+                    </p>
+                  </div>
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => navigateToPage("/artikel_documentation")}
+                    className="px-6 py-3 bg-white/10 hover:bg-white/20 rounded-xl font-medium transition-colors backdrop-blur-sm border border-white/20 flex items-center gap-2"
+                  >
+                    <BookOpen className="w-5 h-5" />
+                    Dokumentasi
+                  </button>
+                  <button
+                    onClick={() => {
+                      document.getElementById("report_modal").showModal();
+                      // Buka modal report bug
+                    }}
+                    className="px-6 py-3 bg-white text-blue-600 hover:bg-blue-50 rounded-xl font-medium transition-colors shadow-lg flex items-center gap-2"
+                  >
+                    <Bug className="w-5 h-5" />
+                    Report Bug
+                  </button>
+                </div>
+              </div>
 
-              <div className="flex flex-col gap-3 md:flex-row md:gap-4">
-                <button
-                  onClick={() => navigateToPage("/artikel_documentation")}
-                  className="btn btn-outline btn-sm flex-1"
-                >
-                  Lihat Dokumentasi
-                </button>
-                <button
-                  onClick={() => toast("lihat pojok kanan bawah")}
-                  className="btn btn-primary btn-sm flex-1"
-                >
-                  Report Bug
-                </button>
+              {/* Quick Contact */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8 pt-6 border-t border-white/20">
+                <div className="flex items-center gap-3">
+                  <Mail className="w-5 h-5 text-blue-200" />
+                  <span className="text-sm">yafizham@catur.co.id</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <MapPin className="w-5 h-5 text-blue-200" />
+                  <span className="text-sm">Jakarta, Indonesia</span>
+                </div>
               </div>
             </div>
           </div>

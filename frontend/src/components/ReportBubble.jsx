@@ -3,11 +3,9 @@ import { createReport } from "../api/reportApi";
 import { toast, Toaster } from "react-hot-toast";
 import {
   AlertCircle,
-  Bug,
   CheckCircle,
   File,
   Info,
-  MessageCircle,
   RefreshCw,
   Send,
   Upload,

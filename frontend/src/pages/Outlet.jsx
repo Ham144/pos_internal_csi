@@ -8,7 +8,24 @@ import {
   getOuletList,
   registerOutlet,
 } from "../api/outletApi";
-import { BadgeHelp, LucideShieldQuestion, Package } from "lucide-react";
+import {
+  ShieldQuestion,
+  Package,
+  Plus,
+  X,
+  Building2,
+  MapPin,
+  CreditCard,
+  Clock,
+  Tag,
+  Users,
+  Store,
+  FileText,
+  Image as ImageIcon,
+  HelpCircle,
+  ChevronRight,
+} from "lucide-react";
+
 import toast from "react-hot-toast";
 import ModalPickKasir from "../components/ModalPickKasir";
 import { getAllAccount } from "@/api/authApi";
@@ -96,7 +113,7 @@ const Outlet = () => {
     mutationFn: async () => {
       return await assignSpgToOutlet(
         selectedOutlet.spgList,
-        selectedOutlet._id
+        selectedOutlet._id,
       );
     },
     onSuccess: () => {
@@ -153,7 +170,7 @@ const Outlet = () => {
     },
     onError: (error) => {
       toast.error(
-        error?.response?.data?.message || "Mungkin anda tidak memiliki akses"
+        error?.response?.data?.message || "Mungkin anda tidak memiliki akses",
       );
     },
   });
@@ -174,7 +191,7 @@ const Outlet = () => {
         (outlet) =>
           (selectedOutlet ? outlet._id !== selectedOutlet._id : true) &&
           outlet.kasirList &&
-          outlet.kasirList.includes(kasirId)
+          outlet.kasirList.includes(kasirId),
       );
 
       if (isUserInOtherOutlet) {
@@ -270,547 +287,636 @@ const Outlet = () => {
   };
 
   return (
-    <div className="flex p-4 bg-gray-50 min-h-screen">
+    <div className="flex bg-gradient-to-br from-blue-50 to-white min-h-screen p-6 gap-6 w-full">
       {/* Left Column: Outlet List (75% width) */}
-      <div className="flex flex-col  pr-4">
-        <div className="flex w-full justify-between mb-6 items-center">
+      <div className="flex flex-1 flex-col  space-y-4 w-3/4">
+        {/* Header Actions */}
+        <div className="flex items-center justify-between">
           <button
             onClick={() => {
               resetNewOutletForm();
               document.getElementById("newoutlet").showModal();
             }}
-            className="bg-secondary-content text-white px-6 py-3 rounded-md shadow-md hover:bg-secondary-focus transition-colors" // Added shadow and hover effects
+            className="bg-blue-600 text-white px-5 py-2.5 rounded-xl shadow-lg hover:bg-blue-700 transition-all duration-200 flex items-center gap-2 font-medium shadow-blue-200"
           >
+            <Plus className="w-5 h-5" />
             Outlet Baru
           </button>
-          <div className="flex gap-3">
-            <button className="bg-primary text-white px-4 py-2 rounded-md shadow-md">
-              Total Outlet: {outletList?.data?.length || 0}
-            </button>
+
+          <div className="flex items-center gap-3">
+            <div className="bg-white px-5 py-2.5 rounded-xl shadow-md border border-blue-100">
+              <span className="text-blue-600 font-semibold">
+                Total Outlet: {outletList?.data?.length || 0}
+              </span>
+            </div>
           </div>
         </div>
-        <div className="overflow-x-auto flex-1 rounded-lg shadow-md bg-white">
-          {" "}
-          {/* Added flex-1, rounded-lg, shadow-md, and bg-white */}
-          <table className="table table-zebra w-full">
-            <thead>
-              <tr className="bg-base-200 text-base-content">
-                <th className="px-4 py-3 text-center font-medium">
-                  Kode Outlet{" "}
-                  <span
-                    className="tooltip tooltip-bottom"
-                    data-tip="untuk format kodeInvoice"
+
+        {/* Table Container */}
+        <div className="bg-white rounded-2xl shadow-xl border border-blue-100 overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="bg-gradient-to-r from-blue-600 to-blue-700 text-white">
+                  <th className="px-4 py-4 text-left text-sm font-semibold">
+                    <div className="flex items-center gap-1">
+                      Kode Outlet
+                      <div
+                        className="tooltip tooltip-bottom"
+                        data-tip="untuk format kodeInvoice"
+                      >
+                        <ShieldQuestion className="w-4 h-4 text-blue-200" />
+                      </div>
+                    </div>
+                  </th>
+                  <th className="px-4 py-4 text-left text-sm font-semibold">
+                    <div className="flex items-center gap-1">
+                      Nama Outlet
+                      <div
+                        className="tooltip tooltip-bottom"
+                        data-tip="untuk display dan struk"
+                      >
+                        <ShieldQuestion className="w-4 h-4 text-blue-200" />
+                      </div>
+                    </div>
+                  </th>
+                  <th className="px-4 py-4 text-left text-sm font-semibold">
+                    Deskripsi
+                  </th>
+                  <th className="px-4 py-4 text-left text-sm font-semibold">
+                    <div className="flex items-center gap-1">
+                      Pendapatan
+                      <div
+                        className="tooltip tooltip-bottom"
+                        data-tip="Pendapatan total outlet terkait terlepas dari kasir"
+                      >
+                        <ShieldQuestion className="w-4 h-4 text-blue-200" />
+                      </div>
+                    </div>
+                  </th>
+                  <th className="px-4 py-4 text-left text-sm font-semibold">
+                    <div className="flex items-center gap-1">
+                      Kasir List
+                      <div
+                        className="tooltip tooltip-bottom"
+                        data-tip="Kasir yang di assign/set untuk outlet ini"
+                      >
+                        <ShieldQuestion className="w-4 h-4 text-blue-200" />
+                      </div>
+                    </div>
+                  </th>
+                  <th className="px-4 py-4 text-left text-sm font-semibold">
+                    <div className="flex items-center gap-1">
+                      SPG List
+                      <div
+                        className="tooltip tooltip-bottom"
+                        data-tip="spg yang di assing/set ke outlet ini"
+                      >
+                        <ShieldQuestion className="w-4 h-4 text-blue-200" />
+                      </div>
+                    </div>
+                  </th>
+                  <th className="px-4 py-4 text-left text-sm font-semibold">
+                    <div className="flex items-center gap-1">
+                      Perusahaan
+                      <div
+                        className="tooltip tooltip-bottom"
+                        data-tip="Nama perusahaan yang terkait dengan outlet ini"
+                      >
+                        <ShieldQuestion className="w-4 h-4 text-blue-200" />
+                      </div>
+                    </div>
+                  </th>
+                  <th className="px-4 py-4 text-left text-sm font-semibold">
+                    <div className="flex items-center gap-1">
+                      Alamat
+                      <div
+                        className="tooltip tooltip-bottom"
+                        data-tip="Alamat outlet"
+                      >
+                        <ShieldQuestion className="w-4 h-4 text-blue-200" />
+                      </div>
+                    </div>
+                  </th>
+                  <th className="px-4 py-4 text-left text-sm font-semibold">
+                    NPWP
+                  </th>
+                  <th className="px-4 py-4 text-left text-sm font-semibold">
+                    Brand
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-blue-100">
+                {outletList?.data?.map((outlet) => (
+                  <tr
+                    key={outlet._id}
+                    onClick={() => handleEditClick(outlet)}
+                    className="hover:bg-blue-50/50 cursor-pointer transition-all duration-200 group"
                   >
-                    <LucideShieldQuestion className="w-4 h-4 inline-block ml-1 opacity-70" />
-                  </span>
-                </th>
-                <th className="px-4 py-3 text-center font-medium">
-                  Nama Outlet{" "}
-                  <span
-                    className="tooltip tooltip-bottom"
-                    data-tip="untuk display dan struk"
-                  >
-                    <LucideShieldQuestion className="w-4 h-4 inline-block ml-1 opacity-70" />
-                  </span>
-                </th>
-                <th className="px-4 py-3 text-center font-medium">Deskripsi</th>
-                <th className="px-4 py-3 text-center font-medium">
-                  Pendapatan{" "}
-                  <span
-                    className="tooltip tooltip-bottom"
-                    data-tip="Pendapatan total outlet terkait terlepas dari kasir"
-                  >
-                    <LucideShieldQuestion className="w-4 h-4 inline-block ml-1 opacity-70" />
-                  </span>
-                </th>
-                <th className="px-4 py-3 text-center font-medium">
-                  Kasir List{" "}
-                  <span
-                    className="tooltip tooltip-bottom"
-                    data-tip="Kasir yang di assign/set untuk outlet ini"
-                  >
-                    <LucideShieldQuestion className="w-4 h-4 inline-block ml-1 opacity-70" />
-                  </span>
-                </th>
-                <th className="px-4 py-3 text-center font-medium">
-                  Spg List{" "}
-                  <span
-                    className="tooltip tooltip-bottom"
-                    data-tip="spg yang di assing/set ke outlet ini, spg yang sama bisa di assign ke outlet lain juga tidak seperti kasir yang harus berpindah outlet"
-                  >
-                    <LucideShieldQuestion className="w-4 h-4 inline-block ml-1 opacity-70" />
-                  </span>
-                </th>
-                <th className="px-4 py-3 text-center font-medium">
-                  Nama Perusahaan{" "}
-                  <span
-                    className="tooltip tooltip-bottom"
-                    data-tip="Nama perusahaan yang terkait dengan outlet ini"
-                  >
-                    <LucideShieldQuestion className="w-4 h-4 inline-block ml-1 opacity-70" />
-                  </span>
-                </th>
-                <th className="px-4 py-3 text-center font-medium">
-                  Alamat{" "}
-                  <span
-                    className="tooltip tooltip-bottom"
-                    data-tip="Alamat outlet"
-                  >
-                    <LucideShieldQuestion className="w-4 h-4 inline-block ml-1 opacity-70" />
-                  </span>
-                </th>
-                <th className="px-4 py-3 text-center font-medium">NPWP</th>
-                <th className="px-4 py-3 text-center font-medium">Brand</th>
-              </tr>
-            </thead>
-            <tbody>
-              {outletList?.data?.map((outlet) => (
-                <tr
-                  key={outlet._id}
-                  onClick={() => handleEditClick(outlet)}
-                  className="hover:bg-base-200/50 cursor-pointer transition-colors"
-                >
-                  <td className="px-4 py-3 text-center">{outlet.kodeOutlet}</td>
-                  <td className="px-4 py-3 text-center font-medium">
-                    {outlet.namaOutlet}
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    {outlet.description}
-                  </td>
-                  <td className="px-4 py-3 text-center font-medium">
-                    {outlet.pendapatan
-                      ? Intl.NumberFormat("id-ID", {
-                          style: "currency",
-                          currency: "IDR",
-                        }).format(Number(outlet.pendapatan))
-                      : "0"}
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    {userList?.data
-                      ?.filter((user) => outlet?.kasirList?.includes(user._id))
-                      ?.map((user) => (
-                        <span
-                          key={user._id}
-                          className="badge badge-ghost mr-1 mb-1"
-                        >
-                          {user.username}
+                    <td className="px-4 py-4 text-sm">
+                      <span className="font-mono bg-blue-50 px-2 py-1 rounded-lg text-blue-700">
+                        {outlet.kodeOutlet}
+                      </span>
+                    </td>
+                    <td className="px-4 py-4">
+                      <div className="flex items-center gap-2">
+                        <Store className="w-4 h-4 text-blue-500" />
+                        <span className="font-medium text-gray-800">
+                          {outlet.namaOutlet}
                         </span>
-                      ))}
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    {spgList?.data
-                      ?.filter((spg) => outlet?.spgList?.includes(spg._id))
-                      .map((spg) => (
-                        <span
-                          key={spg._id}
-                          className="badge badge-ghost mr-1 mb-1"
-                        >
-                          {spg.name}
-                        </span>
-                      ))}
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    {outlet.namaPerusahaan || "-"}
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    {outlet.alamat || "-"}
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    {outlet.npwp || "-"}
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    {outlet.brandIds?.length > 0 && (
-                      <div className="flex flex-wrap gap-1 justify-center">
-                        {brandList?.data?.data
-                          ?.filter((brand) =>
-                            outlet.brandIds.includes(brand._id)
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 text-sm text-gray-600 max-w-[150px] truncate">
+                      {outlet.description || "-"}
+                    </td>
+                    <td className="px-4 py-4">
+                      <span className="font-semibold text-green-600">
+                        {outlet.pendapatan
+                          ? Intl.NumberFormat("id-ID", {
+                              style: "currency",
+                              currency: "IDR",
+                            }).format(Number(outlet.pendapatan))
+                          : "Rp 0"}
+                      </span>
+                    </td>
+                    <td className="px-4 py-4">
+                      <div className="flex flex-wrap gap-1 max-w-[200px]">
+                        {userList?.data
+                          ?.filter((user) =>
+                            outlet?.kasirList?.includes(user._id),
                           )
-                          ?.map((brand) => (
+                          ?.slice(0, 2)
+                          ?.map((user) => (
                             <span
-                              key={brand._id}
-                              className="badge badge-primary badge-sm truncate text-white"
+                              key={user._id}
+                              className="bg-blue-100 text-blue-700 px-2 py-1 rounded-lg text-xs font-medium"
                             >
-                              {brand.name}
+                              {user.username}
                             </span>
                           ))}
+                        {outlet?.kasirList?.length > 2 && (
+                          <span className="text-xs text-blue-500 font-medium">
+                            +{outlet.kasirList.length - 2}
+                          </span>
+                        )}
                       </div>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                    </td>
+                    <td className="px-4 py-4">
+                      <div className="flex flex-wrap gap-1 max-w-[200px]">
+                        {spgList?.data
+                          ?.filter((spg) => outlet?.spgList?.includes(spg._id))
+                          .slice(0, 2)
+                          .map((spg) => (
+                            <span
+                              key={spg._id}
+                              className="bg-purple-100 text-purple-700 px-2 py-1 rounded-lg text-xs font-medium"
+                            >
+                              {spg.name}
+                            </span>
+                          ))}
+                        {outlet?.spgList?.length > 2 && (
+                          <span className="text-xs text-purple-500 font-medium">
+                            +{outlet.spgList.length - 2}
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 text-sm text-gray-600 max-w-[150px] truncate">
+                      {outlet.namaPerusahaan || "-"}
+                    </td>
+                    <td className="px-4 py-4 text-sm text-gray-600 max-w-[150px] truncate">
+                      {outlet.alamat || "-"}
+                    </td>
+                    <td className="px-4 py-4 text-sm text-gray-600">
+                      {outlet.npwp || "-"}
+                    </td>
+                    <td className="px-4 py-4">
+                      {outlet.brandIds?.length > 0 && (
+                        <div className="flex flex-wrap gap-1 max-w-[150px]">
+                          {brandList?.data?.data
+                            ?.filter((brand) =>
+                              outlet.brandIds.includes(brand._id),
+                            )
+                            ?.slice(0, 2)
+                            ?.map((brand) => (
+                              <span
+                                key={brand._id}
+                                className="bg-blue-600 text-white px-2 py-1 rounded-lg text-xs font-medium"
+                              >
+                                {brand.name}
+                              </span>
+                            ))}
+                          {outlet.brandIds.length > 2 && (
+                            <span className="text-xs text-blue-600 font-medium">
+                              +{outlet.brandIds.length - 2}
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
-      {/* Right Column: Edit Outlet (flex-1) */}
+      {/* Right Column: Edit Outlet */}
       {showEditForm && selectedOutlet && (
-        <div className="bg-white p-6 flex flex-col flex-1 rounded-lg shadow-md sticky top-4 self-start">
-          {" "}
-          {/* Added p-6, sticky, top-4, and self-start */}
-          <h2 className="text-2xl font-semibold text-gray-800 mb-6">
-            {" "}
-            {/* Increased mb to mb-6 */}
-            Edit Outlet
-          </h2>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              () => handleEditOutlet(selectedOutlet);
-            }}
-            className="space-y-4 flex-1 flex flex-col "
-          >
-            <div className="flex justify-between gap-4 mb-4 sticky top-0 bg-white rounded-md shadow-md p-5">
-              {" "}
-              {/* Added mb-4 */}
-              <button
-                type="button"
-                className="bg-gray-400 text-white px-4 py-2 rounded-md hover:bg-gray-500 transition-colors shadow-sm" // Consistent rounded-md, added shadow-sm
-                onClick={() => setShowEditForm(false)}
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setOutletToDelete(selectedOutlet?._id);
-                  document.getElementById("modal_confirmation").showModal();
-                }}
-                className="bg-red-500 text-white px-6 py-2 rounded-md hover:bg-red-600 transition-colors shadow-sm" // Consistent rounded-md, added hover and shadow-sm
-              >
-                Hapus
-              </button>
-              <button
-                type="submit"
-                onClick={() => handleEditOutlet(selectedOutlet)}
-                className="bg-primary-content text-white px-6 py-2 rounded-md hover:bg-primary-focus transition-colors shadow-sm" // Consistent rounded-md, added hover and shadow-sm
-              >
-                Update
-              </button>
+        <div className="bg-white rounded-2xl shadow-xl border border-blue-100 sticky top-6 h-screen overflow-hidden flex-1">
+          <div className="h-full flex flex-col">
+            {/* Header */}
+            <div className="p-6 border-b border-blue-100 bg-gradient-to-r from-blue-600 to-blue-700">
+              <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                <Building2 className="w-5 h-5" />
+                Edit Outlet
+              </h2>
             </div>
-            <div className="space-y-4 overflow-y-auto pr-2">
-              {" "}
-              {/* Added overflow-y-auto and pr-2 for scrollable content */}
-              <div>
-                <label className="block font-semibold mb-1">Nama Outlet</label>{" "}
-                {/* Added mb-1 */}
-                <input
-                  type="text"
-                  className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" // Added border-gray-300, focus styles
-                  placeholder="Masukkan nama outlet"
-                  value={selectedOutlet.namaOutlet}
-                  onChange={(e) =>
-                    setSelectedOutlet((prev) => ({
-                      ...prev,
-                      namaOutlet: e.target.value,
-                    }))
-                  }
-                />
-              </div>
-              {/* Deskripsi edit */}
-              <div>
-                <label className="block font-semibold mb-1">Deskripsi</label>
-                <input
-                  type="text"
-                  className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                  placeholder="Masukkan deskripsi outlet"
-                  value={selectedOutlet.description}
-                  onChange={(e) =>
-                    setSelectedOutlet((prev) => ({
-                      ...prev,
-                      description: e.target.value,
-                    }))
-                  }
-                />
-              </div>
-              {/* Nama Perusahaan edit */}
-              <div>
-                <label className="block font-semibold mb-1">
-                  Nama Perusahaan
-                </label>
-                <input
-                  type="text"
-                  className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                  placeholder="Masukkan nama perusahaan"
-                  value={selectedOutlet.namaPerusahaan}
-                  onChange={(e) =>
-                    setSelectedOutlet((prev) => ({
-                      ...prev,
-                      namaPerusahaan: e.target.value,
-                    }))
-                  }
-                />
-              </div>
-              {/* Alamat edit */}
-              <div>
-                <label className="block font-semibold mb-1">Alamat</label>
-                <input
-                  type="text"
-                  className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                  placeholder="Masukkan alamat"
-                  value={selectedOutlet.alamat}
-                  onChange={(e) =>
-                    setSelectedOutlet((prev) => ({
-                      ...prev,
-                      alamat: e.target.value,
-                    }))
-                  }
-                />
-              </div>
-              {/* NPWP edit */}
-              <div>
-                <label className="block font-semibold mb-1">NPWP</label>
-                <input
-                  type="text"
-                  className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                  placeholder="Masukkan NPWP"
-                  value={selectedOutlet.npwp}
-                  onChange={(e) =>
-                    setSelectedOutlet((prev) => ({
-                      ...prev,
-                      npwp: e.target.value,
-                    }))
-                  }
-                />
-              </div>
-              {/* Periode Settlement edit */}
-              <div>
-                <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-1">
-                  Periode Settlement (hari)
-                  <div
-                    className="tooltip tooltip-left"
-                    data-tip="Untuk statistik sales_report filter dan settlement, berfungsi sebagai auto berganti shift spg, kasir, settlement outlet, dan lainnya jika 3 hari maka penjualan 3 hari akan digrupkan menjadi 1 periode settlement yang sama, note: bisa diganti kapanpun"
-                  >
-                    <LucideShieldQuestion className="w-4 h-4" />
-                  </div>
-                </label>
-                <input
-                  type="number"
-                  min="1"
-                  className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                  placeholder="Masukkan periode settlement dalam hari"
-                  value={selectedOutlet.periodeSettlement}
-                  onChange={(e) =>
-                    setSelectedOutlet((prev) => ({
-                      ...prev,
-                      periodeSettlement: parseInt(e.target.value),
-                    }))
-                  }
-                />
-              </div>
-              {/* Jam Settlement edit */}
-              <div>
-                <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-1">
-                  Jam Settlement
-                  <div
-                    className="tooltip tooltip-left"
-                    data-tip="Jam spesifik untuk field periode settlement, default jam 12 malam"
-                  >
-                    <LucideShieldQuestion className="w-4 h-4" />
-                  </div>
-                </label>
-                <input
-                  type="time"
-                  className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                  value={selectedOutlet.jamSettlement || "00:00"}
-                  onChange={(e) =>
-                    setSelectedOutlet((prev) => ({
-                      ...prev,
-                      jamSettlement: e.target.value,
-                    }))
-                  }
-                />
-              </div>
-              {/* Brand Terpilih edit */}
-              <div>
-                <label className="block font-semibold mb-1">
-                  Brand terhubung dengan outlet ini
-                  <span
-                    className="tooltip tooltip-bottom"
-                    data-tip="hanya Brand terpilih akan ditampilkan di mobile app, namun jika tidak ada brand terpilih maka akan ditampilkna semuanya sku dari brand manapun"
-                  >
-                    <LucideShieldQuestion className="w-4 h-4 inline-block ml-1 opacity-70" />
-                  </span>
-                </label>
-                <div className="form-control w-full">
+
+            {/* Form */}
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleEditOutlet(selectedOutlet);
+              }}
+              className="flex-1 overflow-y-auto p-6"
+            >
+              <div className="space-y-5">
+                {/* Action Buttons */}
+                <div className="flex gap-2">
                   <button
                     type="button"
-                    className="btn text-primary hover:bg-primary/10 rounded-md px-2 flex items-center gap-1 border border-gray-300 bg-white shadow-sm" // Styled the button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      document.getElementById("modalBrandPick").showModal();
-                    }}
+                    className="flex-1 bg-gray-100 text-gray-700 px-4 py-2.5 rounded-xl hover:bg-gray-200 transition-all duration-200 font-medium text-sm"
+                    onClick={() => setShowEditForm(false)}
                   >
-                    <Package className="w-4 h-4" />
-                    Tambah Brand
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOutletToDelete(selectedOutlet?._id);
+                      document.getElementById("modal_confirmation").showModal();
+                    }}
+                    className="flex-1 bg-red-500 text-white px-4 py-2.5 rounded-xl hover:bg-red-600 transition-all duration-200 font-medium text-sm shadow-lg shadow-red-200"
+                  >
+                    Hapus
+                  </button>
+                  <button
+                    type="submit"
+                    className="flex-1 bg-blue-600 text-white px-4 py-2.5 rounded-xl hover:bg-blue-700 transition-all duration-200 font-medium text-sm shadow-lg shadow-blue-200"
+                  >
+                    Update
                   </button>
                 </div>
-              </div>
-              {/* Kasir List edit */}
-              <div>
-                <label className="block font-semibold mb-1">Kasir List</label>
-                <div
-                  onClick={() =>
-                    document.getElementById("pickKasir").showModal()
-                  }
-                  className="w-full border border-gray-300 px-4 py-2 rounded-lg bg-gray-50 cursor-pointer flex items-center min-h-[42px] hover:border-primary transition-colors" // Added border-gray-300 and hover effect
-                >
-                  {selectedOutlet?.kasirList?.length === 0 && (
-                    <span className="text-gray-400">
-                      Pilih kasir untuk outlet ini
-                    </span>
-                  )}
-                  {selectedOutlet?.kasirList?.length > 0 && (
-                    <div className="flex flex-wrap gap-2">
-                      {userList?.data
-                        ?.filter((user) =>
-                          selectedOutlet?.kasirList?.includes(user._id)
-                        )
-                        ?.map((user) => (
-                          <div
-                            key={user._id}
-                            className="flex items-center bg-primary/10 text-primary rounded px-2 py-1 text-sm" // Smaller text
-                          >
-                            <span>{user.username}</span>
-                            <button
-                              type="button"
-                              className="ml-2 text-primary hover:text-red-500"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setSelectedOutlet((prev) => ({
-                                  ...prev,
-                                  kasirList: prev.kasirList.filter(
-                                    (id) => id !== user._id
-                                  ),
-                                }));
-                              }}
-                            >
-                              ×
-                            </button>
-                          </div>
-                        ))}
-                      <button
-                        type="button"
-                        className="text-primary hover:bg-primary/10 rounded px-2 text-sm" // Smaller text
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          document.getElementById("pickKasir").showModal();
-                        }}
-                      >
-                        + Add
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </div>
-              {/* SPG List edit */}
-              <div>
-                <label className="block font-semibold mb-1">SPG List</label>
-                <div
-                  onClick={() => {
-                    setSelectedSpgIds(selectedOutlet?.spgList || []);
-                    document.getElementById("modalSpgPick").showModal();
-                  }}
-                  className="w-full border border-gray-300 px-4 py-2 rounded-lg bg-gray-50 cursor-pointer flex items-center min-h-[42px] hover:border-primary transition-colors" // Added border-gray-300 and hover effect
-                >
-                  {(!selectedOutlet?.spgList ||
-                    selectedOutlet?.spgList?.length === 0) && (
-                    <span className="text-gray-400">
-                      Pilih SPG untuk outlet ini
-                    </span>
-                  )}
-                  {selectedOutlet?.spgList?.length > 0 && (
-                    <div className="flex flex-wrap gap-2">
-                      {spgList?.data
-                        ?.filter((spg) =>
-                          selectedOutlet?.spgList?.includes(spg?._id)
-                        )
-                        .map((spg) => (
-                          <div
-                            key={spg?._id}
-                            className="flex items-center bg-primary/10 text-primary rounded px-2 py-1 text-sm" // Smaller text
-                          >
-                            <span>{spg?.name}</span>
-                            <button
-                              type="button"
-                              className="ml-2 text-primary hover:text-red-500"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setSelectedOutlet((prev) => ({
-                                  ...prev,
-                                  spgList: prev.spgList.filter(
-                                    (id) => id !== spg._id
-                                  ),
-                                }));
-                              }}
-                            >
-                              ×
-                            </button>
-                          </div>
-                        ))}
-                      <button
-                        type="button"
-                        className="text-primary hover:bg-primary/10 rounded px-2 text-sm" // Smaller text
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedSpgIds(selectedOutlet?.spgList || []);
-                          document.getElementById("modalSpgPick").showModal();
-                        }}
-                      >
-                        + Add
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </div>
-              {/* Logo */}
-              <div>
-                <div className="text-lg font-bold mb-2 gap-x-3 flex items-center">
-                  Logo Outlet{" "}
-                  <div className="dropdown dropdown-hover">
-                    <BadgeHelp />
-                    <ul
-                      tabIndex={0}
-                      className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52 font-mono font-light"
-                    >
-                      Logo ini akan ditampillkan di struk/invoice bill, dan
-                      personalisasi lain yang terkait, mohon pilih ukuran logo
-                      yang kecil
-                    </ul>
-                  </div>
-                </div>
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="file-input file-input-bordered file-input-primary w-full max-w-xs" // DaisyUI file input
-                  onChange={(e) => {
-                    const file = e.target.files[0];
-                    if (file) {
-                      const reader = new FileReader();
-                      reader.onload = () => {
-                        setSelectedOutlet({
-                          ...selectedOutlet,
-                          logo: reader.result,
-                        });
-                      };
-                      reader.readAsDataURL(file);
-                    }
-                  }}
-                />
-                {/* Preview Logo */}
-                {selectedOutlet?.logo && (
-                  <div className="mt-3 flex-col flex">
-                    <p className="text-sm font-semibold text-gray-600"></p>
-                    <img
-                      src={selectedOutlet.logo}
-                      alt="Preview Logo"
-                      className="mt-2 w-32 h-32 object-contain rounded-lg border shadow-sm p-1 bg-white" // object-contain and p-1
+
+                {/* Form Fields */}
+                <div className="space-y-4">
+                  {/* Nama Outlet */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5 flex items-center gap-1">
+                      <Store className="w-4 h-4 text-blue-500" />
+                      Nama Outlet
+                    </label>
+                    <input
+                      type="text"
+                      className="w-full border border-gray-200 px-4 py-2.5 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                      placeholder="Masukkan nama outlet"
+                      value={selectedOutlet.namaOutlet}
+                      onChange={(e) =>
+                        setSelectedOutlet((prev) => ({
+                          ...prev,
+                          namaOutlet: e.target.value,
+                        }))
+                      }
                     />
                   </div>
-                )}
+
+                  {/* Deskripsi */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5 flex items-center gap-1">
+                      <FileText className="w-4 h-4 text-blue-500" />
+                      Deskripsi
+                    </label>
+                    <input
+                      type="text"
+                      className="w-full border border-gray-200 px-4 py-2.5 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                      placeholder="Masukkan deskripsi outlet"
+                      value={selectedOutlet.description}
+                      onChange={(e) =>
+                        setSelectedOutlet((prev) => ({
+                          ...prev,
+                          description: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+
+                  {/* Nama Perusahaan */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5 flex items-center gap-1">
+                      <Building2 className="w-4 h-4 text-blue-500" />
+                      Nama Perusahaan
+                    </label>
+                    <input
+                      type="text"
+                      className="w-full border border-gray-200 px-4 py-2.5 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                      placeholder="Masukkan nama perusahaan"
+                      value={selectedOutlet.namaPerusahaan}
+                      onChange={(e) =>
+                        setSelectedOutlet((prev) => ({
+                          ...prev,
+                          namaPerusahaan: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+
+                  {/* Alamat */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5 flex items-center gap-1">
+                      <MapPin className="w-4 h-4 text-blue-500" />
+                      Alamat
+                    </label>
+                    <input
+                      type="text"
+                      className="w-full border border-gray-200 px-4 py-2.5 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                      placeholder="Masukkan alamat"
+                      value={selectedOutlet.alamat}
+                      onChange={(e) =>
+                        setSelectedOutlet((prev) => ({
+                          ...prev,
+                          alamat: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+
+                  {/* NPWP */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5 flex items-center gap-1">
+                      <CreditCard className="w-4 h-4 text-blue-500" />
+                      NPWP
+                    </label>
+                    <input
+                      type="text"
+                      className="w-full border border-gray-200 px-4 py-2.5 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                      placeholder="Masukkan NPWP"
+                      value={selectedOutlet.npwp}
+                      onChange={(e) =>
+                        setSelectedOutlet((prev) => ({
+                          ...prev,
+                          npwp: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+
+                  {/* Periode Settlement */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                      <div className="flex items-center gap-1">
+                        <Clock className="w-4 h-4 text-blue-500" />
+                        Periode Settlement (hari)
+                        <div
+                          className="tooltip tooltip-left"
+                          data-tip="Untuk statistik sales_report filter dan settlement"
+                        >
+                          <HelpCircle className="w-4 h-4 text-gray-400" />
+                        </div>
+                      </div>
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      className="w-full border border-gray-200 px-4 py-2.5 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                      placeholder="Masukkan periode settlement"
+                      value={selectedOutlet.periodeSettlement}
+                      onChange={(e) =>
+                        setSelectedOutlet((prev) => ({
+                          ...prev,
+                          periodeSettlement: parseInt(e.target.value),
+                        }))
+                      }
+                    />
+                  </div>
+
+                  {/* Jam Settlement */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5 flex items-center gap-1">
+                      <Clock className="w-4 h-4 text-blue-500" />
+                      Jam Settlement
+                    </label>
+                    <input
+                      type="time"
+                      className="w-full border border-gray-200 px-4 py-2.5 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                      value={selectedOutlet.jamSettlement || "00:00"}
+                      onChange={(e) =>
+                        setSelectedOutlet((prev) => ({
+                          ...prev,
+                          jamSettlement: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+
+                  {/* Brand */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                      <div className="flex items-center gap-1">
+                        <Tag className="w-4 h-4 text-blue-500" />
+                        Brand Terhubung
+                        <div
+                          className="tooltip tooltip-bottom"
+                          data-tip="Brand yang akan ditampilkan di mobile app"
+                        >
+                          <HelpCircle className="w-4 h-4 text-gray-400" />
+                        </div>
+                      </div>
+                    </label>
+                    <button
+                      type="button"
+                      className="w-full border border-gray-200 bg-gray-50 px-4 py-2.5 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all duration-200 flex items-center justify-between text-gray-700"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        document.getElementById("modalBrandPick").showModal();
+                      }}
+                    >
+                      <span className="flex items-center gap-2">
+                        <Package className="w-4 h-4 text-blue-500" />
+                        Tambah Brand
+                      </span>
+                      <ChevronRight className="w-4 h-4 text-gray-400" />
+                    </button>
+                  </div>
+
+                  {/* Kasir List */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5 flex items-center gap-1">
+                      <Users className="w-4 h-4 text-blue-500" />
+                      Kasir List
+                    </label>
+                    <div
+                      onClick={() =>
+                        document.getElementById("pickKasir").showModal()
+                      }
+                      className="w-full border border-gray-200 bg-gray-50 px-4 py-3 rounded-xl cursor-pointer hover:border-blue-500 transition-all duration-200"
+                    >
+                      {selectedOutlet?.kasirList?.length === 0 ? (
+                        <span className="text-gray-400 text-sm">
+                          Pilih kasir untuk outlet ini
+                        </span>
+                      ) : (
+                        <div className="flex flex-wrap gap-2">
+                          {userList?.data
+                            ?.filter((user) =>
+                              selectedOutlet?.kasirList?.includes(user._id),
+                            )
+                            ?.map((user) => (
+                              <div
+                                key={user._id}
+                                className="flex items-center bg-blue-100 text-blue-700 rounded-lg px-3 py-1.5 text-sm"
+                              >
+                                <span>{user.username}</span>
+                                <button
+                                  type="button"
+                                  className="ml-2 hover:text-red-500 transition-colors"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedOutlet((prev) => ({
+                                      ...prev,
+                                      kasirList: prev.kasirList.filter(
+                                        (id) => id !== user._id,
+                                      ),
+                                    }));
+                                  }}
+                                >
+                                  <X className="w-3 h-3" />
+                                </button>
+                              </div>
+                            ))}
+                          <button
+                            type="button"
+                            className="text-blue-600 hover:bg-blue-100 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              document.getElementById("pickKasir").showModal();
+                            }}
+                          >
+                            + Add
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* SPG List */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5 flex items-center gap-1">
+                      <Users className="w-4 h-4 text-blue-500" />
+                      SPG List
+                    </label>
+                    <div
+                      onClick={() => {
+                        setSelectedSpgIds(selectedOutlet?.spgList || []);
+                        document.getElementById("modalSpgPick").showModal();
+                      }}
+                      className="w-full border border-gray-200 bg-gray-50 px-4 py-3 rounded-xl cursor-pointer hover:border-blue-500 transition-all duration-200"
+                    >
+                      {!selectedOutlet?.spgList?.length ? (
+                        <span className="text-gray-400 text-sm">
+                          Pilih SPG untuk outlet ini
+                        </span>
+                      ) : (
+                        <div className="flex flex-wrap gap-2">
+                          {spgList?.data
+                            ?.filter((spg) =>
+                              selectedOutlet?.spgList?.includes(spg?._id),
+                            )
+                            .map((spg) => (
+                              <div
+                                key={spg?._id}
+                                className="flex items-center bg-purple-100 text-purple-700 rounded-lg px-3 py-1.5 text-sm"
+                              >
+                                <span>{spg?.name}</span>
+                                <button
+                                  type="button"
+                                  className="ml-2 hover:text-red-500 transition-colors"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedOutlet((prev) => ({
+                                      ...prev,
+                                      spgList: prev.spgList.filter(
+                                        (id) => id !== spg._id,
+                                      ),
+                                    }));
+                                  }}
+                                >
+                                  <X className="w-3 h-3" />
+                                </button>
+                              </div>
+                            ))}
+                          <button
+                            type="button"
+                            className="text-purple-600 hover:bg-purple-100 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedSpgIds(selectedOutlet?.spgList || []);
+                              document
+                                .getElementById("modalSpgPick")
+                                .showModal();
+                            }}
+                          >
+                            + Add
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Logo */}
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <ImageIcon className="w-4 h-4 text-blue-500" />
+                      <span className="text-sm font-medium text-gray-700">
+                        Logo Outlet
+                      </span>
+                      <div className="dropdown dropdown-hover">
+                        <HelpCircle className="w-4 h-4 text-gray-400" />
+                      </div>
+                    </div>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-all duration-200"
+                      onChange={(e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                          const reader = new FileReader();
+                          reader.onload = () => {
+                            setSelectedOutlet({
+                              ...selectedOutlet,
+                              logo: reader.result,
+                            });
+                          };
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                    />
+                    {selectedOutlet?.logo && (
+                      <div className="mt-3 flex justify-center">
+                        <img
+                          src={selectedOutlet.logo}
+                          alt="Preview Logo"
+                          className="w-24 h-24 object-contain rounded-xl border-2 border-blue-200 p-1 bg-white"
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
-            </div>
-          </form>
+            </form>
+          </div>
         </div>
       )}
 
@@ -860,8 +966,8 @@ const Outlet = () => {
         }}
         title={"Konfirmasi Pemindahan Kasir"}
         message={`${ambiguKasir.join(
-          ", "
-        )} sudah terdaftar di outlet lain. Satu kasir hanya dapat ditugaskan ke satu outlet, Apakah anda yakin ingin memindahkan kasir, dan nanti setelah update akan memindahkan kasir ke outlet ini.`}
+          ", ",
+        )} sudah terdaftar di outlet lain. Satu kasir hanya dapat ditugaskan ke satu outlet, Apakah anda yakin ingin memindahkan kasir?`}
       />
       <ModalSpgMultiPick
         selectedOutletObj={selectedOutlet}

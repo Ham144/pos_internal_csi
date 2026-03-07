@@ -5,6 +5,24 @@ import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { mockBackend, mockPages } from "@/api/constant";
 
+import {
+  User,
+  Lock,
+  Mail,
+  Phone,
+  Target,
+  Store,
+  Shield,
+  Key,
+  X,
+  AlertCircle,
+  UserPlus,
+  Info,
+  Eye,
+  EyeOff,
+  Save,
+} from "lucide-react";
+
 const ModalNewAccount = () => {
   const [newAccount, setNewAccount] = useState({
     username: "",
@@ -20,6 +38,8 @@ const ModalNewAccount = () => {
     outletId: "",
   });
   const [errorMessage, setErrorMessage] = useState(null);
+
+  const [showPassword, setShowPassword] = useState(false);
 
   const queryClient = useQueryClient();
   const { data: outletList } = useQuery({
@@ -47,7 +67,7 @@ const ModalNewAccount = () => {
                 userId: response.userId, // ID user yang baru dibuat
                 outletId: newAccount.outletId, // ID outlet yang dipilih
               }),
-            }
+            },
           );
 
           if (!outletAssignResponse.ok) {
@@ -117,17 +137,29 @@ const ModalNewAccount = () => {
 
   return (
     <dialog id="newAccount" className="modal">
-      <div className="modal-box w-full max-w-7xl p-8 rounded-xl shadow-2xl bg-white">
+      <div className="modal-box w-full max-w-7xl p-0 overflow-hidden bg-gradient-to-br from-white to-blue-50/30 rounded-2xl shadow-2xl">
         {/* Header */}
-        <div className="flex justify-between items-center mb-6">
-          <h3 className="font-bold text-2xl text-gray-800">
-            Create New Account
-          </h3>
-          <form method="dialog">
-            <button className="btn btn-sm btn-circle btn-ghost text-gray-500 hover:text-gray-700">
-              ✕
-            </button>
-          </form>
+        <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-8 py-5">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm">
+                <UserPlus className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h3 className="font-bold text-2xl text-white">
+                  Create New Account
+                </h3>
+                <p className="text-sm text-blue-100 mt-1">
+                  Tambahkan akun baru untuk kasir atau SPG
+                </p>
+              </div>
+            </div>
+            <form method="dialog">
+              <button className="btn btn-sm btn-circle btn-ghost text-white hover:bg-white/20">
+                <X className="w-5 h-5" />
+              </button>
+            </form>
+          </div>
         </div>
 
         {/* Form */}
@@ -136,304 +168,352 @@ const ModalNewAccount = () => {
             e.preventDefault();
             handleCreateNewUser();
           }}
-          className="space-y-6"
+          className="p-8"
         >
-          {/* Submit Button */}
-          <button
-            type="submit"
-            className="btn w-full bg-blue-600 text-white hover:bg-blue-700 rounded-lg shadow-md py-3 transition-all"
-          >
-            Create Account
-          </button>
-          {/* Grid untuk Input */}
+          {/* Error Message */}
           {errorMessage && (
-            <div className="alert alert-error">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="stroke-current shrink-0 h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              <span>{errorMessage}</span>
+            <div className="mb-6 bg-red-50 border-l-4 border-red-500 rounded-lg p-4">
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0">
+                  <AlertCircle className="w-5 h-5 text-red-600" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-red-800">Error</p>
+                  <p className="text-sm text-red-600 mt-1">{errorMessage}</p>
+                </div>
+              </div>
             </div>
           )}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label
-                htmlFor="username"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Username <span className="text-red-500">*</span>
+
+          {/* Grid Input Fields */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            {/* Username */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                <User className="w-4 h-4 text-blue-500" />
+                Username
+                <span className="text-red-500">*</span>
               </label>
-              <input
-                type="text"
-                id="username"
-                name="username"
-                value={newAccount.username}
-                onChange={handleChange}
-                required
-                className="input input-bordered w-full rounded-lg focus:ring-2 focus:ring-blue-500 transition-all"
-                placeholder="Masukkan username"
-              />
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type="text"
+                  name="username"
+                  value={newAccount.username}
+                  onChange={handleChange}
+                  required
+                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200"
+                  placeholder="Masukkan username"
+                />
+              </div>
             </div>
 
-            <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Password <span className="text-red-500">*</span>
+            {/* Password */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                <Lock className="w-4 h-4 text-blue-500" />
+                Password
+                <span className="text-red-500">*</span>
               </label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                value={newAccount.password}
-                onChange={handleChange}
-                required
-                className="input input-bordered w-full rounded-lg focus:ring-2 focus:ring-blue-500 transition-all"
-                placeholder="Masukkan password"
-              />
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  value={newAccount.password}
+                  onChange={handleChange}
+                  required
+                  className="w-full pl-10 pr-12 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200"
+                  placeholder="Masukkan password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  {showPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
+                </button>
+              </div>
             </div>
 
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Email <span className="text-red-500">*</span>
+            {/* Email */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                <Mail className="w-4 h-4 text-blue-500" />
+                Email
+                <span className="text-red-500">*</span>
               </label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={newAccount.email}
-                onChange={handleChange}
-                required
-                className="input input-bordered w-full rounded-lg focus:ring-2 focus:ring-blue-500 transition-all"
-                placeholder="Masukkan email"
-              />
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type="email"
+                  name="email"
+                  value={newAccount.email}
+                  onChange={handleChange}
+                  required
+                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200"
+                  placeholder="user@example.com"
+                />
+              </div>
             </div>
 
-            <div>
-              <label
-                htmlFor="telepon"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Telepon{" "}
-                <span className="badge badge-neutral text-xs">Opsional</span>
-              </label>
-              <input
-                type="tel"
-                id="telepon"
-                name="telepon"
-                value={newAccount.telepon}
-                onChange={handleChange}
-                className="input input-bordered w-full rounded-lg focus:ring-2 focus:ring-blue-500 transition-all"
-                placeholder="Masukkan nomor telepon"
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="targetHargaPenjualan"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Target Harga Penjualan{" "}
-                <span className="badge badge-neutral text-xs">Opsional</span>
-                <span className="badge badge-neutral text-xs ml-2">
-                  Untuk Statistik
+            {/* Telepon */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                <Phone className="w-4 h-4 text-blue-500" />
+                Telepon
+                <span className="badge badge-soft badge-info text-xs">
+                  Opsional
                 </span>
               </label>
-              <input
-                type="number"
-                id="targetHargaPenjualan"
-                name="targetHargaPenjualan"
-                value={newAccount.targetHargaPenjualan}
-                onChange={handleChange}
-                min={0}
-                className="input input-bordered w-full rounded-lg focus:ring-2 focus:ring-blue-500 transition-all"
-                placeholder="Masukkan target harga"
-              />
+              <div className="relative">
+                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type="tel"
+                  name="telepon"
+                  value={newAccount.telepon}
+                  onChange={handleChange}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200"
+                  placeholder="08123456789"
+                />
+              </div>
             </div>
 
-            <div>
-              <label
-                htmlFor="targetQuantityPenjualan"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Target Quantity Penjualan{" "}
-                <span className="badge badge-neutral text-xs">Opsional</span>
-                <span className="badge badge-neutral text-xs ml-2">
-                  Untuk Statistik
+            {/* Target Harga */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                <Target className="w-4 h-4 text-blue-500" />
+                Target Harga Penjualan
+                <span className="badge badge-soft badge-info text-xs">
+                  Opsional
                 </span>
               </label>
-              <input
-                type="number"
-                id="targetQuantityPenjualan"
-                name="targetQuantityPenjualan"
-                value={newAccount.targetQuantityPenjualan}
-                onChange={handleChange}
-                min={0}
-                className="input input-bordered w-full rounded-lg focus:ring-2 focus:ring-blue-500 transition-all"
-                placeholder="Masukkan target quantity"
-              />
+              <div className="relative">
+                <Target className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type="number"
+                  name="targetHargaPenjualan"
+                  value={newAccount.targetHargaPenjualan}
+                  onChange={handleChange}
+                  min={0}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200"
+                  placeholder="Masukkan target harga"
+                />
+              </div>
+              <p className="text-xs text-gray-500">Untuk keperluan statistik</p>
             </div>
 
-            <div>
-              <label
-                htmlFor="outlet"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Outlet{" "}
-                <span className="badge badge-neutral text-xs">Opsional</span>
-                <span className="badge badge-neutral text-xs ml-2">
-                  Untuk Statistik
+            {/* Target Quantity */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                <Target className="w-4 h-4 text-blue-500" />
+                Target Quantity Penjualan
+                <span className="badge badge-soft badge-info text-xs">
+                  Opsional
                 </span>
               </label>
-              <select
-                id="outlet"
-                name="outlet"
-                value={newAccount.outletId}
-                onChange={(e) =>
-                  setNewAccount((prev) => ({
-                    ...prev,
-                    outletId: e.target.value,
-                  }))
-                }
-                className="select select-bordered w-full rounded-lg focus:ring-2 focus:ring-blue-500 transition-all"
-              >
-                <option value="">Pilih Outlet</option>
-                {outletList?.data?.map((outlet) => (
-                  <option key={outlet._id} value={outlet._id}>
-                    {outlet.namaOutlet}
-                  </option>
-                ))}
-              </select>
+              <div className="relative">
+                <Target className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type="number"
+                  name="targetQuantityPenjualan"
+                  value={newAccount.targetQuantityPenjualan}
+                  onChange={handleChange}
+                  min={0}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200"
+                  placeholder="Masukkan target quantity"
+                />
+              </div>
+              <p className="text-xs text-gray-500">Untuk keperluan statistik</p>
             </div>
 
-            <div>
-              <label
-                htmlFor="roleName"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Role Name <span className="text-red-500">*</span>
-                <span className="badge badge-neutral text-xs ml-2">
-                  Untuk Pembatasan Routing
+            {/* Outlet */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                <Store className="w-4 h-4 text-blue-500" />
+                Outlet
+                <span className="badge badge-soft badge-info text-xs">
+                  Opsional
                 </span>
               </label>
-              <input
-                type="text"
-                id="roleName"
-                name="roleName"
-                value={newAccount.roleName}
-                onChange={handleChange}
-                required
-                className="input input-bordered w-full rounded-lg focus:ring-2 focus:ring-blue-500 transition-all"
-                placeholder="Masukkan nama role"
-              />
+              <div className="relative">
+                <Store className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <select
+                  name="outlet"
+                  value={newAccount.outletId}
+                  onChange={(e) =>
+                    setNewAccount((prev) => ({
+                      ...prev,
+                      outletId: e.target.value,
+                    }))
+                  }
+                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200 appearance-none bg-white"
+                >
+                  <option value="">Pilih Outlet</option>
+                  {outletList?.data?.map((outlet) => (
+                    <option key={outlet._id} value={outlet._id}>
+                      {outlet.namaOutlet}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <p className="text-xs text-gray-500">Untuk keperluan statistik</p>
             </div>
 
-            <div>
-              <label
-                htmlFor="kodeKasir"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Kode Kasir{" "}
-                <span className="badge badge-info text-xs">Max 3 karakter</span>
-                <span className="badge badge-neutral text-xs ml-2">
+            {/* Role Name */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                <Shield className="w-4 h-4 text-blue-500" />
+                Role Name
+                <span className="text-red-500">*</span>
+                <span className="badge badge-soft badge-info text-xs">
+                  Untuk Routing
+                </span>
+              </label>
+              <div className="relative">
+                <Shield className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type="text"
+                  name="roleName"
+                  value={newAccount.roleName}
+                  onChange={handleChange}
+                  required
+                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200"
+                  placeholder="ADMIN / MANAGER / KASIR / SPG"
+                />
+              </div>
+            </div>
+
+            {/* Kode Kasir */}
+            <div className="space-y-2 md:col-span-2">
+              <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                <Key className="w-4 h-4 text-blue-500" />
+                Kode Kasir
+                <span className="badge badge-soft badge-warning text-xs">
+                  Max 3 karakter
+                </span>
+                <span className="badge badge-soft badge-info text-xs">
                   Untuk Mobile
                 </span>
               </label>
-              <div className="flex items-center">
-                <input
-                  type="text"
-                  id="kodeKasir"
-                  name="kodeKasir"
-                  value={newAccount.kodeKasir}
-                  onChange={handleChange}
-                  maxLength={3}
-                  className="input input-bordered w-full rounded-lg focus:ring-2 focus:ring-blue-500 transition-all"
-                  placeholder="Masukkan 3 karakter unik (opsional)"
-                />
-                <div className="ml-2 text-xs text-gray-500">
-                  Kode 3 karakter akan dibuat otomatis jika tidak diisi
+              <div className="flex gap-3">
+                <div className="flex-1 relative">
+                  <Key className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="text"
+                    name="kodeKasir"
+                    value={newAccount.kodeKasir}
+                    onChange={handleChange}
+                    maxLength={3}
+                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200 uppercase"
+                    placeholder="ADM"
+                  />
+                </div>
+                <div className="flex items-center text-sm text-gray-500 bg-gray-50 px-4 rounded-xl border border-gray-200">
+                  <Info className="w-4 h-4 mr-2 text-blue-500" />
+                  Akan dibuat otomatis jika tidak diisi
                 </div>
               </div>
             </div>
           </div>
 
           {/* Blocked Access Frontend */}
-          <div>
-            <label className="block text-base font-medium text-gray-700 mb-3">
+          <div className="mb-6">
+            <h4 className="text-base font-semibold text-gray-800 mb-4 flex items-center gap-2">
+              <div className="w-1 h-6 bg-blue-600 rounded-full"></div>
               Blocked Access By Page
-            </label>
+            </h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {mockPages.map((page) => (
                 <div
                   key={page.originalPath}
-                  className="bg-gray-50 rounded-lg shadow-sm p-4 flex items-start gap-3 hover:bg-gray-100 transition-all"
+                  className="bg-gradient-to-br from-gray-50 to-white rounded-xl border border-gray-200 p-4 hover:border-blue-300 hover:shadow-md transition-all group"
                 >
-                  <input
-                    type="checkbox"
-                    checked={newAccount.blockedAccess.includes(
-                      page.originalPath
-                    )}
-                    onChange={() => toggleBlockedAccess(page.originalPath)}
-                    className="checkbox checkbox-primary mt-1"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-base font-semibold text-gray-800 truncate">
-                      {page.originalPath}
-                    </h3>
-                    <p className="text-sm text-gray-500 line-clamp-2">
-                      {page.description}
-                    </p>
+                  <div className="flex items-start gap-3">
+                    <input
+                      type="checkbox"
+                      checked={newAccount.blockedAccess.includes(
+                        page.originalPath,
+                      )}
+                      onChange={() => toggleBlockedAccess(page.originalPath)}
+                      className="checkbox checkbox-primary checkbox-sm mt-1"
+                    />
+                    <div className="flex-1">
+                      <h5 className="text-sm font-semibold text-gray-800 group-hover:text-blue-600 transition-colors">
+                        {page.originalPath}
+                      </h5>
+                      <p className="text-xs text-gray-500 mt-1 line-clamp-2">
+                        {page.description}
+                      </p>
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="divider divider-neutral">Atau Lebih Spesifik</div>
+          <div className="divider">
+            <span className="px-4 py-1 bg-blue-100 text-blue-600 rounded-full text-xs font-medium">
+              ATAU LEBIH SPESIFIK
+            </span>
+          </div>
 
           {/* Blocked Access Backend */}
-          <div>
-            <label className="block text-base font-medium text-gray-700 mb-3">
+          <div className="mb-8">
+            <h4 className="text-base font-semibold text-gray-800 mb-4 flex items-center gap-2">
+              <div className="w-1 h-6 bg-purple-600 rounded-full"></div>
               Blocked Access By API Specific
-            </label>
+            </h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {mockBackend.map((api) => (
                 <div
                   key={api.originalPath}
-                  className="bg-gray-50 rounded-lg shadow-sm p-4 flex items-start gap-3 hover:bg-gray-100 transition-all"
+                  className="bg-gradient-to-br from-purple-50 to-white rounded-xl border border-purple-200 p-4 hover:border-purple-300 hover:shadow-md transition-all group"
                 >
-                  <input
-                    type="checkbox"
-                    checked={newAccount.blockedAccess.includes(
-                      api.originalPath
-                    )}
-                    onChange={() => toggleBlockedAccess(api.originalPath)}
-                    className="checkbox checkbox-primary mt-1"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-base font-semibold text-gray-800 truncate">
-                      {api.originalPath}
-                    </h3>
-                    <p className="text-sm text-gray-500 line-clamp-2">
-                      {api.description}
-                    </p>
+                  <div className="flex items-start gap-3">
+                    <input
+                      type="checkbox"
+                      checked={newAccount.blockedAccess.includes(
+                        api.originalPath,
+                      )}
+                      onChange={() => toggleBlockedAccess(api.originalPath)}
+                      className="checkbox checkbox-primary checkbox-sm mt-1"
+                    />
+                    <div className="flex-1">
+                      <h5 className="text-sm font-semibold text-gray-800 group-hover:text-purple-600 transition-colors">
+                        {api.originalPath}
+                      </h5>
+                      <p className="text-xs text-gray-500 mt-1 line-clamp-2">
+                        {api.description}
+                      </p>
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
+          </div>
+
+          {/* Submit Button */}
+          <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
+            <form method="dialog">
+              <button
+                type="button"
+                className="px-6 py-3 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors font-medium"
+              >
+                Batal
+              </button>
+            </form>
+            <button
+              type="submit"
+              className="px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-200 font-medium flex items-center gap-2 shadow-lg shadow-blue-500/25"
+            >
+              <Save className="w-5 h-5" />
+              Create Account
+            </button>
           </div>
         </form>
       </div>

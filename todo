@@ -48,7 +48,14 @@
 [x] fitur: ext code sudah bisa dicari di page invoice(web) dan bill history
 [x] fix: fitur promo, diskon, futureVoucher harusnya default aktiv bukan inactive
 //perubahan web
-[x] fitur: stack trace tiap item dari awal spawn hingga tiap perubahan item di item_library dan downloadable di buku besar item. meliputi :  
+[x] fitur: stack trace tiap item dari awal spawn hingga tiap perubahan item di item_library dan downloadable di buku besar item. meliputi :
+
+// saas
+[] add: optimasi dan sederhakan mobile
+[] add: perbaiki UI mobile
+[] add: landing page
+[] add: page "report list" tidak implemented, pakai di menu khusus admin (buat menu khusus admin)
+
 -bulPriceupdate ga nemu(spawn)
 -create manual di item_library (spawn)
 -perbarui data dari middleware (spawn)

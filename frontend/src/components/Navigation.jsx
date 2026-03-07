@@ -58,8 +58,8 @@ const SideDrawer = ({ children }) => {
       items: ["CUSTOMER LIST"],
     },
     {
-      title: "ACCOUNTS AND SPGS",
-      items: ["ALL ACCOUNT", "KASIR LIST", "SPG LIST"],
+      title: "ACCOUNTS",
+      items: ["ALL ACCOUNT"],
     },
     {
       title: "TRANSACTION SETTINGS",
@@ -67,15 +67,11 @@ const SideDrawer = ({ children }) => {
     },
     {
       title: "APPLICATION SETTINGS",
-      items: [
-        "DATABASE FEATURE",
-        "SUMBER THIRDPARTY",
-        "PROFILE",
-        "EMAIL CONFIG",
-        "REPORT LIST",
-      ],
+      items: ["SUMBER THIRDPARTY", "PROFILE", "EMAIL CONFIG"],
     },
   ];
+
+  const super_admin_menus = ["REPORT LIST"];
 
   function navigatTo(menu) {
     setActiveMenu(menu);

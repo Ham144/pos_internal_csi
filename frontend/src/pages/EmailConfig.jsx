@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import {
   verifyEmailConnection,
   testOutlookConnection,
@@ -9,6 +9,24 @@ import {
   saveEmailConfig,
 } from "../api/adminApi";
 import toast from "react-hot-toast";
+
+import {
+  Mail,
+  RefreshCw,
+  CheckCircle2,
+  AlertCircle,
+  Server,
+  Settings,
+  Send,
+  Save,
+  TestTube,
+  Play,
+  Globe,
+  Lock,
+  Info,
+  MailCheck,
+  MailWarning,
+} from "lucide-react";
 
 const EmailConfig = () => {
   // State untuk form konfigurasi email kustom
@@ -37,7 +55,8 @@ const EmailConfig = () => {
     queryFn: verifyEmailConnection,
     onError: (error) => {
       toast.error(
-        error?.response?.data?.message || "Gagal memeriksa status koneksi email"
+        error?.response?.data?.message ||
+          "Gagal memeriksa status koneksi email",
       );
     },
   });
@@ -63,7 +82,7 @@ const EmailConfig = () => {
     onError: (error) => {
       toast.error(
         error?.response?.data?.message ||
-          "Gagal mendapatkan konfigurasi email saat ini"
+          "Gagal mendapatkan konfigurasi email saat ini",
       );
     },
   });
@@ -82,7 +101,7 @@ const EmailConfig = () => {
       return result;
     } catch (error) {
       toast.error(
-        error?.response?.data?.message || "Gagal mengirim email test"
+        error?.response?.data?.message || "Gagal mengirim email test",
       );
       throw error;
     } finally {
@@ -111,7 +130,7 @@ const EmailConfig = () => {
       return result;
     } catch (error) {
       toast.error(
-        error?.response?.data?.message || "Gagal mengirim email test"
+        error?.response?.data?.message || "Gagal mengirim email test",
       );
       throw error;
     } finally {
@@ -147,7 +166,7 @@ const EmailConfig = () => {
       return result;
     } catch (error) {
       toast.error(
-        error?.response?.data?.message || "Gagal menyimpan konfigurasi email"
+        error?.response?.data?.message || "Gagal menyimpan konfigurasi email",
       );
       throw error;
     } finally {
@@ -165,7 +184,7 @@ const EmailConfig = () => {
     } catch (error) {
       toast.error(
         error?.response?.data?.message ||
-          "Gagal menjalankan job pengiriman email"
+          "Gagal menjalankan job pengiriman email",
       );
       throw error;
     } finally {
@@ -188,266 +207,385 @@ const EmailConfig = () => {
   }, [refetchConfig]);
 
   return (
-    <div className="p-4 max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6">Konfigurasi Email</h1>
+    <div className="p-6 max-w-5xl mx-auto bg-gray-50 min-h-screen">
+      {/* Header */}
+      <div className="flex items-center gap-3 mb-8">
+        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center shadow-md">
+          <Mail className="w-6 h-6 text-white" />
+        </div>
+        <div>
+          <h1 className="text-3xl font-bold text-gray-800">
+            Konfigurasi Email
+          </h1>
+          <p className="text-gray-500 text-sm mt-1">
+            Atur dan uji konfigurasi email untuk sistem
+          </p>
+        </div>
+      </div>
 
       {/* Status Koneksi Email Saat Ini */}
-      <div className="bg-white p-6 rounded-lg shadow-md mb-8">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold">Status Koneksi Email</h2>
+      <div className="bg-white rounded-xl shadow-md border border-gray-200 mb-6 overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <Server className="w-5 h-5 text-blue-600" />
+            <h2 className="text-lg font-semibold text-gray-800">
+              Status Koneksi Email
+            </h2>
+          </div>
           <button
             onClick={() => refetchStatus()}
-            className="btn btn-sm btn-outline"
+            className="px-4 py-2 text-sm bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2 text-gray-700"
           >
+            <RefreshCw className="w-4 h-4" />
             Refresh Status
           </button>
         </div>
 
-        <div className="flex items-center mb-4">
-          <div
-            className={`w-4 h-4 rounded-full mr-2 ${
-              connectionStatus?.success
-                ? "bg-success"
+        <div className="p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div
+              className={`w-3 h-3 rounded-full ${
+                connectionStatus?.success
+                  ? "bg-green-500"
+                  : connectionStatus?.success === false
+                    ? "bg-red-500"
+                    : "bg-gray-300"
+              }`}
+            />
+            <span className="font-medium text-gray-700">
+              {connectionStatus?.success
+                ? "Terhubung"
                 : connectionStatus?.success === false
-                ? "bg-error"
-                : "bg-gray-300"
-            }`}
-          ></div>
-          <span>
-            {connectionStatus?.success
-              ? "Terhubung"
-              : connectionStatus?.success === false
-              ? "Tidak Terhubung"
-              : "Belum Diperiksa"}
-          </span>
-        </div>
-
-        {connectionStatus && (
-          <div className="text-sm">
-            <p>{connectionStatus.message}</p>
+                  ? "Tidak Terhubung"
+                  : "Belum Diperiksa"}
+            </span>
+            {connectionStatus?.success && (
+              <CheckCircle2 className="w-4 h-4 text-green-500" />
+            )}
+            {connectionStatus?.success === false && (
+              <AlertCircle className="w-4 h-4 text-red-500" />
+            )}
           </div>
-        )}
 
-        {currentConfig?.config && (
-          <div className="mt-4 p-3 bg-gray-100 rounded-md">
-            <h3 className="font-medium text-sm mb-1">Konfigurasi Saat Ini:</h3>
-            <div className="text-xs grid grid-cols-2 gap-2">
-              <span>
-                Host:{" "}
-                <span className="font-semibold">
-                  {currentConfig.config.host}
-                </span>
-              </span>
-              <span>
-                Port:{" "}
-                <span className="font-semibold">
-                  {currentConfig.config.port}
-                </span>
-              </span>
-              <span>
-                Secure:{" "}
-                <span className="font-semibold">
-                  {currentConfig.config.secure ? "Ya" : "Tidak"}
-                </span>
-              </span>
-              <span>
-                Service:{" "}
-                <span className="font-semibold">
-                  {currentConfig.config.service || "-"}
-                </span>
-              </span>
-              <span>
-                User:{" "}
-                <span className="font-semibold">
-                  {currentConfig.config.user}
-                </span>
-              </span>
+          {connectionStatus && (
+            <div className="bg-gray-50 p-4 rounded-lg text-sm text-gray-600 border border-gray-200 mb-4">
+              {connectionStatus.message}
             </div>
-          </div>
-        )}
+          )}
+
+          {currentConfig?.config && (
+            <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+              <h3 className="font-medium text-sm text-blue-800 mb-3 flex items-center gap-1">
+                <Info className="w-4 h-4" />
+                Konfigurasi Saat Ini:
+              </h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
+                <div className="flex items-center gap-2">
+                  <Globe className="w-4 h-4 text-blue-600" />
+                  <span className="text-gray-600">Host:</span>
+                  <span className="font-mono text-blue-700 bg-white px-2 py-1 rounded text-xs">
+                    {currentConfig.config.host}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Server className="w-4 h-4 text-blue-600" />
+                  <span className="text-gray-600">Port:</span>
+                  <span className="font-mono text-blue-700 bg-white px-2 py-1 rounded text-xs">
+                    {currentConfig.config.port}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Lock className="w-4 h-4 text-blue-600" />
+                  <span className="text-gray-600">Secure:</span>
+                  <span
+                    className={`px-2 py-1 rounded text-xs font-medium ${
+                      currentConfig.config.secure
+                        ? "bg-green-100 text-green-700"
+                        : "bg-gray-100 text-gray-600"
+                    }`}
+                  >
+                    {currentConfig.config.secure ? "Ya" : "Tidak"}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Settings className="w-4 h-4 text-blue-600" />
+                  <span className="text-gray-600">Service:</span>
+                  <span className="font-mono text-blue-700 bg-white px-2 py-1 rounded text-xs">
+                    {currentConfig.config.service || "-"}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Mail className="w-4 h-4 text-blue-600" />
+                  <span className="text-gray-600">User:</span>
+                  <span className="font-mono text-blue-700 bg-white px-2 py-1 rounded text-xs">
+                    {currentConfig.config.user}
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Pengujian Email Default */}
-      <div className="bg-white p-6 rounded-lg shadow-md mb-8">
-        <h2 className="text-xl font-semibold mb-4">
-          Uji Pengiriman Email (Konfigurasi dari Server)
-        </h2>
-        <div className="form-control w-full mb-4">
-          <label className="label">
-            <span className="label-text">Email Tujuan Pengujian</span>
-          </label>
-          <input
-            type="email"
-            value={testEmail}
-            onChange={(e) => setTestEmail(e.target.value)}
-            placeholder="Masukkan email tujuan"
-            className="input input-bordered w-full"
-            required
-          />
+      <div className="bg-white rounded-xl shadow-md border border-gray-200 mb-6 overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
+          <div className="flex items-center gap-2">
+            <MailCheck className="w-5 h-5 text-blue-600" />
+            <h2 className="text-lg font-semibold text-gray-800">
+              Uji Pengiriman Email (Konfigurasi dari Server)
+            </h2>
+          </div>
         </div>
 
-        <button
-          onClick={testDefaultConnection}
-          className={`btn btn-success w-full ${
-            isTestingDefault ? "loading" : ""
-          }`}
-          disabled={isTestingDefault || !testEmail}
-        >
-          {isTestingDefault ? "Mengirim..." : "Kirim Email Test"}
-        </button>
+        <div className="p-6">
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Email Tujuan Pengujian
+            </label>
+            <input
+              type="email"
+              value={testEmail}
+              onChange={(e) => setTestEmail(e.target.value)}
+              placeholder="contoh@email.com"
+              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              required
+            />
+          </div>
+
+          <button
+            onClick={testDefaultConnection}
+            className={`w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-3 rounded-lg font-medium hover:shadow-md transition-all flex items-center justify-center gap-2 ${
+              isTestingDefault ? "opacity-75 cursor-not-allowed" : ""
+            }`}
+            disabled={isTestingDefault || !testEmail}
+          >
+            {isTestingDefault ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <span>Mengirim...</span>
+              </>
+            ) : (
+              <>
+                <Send className="w-4 h-4" />
+                <span>Kirim Email Test</span>
+              </>
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Form Konfigurasi Email Kustom */}
-      <div className="bg-white p-6 rounded-lg shadow-md mb-8">
-        <h2 className="text-xl font-semibold mb-4">Konfigurasi Email & Uji</h2>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          <div className="form-control w-full">
-            <label className="label">
-              <span className="label-text">SMTP Host</span>
-            </label>
-            <input
-              type="text"
-              name="host"
-              value={customConfig.host}
-              onChange={handleCustomConfigChange}
-              placeholder="smtp.example.com"
-              className="input input-bordered w-full"
-            />
-          </div>
-
-          <div className="form-control w-full">
-            <label className="label">
-              <span className="label-text">SMTP Port</span>
-            </label>
-            <input
-              type="number"
-              name="port"
-              value={customConfig.port}
-              onChange={handleCustomConfigChange}
-              placeholder="587"
-              className="input input-bordered w-full"
-            />
-          </div>
-
-          <div className="form-control w-full">
-            <label className="label">
-              <span className="label-text">Email</span>
-            </label>
-            <input
-              type="email"
-              name="user"
-              value={customConfig.user}
-              onChange={handleCustomConfigChange}
-              placeholder="your@email.com"
-              className="input input-bordered w-full"
-            />
-          </div>
-
-          <div className="form-control w-full">
-            <label className="label">
-              <span className="label-text">Password</span>
-            </label>
-            <input
-              type="password"
-              name="pass"
-              value={customConfig.pass}
-              onChange={handleCustomConfigChange}
-              placeholder="Password"
-              className="input input-bordered w-full"
-            />
-          </div>
-
-          <div className="form-control w-full">
-            <label className="label">
-              <span className="label-text">Service (opsional)</span>
-            </label>
-            <select
-              name="service"
-              value={customConfig.service}
-              onChange={handleCustomConfigChange}
-              className="select select-bordered w-full"
-            >
-              <option value="">Tidak Ada</option>
-              <option value="Outlook365">Outlook365</option>
-              <option value="Gmail">Gmail</option>
-              <option value="Yahoo">Yahoo</option>
-              <option value="Hotmail">Hotmail</option>
-            </select>
-          </div>
-
-          <div className="form-control w-full flex items-center justify-start mt-8">
-            <label className="cursor-pointer label justify-start">
-              <input
-                type="checkbox"
-                name="secure"
-                checked={customConfig.secure}
-                onChange={handleCustomConfigChange}
-                className="checkbox checkbox-primary mr-2"
-              />
-              <span className="label-text">
-                Gunakan SSL (biasanya untuk port 465)
-              </span>
-            </label>
+      <div className="bg-white rounded-xl shadow-md border border-gray-200 mb-6 overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
+          <div className="flex items-center gap-2">
+            <Settings className="w-5 h-5 text-blue-600" />
+            <h2 className="text-lg font-semibold text-gray-800">
+              Konfigurasi Email & Uji
+            </h2>
           </div>
         </div>
 
-        <div className="flex flex-col gap-3">
-          <button
-            onClick={saveConfig}
-            className={`btn btn-success w-full ${isSaving ? "loading" : ""}`}
-            disabled={isSaving}
-          >
-            {isSaving ? "Menyimpan..." : "Simpan Konfigurasi"}
-          </button>
+        <div className="p-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                SMTP Host
+              </label>
+              <input
+                type="text"
+                name="host"
+                value={customConfig.host}
+                onChange={handleCustomConfigChange}
+                placeholder="smtp.example.com"
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              />
+            </div>
 
-          <div className="divider text-sm text-gray-500">Test Konfigurasi</div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                SMTP Port
+              </label>
+              <input
+                type="number"
+                name="port"
+                value={customConfig.port}
+                onChange={handleCustomConfigChange}
+                placeholder="587"
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              />
+            </div>
 
-          <div className="form-control w-full mb-3">
-            <label className="label">
-              <span className="label-text">Email Tujuan Test</span>
-            </label>
-            <input
-              type="email"
-              name="to"
-              value={customConfig.to}
-              onChange={handleCustomConfigChange}
-              placeholder="test@example.com"
-              className="input input-bordered w-full"
-            />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Email
+              </label>
+              <input
+                type="email"
+                name="user"
+                value={customConfig.user}
+                onChange={handleCustomConfigChange}
+                placeholder="your@email.com"
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Password
+              </label>
+              <input
+                type="password"
+                name="pass"
+                value={customConfig.pass}
+                onChange={handleCustomConfigChange}
+                placeholder="••••••••"
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Service (opsional)
+              </label>
+              <select
+                name="service"
+                value={customConfig.service}
+                onChange={handleCustomConfigChange}
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white"
+              >
+                <option value="">Tidak Ada</option>
+                <option value="Outlook365">Outlook365</option>
+                <option value="Gmail">Gmail</option>
+                <option value="Yahoo">Yahoo</option>
+                <option value="Hotmail">Hotmail</option>
+              </select>
+            </div>
+
+            <div className="flex items-end pb-2">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  name="secure"
+                  checked={customConfig.secure}
+                  onChange={handleCustomConfigChange}
+                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                />
+                <span className="text-sm text-gray-700">
+                  Gunakan SSL (port 465)
+                </span>
+              </label>
+            </div>
           </div>
 
-          <button
-            onClick={testCustomConnection}
-            className={`btn btn-outline w-full ${
-              isTestingCustom ? "loading" : ""
-            }`}
-            disabled={isTestingCustom}
-          >
-            {isTestingCustom ? "Mengirim..." : "Uji Konfigurasi"}
-          </button>
+          <div className="flex flex-col gap-3">
+            <button
+              onClick={saveConfig}
+              className={`w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-3 rounded-lg font-medium hover:shadow-md transition-all flex items-center justify-center gap-2 ${
+                isSaving ? "opacity-75 cursor-not-allowed" : ""
+              }`}
+              disabled={isSaving}
+            >
+              {isSaving ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <span>Menyimpan...</span>
+                </>
+              ) : (
+                <>
+                  <Save className="w-4 h-4" />
+                  <span>Simpan Konfigurasi</span>
+                </>
+              )}
+            </button>
+
+            <div className="relative my-2">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-200"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-4 bg-white text-gray-500">
+                  Test Konfigurasi
+                </span>
+              </div>
+            </div>
+
+            <div className="mb-3">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Email Tujuan Test
+              </label>
+              <input
+                type="email"
+                name="to"
+                value={customConfig.to}
+                onChange={handleCustomConfigChange}
+                placeholder="test@example.com"
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              />
+            </div>
+
+            <button
+              onClick={testCustomConnection}
+              className={`w-full border-2 border-blue-600 text-blue-600 px-4 py-3 rounded-lg font-medium hover:bg-blue-50 transition-all flex items-center justify-center gap-2 ${
+                isTestingCustom ? "opacity-75 cursor-not-allowed" : ""
+              }`}
+              disabled={isTestingCustom}
+            >
+              {isTestingCustom ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+                  <span>Mengirim...</span>
+                </>
+              ) : (
+                <>
+                  <TestTube className="w-4 h-4" />
+                  <span>Uji Konfigurasi</span>
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Jalankan Job Email Kwitansi */}
-      <div className="bg-white p-6 rounded-lg shadow-md mb-8">
-        <h2 className="text-xl font-semibold mb-4">
-          Jalankan Job Pengiriman Email Kwitansi
-        </h2>
-        <p className="mb-4 text-sm text-gray-600">
-          Klik tombol di bawah untuk menjalankan job pengiriman email kwitansi
-          secara manual. Job ini akan mencari semua invoice yang sudah dibayar
-          tetapi belum dikirim email kwitansi, dan mengirimkan email bukti
-          pembayaran ke pelanggan.
-        </p>
+      <div className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
+          <div className="flex items-center gap-2">
+            <MailWarning className="w-5 h-5 text-blue-600" />
+            <h2 className="text-lg font-semibold text-gray-800">
+              Jalankan Job Pengiriman Email Kwitansi
+            </h2>
+          </div>
+        </div>
 
-        <button
-          onClick={runEmailJob}
-          className={`btn btn-accent w-full ${isRunningJob ? "loading" : ""}`}
-          disabled={isRunningJob}
-        >
-          {isRunningJob ? "Menjalankan..." : "Jalankan Job Email Kwitansi"}
-        </button>
+        <div className="p-6">
+          <p className="mb-4 text-sm text-gray-600 leading-relaxed">
+            Klik tombol di bawah untuk menjalankan job pengiriman email kwitansi
+            secara manual. Job ini akan mencari semua invoice yang sudah dibayar
+            tetapi belum dikirim email kwitansi, dan mengirimkan email bukti
+            pembayaran ke pelanggan.
+          </p>
+
+          <button
+            onClick={runEmailJob}
+            className={`w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white px-4 py-3 rounded-lg font-medium hover:shadow-md transition-all flex items-center justify-center gap-2 ${
+              isRunningJob ? "opacity-75 cursor-not-allowed" : ""
+            }`}
+            disabled={isRunningJob}
+          >
+            {isRunningJob ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <span>Menjalankan...</span>
+              </>
+            ) : (
+              <>
+                <Play className="w-4 h-4" />
+                <span>Jalankan Job Email Kwitansi</span>
+              </>
+            )}
+          </button>
+        </div>
       </div>
     </div>
   );

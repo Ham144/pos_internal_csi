@@ -1,4 +1,14 @@
 import { cn } from "@/lib/utils";
+import {
+  Lock,
+  User,
+  LogIn,
+  Eye,
+  EyeOff,
+  Shield,
+  CheckCircle,
+  ArrowRight,
+} from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,6 +24,8 @@ export default function Login({ className, ...props }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
 
   const path = useLocation().pathname;
   const navigate = useNavigate();
@@ -81,108 +93,203 @@ export default function Login({ className, ...props }) {
       console.log(err);
       toast.error(
         err?.response?.data?.message ||
-          "Login gagal. Periksa username dan password Anda."
+          "Login gagal. Periksa username dan password Anda.",
       );
     },
   });
-
   return (
     <div
       className={cn(
-        "flex min-h-screen items-center justify-center bg-base-200",
-        className
+        "min-h-screen bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 flex items-center justify-center p-4",
+        className,
       )}
       {...props}
     >
-      <Card className="w-full max-w-lg overflow-visible shadow-lg relative">
-        <CardContent className="flex flex-col">
-          <div className="relative flex  justify-center items-center p-4 -mt-20 ">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-400 rounded-full opacity-20 blur-3xl"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-300 rounded-full opacity-20 blur-3xl"></div>
+      </div>
+
+      {/* Login Card */}
+      <Card className="w-full max-w-md overflow-hidden relative bg-white/95 backdrop-blur-sm shadow-2xl border-0">
+        {/* Card Header with Decoration */}
+        <div className="relative h-32 bg-gradient-to-r from-blue-600 to-blue-700">
+          {/* Decorative Circles */}
+          <div className="absolute top-0 left-0 w-32 h-32 bg-white/10 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
+          <div className="absolute bottom-0 right-0 w-40 h-40 bg-white/10 rounded-full translate-x-1/2 translate-y-1/2"></div>
+
+          {/* Logo Container */}
+          <div className="absolute left-1/2 bottom-0 transform -translate-x-1/2 translate-y-1/2">
             {!(isPending || isVerifying) ? (
-              <img
-                src="/csi-logo2.png"
-                alt="Catur Pos Logo"
-                width={120}
-                height={120}
-                className="rounded-2xl shadow-md bg-white  object-contain transform transition-all duration-300 hover:scale-105 hover:shadow-xl"
-                style={{
-                  transformStyle: "preserve-3d",
-                  transform:
-                    "perspective(1000px) rotateX(-5deg) translateZ(20px)",
-                }}
-              />
+              <div className="relative group">
+                <div className="absolute inset-0 bg-blue-400 rounded-2xl blur-xl opacity-50 group-hover:opacity-75 transition-opacity"></div>
+                <img
+                  src="/csi-logo2.png"
+                  alt="Catur Pos Logo"
+                  width={120}
+                  height={120}
+                  className="relative rounded-2xl bg-white p-2 shadow-xl transform transition-all duration-300 group-hover:scale-110 group-hover:-translate-y-1"
+                />
+                {/* Verified Badge */}
+                <div className="absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center shadow-lg">
+                  <CheckCircle className="w-4 h-4 text-white" />
+                </div>
+              </div>
             ) : (
-              <span className="loading loading-spinner w-16 h-16 mx-auto" />
+              <div className="relative">
+                <div className="w-24 h-24 bg-white rounded-2xl shadow-xl flex items-center justify-center">
+                  <span className="loading loading-spinner w-12 h-12 text-blue-600"></span>
+                </div>
+              </div>
             )}
           </div>
+        </div>
 
-          {/* Form Section */}
-          <form
-            onSubmit={handleLogin}
-            className="p-6 md:p-8 flex flex-col maxmd justify-center"
-          >
-            <div className="flex flex-col gap-6">
-              <div className="flex flex-col items-center text-center">
-                <h1 className="text-2xl font-bold text-primary">Catur Pos</h1>
-                <p className="text-balance text-sm text-base-content/70">
-                  Masuk ke Backoffice Catur Pos
-                </p>
-              </div>
-              <div className="grid gap-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="username" className="text-base-content">
-                    Username
-                  </Label>
+        {/* Form Section */}
+        <CardContent className="pt-20 pb-8 px-8">
+          <form onSubmit={handleLogin} className="space-y-6">
+            {/* Welcome Text */}
+            <div className="text-center space-y-2">
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
+                Selamat Datang Kembali
+              </h1>
+              <p className="text-sm text-gray-500">
+                Silakan masuk ke akun Anda untuk melanjutkan
+              </p>
+            </div>
+
+            {/* Form Fields */}
+            <div className="space-y-4">
+              {/* Username Field */}
+              <div className="space-y-2">
+                <Label
+                  htmlFor="username"
+                  className="text-sm font-medium text-gray-700 flex items-center gap-2"
+                >
+                  <User className="w-4 h-4 text-blue-500" />
+                  Username
+                </Label>
+                <div className="relative group">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
                   <Input
                     id="username"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     type="text"
-                    placeholder="ham"
+                    placeholder="Masukkan username Anda"
                     required
-                    className="border-base-content/20"
                     disabled={isPending || isVerifying}
+                    className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200 bg-white/50 backdrop-blur-sm"
                   />
                 </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="password" className="text-base-content">
-                    Password
-                  </Label>
+              </div>
+
+              {/* Password Field */}
+              <div className="space-y-2">
+                <Label
+                  htmlFor="password"
+                  className="text-sm font-medium text-gray-700 flex items-center gap-2"
+                >
+                  <Lock className="w-4 h-4 text-blue-500" />
+                  Password
+                </Label>
+                <div className="relative group">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
                   <Input
                     id="password"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="border-base-content/20"
                     disabled={isPending || isVerifying}
+                    className="w-full pl-10 pr-12 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200 bg-white/50 backdrop-blur-sm"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="w-5 h-5" />
+                    ) : (
+                      <Eye className="w-5 h-5" />
+                    )}
+                  </button>
                 </div>
               </div>
-              <Button
-                type="submit"
-                className={`w-full ${
-                  (isPending || isVerifying) && "loading-bars"
-                } btn btn-primary`}
-                disabled={isPending || isVerifying}
-              >
-                {isVerifying
-                  ? "Memverifikasi..."
-                  : isPending
-                  ? "Memproses..."
-                  : "Login"}
-              </Button>
-              <div className="flex items-center">
+
+              {/* Remember Me & Forgot Password */}
+              <div className="flex items-center justify-between">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    className="checkbox checkbox-sm checkbox-primary"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                  />
+                  <span className="text-sm text-gray-600">Ingat saya</span>
+                </label>
                 <a
                   href="#"
-                  className="ml-auto text-sm text-primary underline-offset-2 hover:underline"
+                  className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1 group"
                 >
                   Lupa password?
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </a>
               </div>
+
+              {/* Security Info */}
+              <div className="bg-blue-50 rounded-xl p-4 border border-blue-100">
+                <div className="flex gap-3">
+                  <div className="flex-shrink-0">
+                    <Shield className="w-5 h-5 text-blue-600" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-medium text-blue-800">
+                      Koneksi Aman
+                    </p>
+                    <p className="text-xs text-blue-600 mt-1">
+                      Data Anda terenkripsi dan aman
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Login Button */}
+              <Button
+                type="submit"
+                disabled={isPending || isVerifying}
+                className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg shadow-blue-500/25 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {isVerifying ? (
+                  <>
+                    <span className="loading loading-spinner loading-sm"></span>
+                    Memverifikasi...
+                  </>
+                ) : isPending ? (
+                  <>
+                    <span className="loading loading-spinner loading-sm"></span>
+                    Memproses...
+                  </>
+                ) : (
+                  <>
+                    <LogIn className="w-5 h-5" />
+                    Masuk ke Dashboard
+                  </>
+                )}
+              </Button>
             </div>
           </form>
         </CardContent>
+
+        {/* Footer */}
+        <div className="px-8 py-4 border-t border-gray-100 bg-gray-50/50">
+          <p className="text-xs text-center text-gray-500">
+            © 2024 Catur Pos. All rights reserved.
+          </p>
+        </div>
       </Card>
     </div>
   );

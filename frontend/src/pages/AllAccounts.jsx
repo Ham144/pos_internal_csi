@@ -1,13 +1,31 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
-import { getAllKasir, deleteKasir } from "../api/kasirApi";
+import { deleteKasir } from "../api/kasirApi";
 import { toast } from "react-hot-toast";
 import { deleteSpg, editSpg, getAllSpg } from "../api/spgApi";
 import ModalNewAccount from "@/components/ModalNewAccount";
 import { getOuletList, assignUserToOutlet } from "../api/outletApi";
 import { getAllAccount, updateUser } from "@/api/authApi";
 import { mockBackend, mockPages } from "@/api/constant";
-import { LucideShieldQuestion } from "lucide-react";
+import {
+  UserPlus,
+  Download,
+  Filter,
+  Edit,
+  Trash2,
+  X,
+  Save,
+  Eye,
+  EyeOff,
+  Shield,
+  ShieldQuestion,
+  Mail,
+  Phone,
+  Target,
+  Store,
+  Key,
+  Lock,
+} from "lucide-react";
 
 const AllAccounts = () => {
   const [showEditForm, setShowEditForm] = useState(false);
@@ -99,7 +117,7 @@ const AllAccounts = () => {
     },
     onError: (err) => {
       toast.error(
-        err?.response?.data?.message || "Failed to assign user to outlet"
+        err?.response?.data?.message || "Failed to assign user to outlet",
       );
     },
   });
@@ -108,7 +126,7 @@ const AllAccounts = () => {
     if (!outletList || !userId) return null;
 
     const outlet = outletList.find(
-      (outlet) => outlet.kasirList && outlet.kasirList.includes(userId)
+      (outlet) => outlet.kasirList && outlet.kasirList.includes(userId),
     );
 
     return outlet || null;
@@ -195,7 +213,7 @@ const AllAccounts = () => {
       setFilteredAccounts(accounts);
     } else {
       const filtered = accounts.filter(
-        (account) => (account.roleName || "SPG") === role
+        (account) => (account.roleName || "SPG") === role,
       );
       setFilteredAccounts(filtered);
     }
@@ -219,431 +237,609 @@ const AllAccounts = () => {
   };
 
   return (
-    <div className="flex flex-1 flex-col items-start p-4 ">
-      <div className="flex flex-1 w-full">
-        <div className="flex-1 w-full h-full p-6 rounded-lg shadow-lg bg-white">
-          <div className="flex flex-1 w-full overflow-auto">
-            <div className="mb-4 w-full">
-              <div className="flex gap-x-4 justify-between items-center">
-                <div className="flex gap-x-4 items-center">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50/30 to-gray-50 p-6">
+      {/* Header */}
+      <div className="bg-white rounded-2xl shadow-xl border border-blue-100 mb-6 p-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg shadow-blue-500/25">
+              <Shield className="w-8 h-8 text-white" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-800">
+                Manajemen Akun
+              </h1>
+              <p className="text-sm text-gray-500 mt-1">
+                Kelola semua akun pengguna, SPG, dan akses mereka
+              </p>
+            </div>
+          </div>
+
+          {/* Stats Cards */}
+          <div className="flex gap-3">
+            <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl px-4 py-2 text-white shadow-lg">
+              <p className="text-xs text-blue-100">Total Akun</p>
+              <p className="text-xl font-bold">{filteredAccounts.length}</p>
+            </div>
+            <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl px-4 py-2 text-white shadow-lg">
+              <p className="text-xs text-green-100">Kasir</p>
+              <p className="text-xl font-bold">
+                {filteredAccounts.filter((a) => a.type !== "SPG").length}
+              </p>
+            </div>
+            <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl px-4 py-2 text-white shadow-lg">
+              <p className="text-xs text-purple-100">SPG</p>
+              <p className="text-xl font-bold">
+                {filteredAccounts.filter((a) => a.type === "SPG").length}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex flex-1 w-full gap-6">
+        {/* Table Section */}
+        <div
+          className={`flex-1 transition-all duration-300 ${
+            showEditForm && selectedUser ? "lg:w-[calc(100%-432px)]" : "w-full"
+          }`}
+        >
+          <div className="bg-white rounded-2xl shadow-xl border border-blue-100 overflow-hidden">
+            {/* Table Header */}
+            <div className="p-4 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-white">
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  {/* New Account Button */}
                   <button
                     onClick={() => {
                       setShowEditForm(false);
                       setSelectedUser(null);
                       document.getElementById("newAccount").showModal();
                     }}
-                    className="btn bg-primary text-white"
+                    className="btn bg-gradient-to-r from-blue-600 to-blue-700 text-white border-0 hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-500/25"
                   >
+                    <UserPlus className="w-5 h-5 mr-2" />
                     Initialize New Account
                   </button>
-                  <select
-                    value={selectedRole}
-                    onChange={(e) => setSelectedRole(e.target.value)}
-                    className="select select-bordered w-full max-w-xs"
-                  >
-                    <option value="all">All Roles</option>
-                    {uniqueRoles.map((role) => (
-                      <option key={role} value={role}>
-                        {role}
-                      </option>
-                    ))}
-                  </select>
+
+                  {/* Role Filter */}
+                  <div className="relative">
+                    <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <select
+                      value={selectedRole}
+                      onChange={(e) => setSelectedRole(e.target.value)}
+                      className="pl-10 pr-8 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200 appearance-none bg-white"
+                    >
+                      <option value="all">Semua Role</option>
+                      {uniqueRoles.map((role) => (
+                        <option key={role} value={role}>
+                          {role}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
-                <div className="flex gap-x-2 items-center">
+
+                <div className="flex items-center gap-3">
+                  {/* Download CSV */}
                   <button
                     onClick={handleDownloadAsCsv}
-                    className="btn bg-secondary"
+                    className="btn btn-outline border-gray-300 hover:bg-blue-50 hover:border-blue-300 gap-2"
                   >
-                    Download as Csv
+                    <Download className="w-4 h-4" />
+                    Download CSV
                   </button>
-                  <button className="btn bg-secondary">
-                    Length: {filteredAccounts.length}
-                  </button>
+
+                  {/* Total Badge */}
+                  <div className="badge badge-lg bg-gradient-to-r from-blue-500 to-blue-600 text-white border-0 px-4 py-3">
+                    <Filter className="w-4 h-4 mr-2" />
+                    Total: {filteredAccounts.length}
+                  </div>
                 </div>
               </div>
-              <table className="w-full mt-4 border-collapse">
-                <thead>
-                  <tr className="bg-gray-200">
-                    <th className="p-2 text-left">
-                      Username{" "}
-                      <span
-                        className="tooltip tooltip-bottom"
-                        data-tip="untuk login"
-                      >
-                        <LucideShieldQuestion className="w-4 h-4" />
-                      </span>
+            </div>
+
+            {/* Table */}
+            <div className="overflow-x-auto max-h-[calc(100vh-300px)] overflow-y-auto">
+              <table className="w-full">
+                <thead className="bg-gradient-to-r from-blue-600 to-blue-700 sticky top-0 z-10">
+                  <tr>
+                    <th className="px-4 py-4 text-left text-sm font-semibold text-white">
+                      <div className="flex items-center gap-1">
+                        Username
+                        <div
+                          className="tooltip tooltip-bottom"
+                          data-tip="untuk login"
+                        >
+                          <ShieldQuestion className="w-4 h-4 text-blue-200" />
+                        </div>
+                      </div>
                     </th>
-                    <th className="p-2 text-left">
-                      Kode Kasir{" "}
-                      <span
-                        className="tooltip tooltip-bottom"
-                        data-tip="untuk format kodeInvoice"
-                      >
-                        <LucideShieldQuestion className="w-4 h-4" />
-                      </span>
+                    <th className="px-4 py-4 text-left text-sm font-semibold text-white">
+                      <div className="flex items-center gap-1">
+                        Kode Kasir
+                        <div
+                          className="tooltip tooltip-bottom"
+                          data-tip="untuk format kodeInvoice"
+                        >
+                          <ShieldQuestion className="w-4 h-4 text-blue-200" />
+                        </div>
+                      </div>
                     </th>
-                    <th className="p-2 text-left">Email</th>
-                    <th className="p-2 text-left">Telepon</th>
-                    <th className="p-2 text-right">Target Penjualan</th>
-                    <th className="p-2 text-center">Target Quantity</th>
-                    <th className="p-2 text-center">Outlet</th>
-                    <th className="p-2 text-center">Role</th>
+                    <th className="px-4 py-4 text-left text-sm font-semibold text-white">
+                      Email
+                    </th>
+                    <th className="px-4 py-4 text-left text-sm font-semibold text-white">
+                      Telepon
+                    </th>
+                    <th className="px-4 py-4 text-right text-sm font-semibold text-white">
+                      Target Harga
+                    </th>
+                    <th className="px-4 py-4 text-center text-sm font-semibold text-white">
+                      Target Qty
+                    </th>
+                    <th className="px-4 py-4 text-center text-sm font-semibold text-white">
+                      Outlet
+                    </th>
+                    <th className="px-4 py-4 text-center text-sm font-semibold text-white">
+                      Role
+                    </th>
                   </tr>
                 </thead>
-                <tbody className="border">
+                <tbody className="divide-y divide-gray-100">
                   {filteredAccounts?.map((user) => (
                     <tr
                       key={user._id}
                       onClick={() => handleEditClick(user)}
-                      className="hover:bg-gray-100 cursor-pointer"
+                      className="hover:bg-blue-50/50 transition-colors cursor-pointer group"
                     >
-                      <td className="p-2">
-                        {user.username || user.name || "N/A"}
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white shadow-sm group-hover:scale-110 transition-transform">
+                            <Shield className="w-4 h-4" />
+                          </div>
+                          <span className="font-medium text-gray-800">
+                            {user.username || user.name || "N/A"}
+                          </span>
+                        </div>
                       </td>
-                      <td className="p-2 font-mono">{user.kodeKasir || "-"}</td>
-                      <td className="p-2">{user.email || "-"}</td>
-                      <td className="p-2">{user.telepon || "N/A"}</td>
-                      <td className="p-2 text-right">
-                        {Intl.NumberFormat("id-ID", {
-                          style: "currency",
-                          currency: "IDR",
-                        }).format(user.targetHargaPenjualan) || "-"}
+                      <td className="px-4 py-3 font-mono text-sm">
+                        <span className="px-2 py-1 bg-blue-50 text-blue-700 rounded-md">
+                          {user.kodeKasir || "-"}
+                        </span>
                       </td>
-                      <td className="p-2 text-center">
-                        {user.targetQuantityPenjualan || "-"}
+                      <td className="px-4 py-3 text-sm text-gray-600">
+                        {user.email || "-"}
                       </td>
-                      <td className="p-2 text-center">
+                      <td className="px-4 py-3 text-sm text-gray-600">
+                        {user.telepon || "-"}
+                      </td>
+                      <td className="px-4 py-3 text-right font-mono text-sm">
+                        <span className="text-green-600 font-semibold">
+                          {user.targetHargaPenjualan
+                            ? `Rp ${user.targetHargaPenjualan.toLocaleString("id-ID")}`
+                            : "-"}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                          {user.targetQuantityPenjualan || "-"}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-center">
                         {(() => {
                           const outlet = findOutletForUser(
                             user._id,
-                            outletList?.data || []
+                            outletList?.data || [],
                           );
-                          return outlet ? outlet.namaOutlet : "-";
+                          return outlet ? (
+                            <span className="px-2 py-1 bg-purple-100 text-purple-700 rounded-md text-xs">
+                              {outlet.namaOutlet}
+                            </span>
+                          ) : (
+                            "-"
+                          );
                         })()}
                       </td>
-                      <td className="p-2 text-center">
-                        {user.roleName || "SPG"}
+                      <td className="px-4 py-3 text-center">
+                        <span
+                          className={`px-3 py-1 rounded-full text-xs font-medium
+                                                ${
+                                                  user.roleName === "SPG"
+                                                    ? "bg-green-100 text-green-700"
+                                                    : "bg-blue-100 text-blue-700"
+                                                }`}
+                        >
+                          {user.roleName || "SPG"}
+                        </span>
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
+
+              {filteredAccounts?.length === 0 && (
+                <div className="text-center py-12">
+                  <div className="flex flex-col items-center">
+                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-3">
+                      <Shield className="w-8 h-8 text-gray-400" />
+                    </div>
+                    <p className="text-gray-500">Tidak ada data akun</p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
 
+        {/* Edit Form Section */}
         {showEditForm && selectedUser && (
-          <div className="w-[400px] ml-8 bg-white p-6 rounded-lg shadow-lg">
-            <h2 className="text-2xl font-semibold text-gray-800 ">Edit User</h2>
-
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                if (selectedUser.type == "SPG") {
-                  handleUpdateSpg();
-                } else {
-                  handleUpdateUser();
-                }
-              }}
-              className="space-y-5"
-            >
-              <div className="flex pb-3 justify-end gap-4 pt-4">
-                <button
-                  type="button"
-                  className="bg-gray-400 flex-1 hover:bg-gray-500 text-white px-4 py-2 rounded-lg transition-all"
-                  onClick={() => setShowEditForm(false)}
-                >
-                  Batal
-                </button>
-                <button
-                  type="button"
-                  className="bg-red-400 flex-1 hover:bg-red-500 text-white px-4 py-2 rounded-lg transition-all"
-                  onClick={() => {
-                    const confirmDelete = window.confirm(
-                      `Apakah Anda yakin ingin menghapus ${selectedUser.username}?`
-                    );
-                    if (confirmDelete) {
-                      if (selectedUser.type == "SPG") {
-                        handleDeleteSpg(selectedUser._id);
-                      } else {
-                        handleDeleteUserKasir(selectedUser._id);
-                      }
-                    }
-                  }}
-                >
-                  Hapus
-                </button>
-                <button
-                  type="submit"
-                  className="bg-primary text-white px-6 py-2 rounded-lg transition-all"
-                >
-                  Perbarui
-                </button>
+          <div className="w-[400px]">
+            <div className="bg-white rounded-2xl shadow-xl border border-blue-100 overflow-hidden sticky top-4">
+              {/* Form Header */}
+              <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
+                <div className="flex items-center gap-2">
+                  <Edit className="w-5 h-5 text-white" />
+                  <h2 className="text-lg font-semibold text-white">
+                    Edit User
+                  </h2>
+                </div>
               </div>
-              <div>
-                <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-1">
-                  Username
-                  <div
-                    className="tooltip tooltip-bottom"
-                    data-tip="Maaf. Tidak boleh diubah, sudah terlanjur penghubung (FK) antar Invoice"
+
+              {/* Form Actions */}
+              <div className="p-4 border-b border-gray-100 bg-gray-50">
+                <div className="grid grid-cols-3 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowEditForm(false)}
+                    className="flex flex-col items-center p-2 rounded-xl border-2 border-gray-200 text-gray-600 hover:bg-gray-100 transition-colors"
                   >
-                    <LucideShieldQuestion className="w-4 h-4" />
-                  </div>
-                </label>
-                <input
-                  type="text"
-                  disabled
-                  className="w-full border px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500"
-                  value={selectedUser.username || ""}
-                  onChange={(e) =>
-                    setSelectedUser((prev) => ({
-                      ...prev,
-                      username: e.target.value,
-                    }))
-                  }
-                />
+                    <X className="w-5 h-5 mb-1" />
+                    <span className="text-xs font-medium">Batal</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const confirmDelete = window.confirm(
+                        `Apakah Anda yakin ingin menghapus ${selectedUser.username}?`,
+                      );
+                      if (confirmDelete) {
+                        if (selectedUser.type == "SPG") {
+                          handleDeleteSpg(selectedUser._id);
+                        } else {
+                          handleDeleteUserKasir(selectedUser._id);
+                        }
+                      }
+                    }}
+                    className="flex flex-col items-center p-2 rounded-xl border-2 border-red-200 text-red-600 hover:bg-red-50 transition-colors"
+                  >
+                    <Trash2 className="w-5 h-5 mb-1" />
+                    <span className="text-xs font-medium">Hapus</span>
+                  </button>
+                  <button
+                    type="submit"
+                    form="editUserForm"
+                    className="flex flex-col items-center p-2 rounded-xl border-2 border-green-200 text-green-600 hover:bg-green-50 transition-colors"
+                  >
+                    <Save className="w-5 h-5 mb-1" />
+                    <span className="text-xs font-medium">Simpan</span>
+                  </button>
+                </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
-                  Kode Kasir{" "}
-                  <span className="badge badge-info text-xs">
-                    Max 3 karakter
-                  </span>
-                </label>
-                <input
-                  type="text"
-                  maxLength={3}
-                  className="w-full border px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500"
-                  value={selectedUser.kodeKasir || ""}
-                  onChange={(e) =>
-                    setSelectedUser((prev) => ({
-                      ...prev,
-                      kodeKasir: e.target.value.toUpperCase(),
-                    }))
-                  }
-                  placeholder="Masukkan kode kasir (3 karakter)"
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  Kode ini muncul dalam kode invoice dan harus unik (3 karakter)
-                </p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
-                  Password
-                </label>
-                <input
-                  type="password"
-                  className="w-full border px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500"
-                  value={selectedUser.password || ""}
-                  onChange={(e) =>
-                    setSelectedUser((prev) => ({
-                      ...prev,
-                      password: e.target.value,
-                    }))
-                  }
-                  placeholder="Enter new password (leave blank to keep current)"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  className="w-full border px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500"
-                  value={selectedUser.email || ""}
-                  onChange={(e) =>
-                    setSelectedUser((prev) => ({
-                      ...prev,
-                      email: e.target.value,
-                    }))
-                  }
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
-                  Telepon
-                </label>
-                <input
-                  type="text"
-                  className="w-full border px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500"
-                  value={selectedUser.telepon || ""}
-                  onChange={(e) =>
-                    setSelectedUser((prev) => ({
-                      ...prev,
-                      telepon: e.target.value,
-                    }))
-                  }
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
-                  Target Harga Penjualan
-                </label>
-                <input
-                  type="number"
-                  className="w-full border px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500"
-                  value={selectedUser.targetHargaPenjualan || ""}
-                  onChange={(e) =>
-                    setSelectedUser((prev) => ({
-                      ...prev,
-                      targetHargaPenjualan: parseInt(e.target.value) || 0,
-                    }))
-                  }
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
-                  Target Quantity Penjualan
-                </label>
-                <input
-                  type="number"
-                  className="w-full border px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500"
-                  value={selectedUser.targetQuantityPenjualan || ""}
-                  onChange={(e) =>
-                    setSelectedUser((prev) => ({
-                      ...prev,
-                      targetQuantityPenjualan: parseInt(e.target.value) || 0,
-                    }))
-                  }
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
-                  Outlet
-                </label>
-                <select
-                  className="w-full border px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500"
-                  value={selectedUser.outlet || ""}
-                  onChange={(e) => {
-                    const newOutletId = e.target.value;
-                    setSelectedUser((prev) => ({
-                      ...prev,
-                      outlet: newOutletId,
-                    }));
-
-                    // Immediately update the outlet assignment
-                    if (selectedUser._id) {
-                      handleAssignOutlet({
-                        userId: selectedUser._id,
-                        outletId: newOutletId,
-                      });
+              {/* Form Fields */}
+              <div className="p-6 max-h-[600px] overflow-y-auto">
+                <form
+                  id="editUserForm"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    if (selectedUser.type == "SPG") {
+                      handleUpdateSpg();
+                    } else {
+                      handleUpdateUser();
                     }
                   }}
+                  className="space-y-4"
                 >
-                  <option value="">Pilih Outlet</option>
-                  {outletList?.data?.map((outlet) => (
-                    <option key={outlet._id} value={outlet._id}>
-                      {outlet.namaOutlet}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {selectedUser?.type !== "SPG" && (
-                <>
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1">
-                      Role Name
+                  {/* Username (Disabled) */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                      <Shield className="w-4 h-4 text-blue-500" />
+                      Username
+                      <div
+                        className="tooltip tooltip-bottom"
+                        data-tip="Maaf. Tidak boleh diubah, sudah terlanjur penghubung (FK) antar Invoice"
+                      >
+                        <ShieldQuestion className="w-4 h-4 text-gray-400" />
+                      </div>
                     </label>
                     <input
                       type="text"
-                      className="w-full border px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500"
-                      value={selectedUser.roleName?.toUpperCase() || ""}
-                      onChange={(e) =>
-                        setSelectedUser((prev) => ({
-                          ...prev,
-                          roleName: e.target.value.toUpperCase(),
-                        }))
-                      }
+                      disabled
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-xl bg-gray-50 text-gray-500"
+                      value={selectedUser.username || ""}
                     />
                   </div>
 
-                  {/* Blocked Access Frontend */}
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Blocked Access By Page
+                  {/* Kode Kasir */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                      <Key className="w-4 h-4 text-blue-500" />
+                      Kode Kasir
+                      <span className="badge badge-info text-xs">
+                        Max 3 karakter
+                      </span>
                     </label>
-                    <div className="grid grid-cols-1 gap-3">
-                      {mockPages.map((page) => (
-                        <div
-                          key={page.originalPath}
-                          className="bg-gray-50 rounded-lg shadow-sm p-3 flex items-start gap-3 hover:bg-gray-100 transition-all"
-                        >
-                          <input
-                            type="checkbox"
-                            checked={selectedUser.blockedAccess?.includes(
-                              page.originalPath
-                            )}
-                            onChange={() =>
-                              toggleBlockedAccess(page.originalPath)
-                            }
-                            className="checkbox checkbox-primary mt-1"
-                          />
-                          <div className="flex-1 min-w-0">
-                            <h3 className="text-sm font-semibold text-gray-800 truncate">
-                              {page.originalPath}
-                            </h3>
-                            <p className="text-xs text-gray-500 line-clamp-2">
-                              {page.description}
-                            </p>
-                          </div>
-                        </div>
-                      ))}
+                    <input
+                      type="text"
+                      maxLength={3}
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200 uppercase"
+                      value={selectedUser.kodeKasir || ""}
+                      onChange={(e) =>
+                        setSelectedUser((prev) => ({
+                          ...prev,
+                          kodeKasir: e.target.value.toUpperCase(),
+                        }))
+                      }
+                      placeholder="Contoh: ADM"
+                    />
+                    <p className="text-xs text-gray-500">
+                      Kode ini muncul dalam kode invoice dan harus unik (3
+                      karakter)
+                    </p>
+                  </div>
+
+                  {/* Password */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                      <Lock className="w-4 h-4 text-blue-500" />
+                      Password
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200"
+                        value={selectedUser.password || ""}
+                        onChange={(e) =>
+                          setSelectedUser((prev) => ({
+                            ...prev,
+                            password: e.target.value,
+                          }))
+                        }
+                        placeholder="Biarkan kosong jika tidak diubah"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2"
+                      >
+                        {showPassword ? (
+                          <EyeOff className="w-4 h-4 text-gray-400" />
+                        ) : (
+                          <Eye className="w-4 h-4 text-gray-400" />
+                        )}
+                      </button>
                     </div>
                   </div>
 
-                  <div className="divider divider-neutral">
-                    Atau Lebih Spesifik
+                  {/* Email */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                      <Mail className="w-4 h-4 text-blue-500" />
+                      Email
+                    </label>
+                    <input
+                      type="email"
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200"
+                      value={selectedUser.email || ""}
+                      onChange={(e) =>
+                        setSelectedUser((prev) => ({
+                          ...prev,
+                          email: e.target.value,
+                        }))
+                      }
+                      placeholder="user@example.com"
+                    />
                   </div>
 
-                  {/* Blocked Access Backend */}
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Blocked Access By API Specific
+                  {/* Telepon */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                      <Phone className="w-4 h-4 text-blue-500" />
+                      Telepon
                     </label>
-                    <div className="grid grid-cols-1 gap-3">
-                      {mockBackend.map((api) => (
-                        <div
-                          key={api.originalPath}
-                          className="bg-gray-50 rounded-lg shadow-sm p-3 flex items-start gap-3 hover:bg-gray-100 transition-all"
-                        >
-                          <input
-                            type="checkbox"
-                            checked={selectedUser.blockedAccess?.includes(
-                              api.originalPath
-                            )}
-                            onChange={() =>
-                              toggleBlockedAccess(api.originalPath)
-                            }
-                            className="checkbox checkbox-primary mt-1"
-                          />
-                          <div className="flex-1 min-w-0">
-                            <h3 className="text-sm font-semibold text-gray-800 truncate">
-                              {api.originalPath}
-                            </h3>
-                            <p className="text-xs text-gray-500 line-clamp-2">
-                              {api.description}
-                            </p>
+                    <input
+                      type="text"
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200"
+                      value={selectedUser.telepon || ""}
+                      onChange={(e) =>
+                        setSelectedUser((prev) => ({
+                          ...prev,
+                          telepon: e.target.value,
+                        }))
+                      }
+                      placeholder="08123456789"
+                    />
+                  </div>
+
+                  {/* Target Harga */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                      <Target className="w-4 h-4 text-blue-500" />
+                      Target Harga Penjualan
+                    </label>
+                    <input
+                      type="number"
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200"
+                      value={selectedUser.targetHargaPenjualan || ""}
+                      onChange={(e) =>
+                        setSelectedUser((prev) => ({
+                          ...prev,
+                          targetHargaPenjualan: parseInt(e.target.value) || 0,
+                        }))
+                      }
+                      placeholder="0"
+                    />
+                  </div>
+
+                  {/* Target Quantity */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                      <Target className="w-4 h-4 text-blue-500" />
+                      Target Quantity Penjualan
+                    </label>
+                    <input
+                      type="number"
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200"
+                      value={selectedUser.targetQuantityPenjualan || ""}
+                      onChange={(e) =>
+                        setSelectedUser((prev) => ({
+                          ...prev,
+                          targetQuantityPenjualan:
+                            parseInt(e.target.value) || 0,
+                        }))
+                      }
+                      placeholder="0"
+                    />
+                  </div>
+
+                  {/* Outlet */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                      <Store className="w-4 h-4 text-blue-500" />
+                      Outlet
+                    </label>
+                    <select
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200 appearance-none bg-white"
+                      value={selectedUser.outlet || ""}
+                      onChange={(e) => {
+                        const newOutletId = e.target.value;
+                        setSelectedUser((prev) => ({
+                          ...prev,
+                          outlet: newOutletId,
+                        }));
+
+                        if (selectedUser._id) {
+                          handleAssignOutlet({
+                            userId: selectedUser._id,
+                            outletId: newOutletId,
+                          });
+                        }
+                      }}
+                    >
+                      <option value="">Pilih Outlet</option>
+                      {outletList?.data?.map((outlet) => (
+                        <option key={outlet._id} value={outlet._id}>
+                          {outlet.namaOutlet}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Role Name (for non-SPG) */}
+                  {selectedUser?.type !== "SPG" && (
+                    <>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                          <Shield className="w-4 h-4 text-blue-500" />
+                          Role Name
+                        </label>
+                        <input
+                          type="text"
+                          className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200 uppercase"
+                          value={selectedUser.roleName?.toUpperCase() || ""}
+                          onChange={(e) =>
+                            setSelectedUser((prev) => ({
+                              ...prev,
+                              roleName: e.target.value.toUpperCase(),
+                            }))
+                          }
+                          placeholder="ADMIN / MANAGER / KASIR"
+                        />
+                      </div>
+
+                      {/* Blocked Access Sections */}
+                      <div className="space-y-4 pt-2">
+                        <div className="bg-gradient-to-r from-blue-50 to-white rounded-xl p-4 border border-blue-100">
+                          <h3 className="text-sm font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                            <Lock className="w-4 h-4 text-blue-500" />
+                            Blocked Access By Page
+                          </h3>
+                          <div className="space-y-2 max-h-48 overflow-y-auto">
+                            {mockPages.map((page) => (
+                              <div
+                                key={page.originalPath}
+                                className="flex items-start gap-3 p-2 bg-white rounded-lg hover:bg-blue-50 transition-colors"
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={selectedUser.blockedAccess?.includes(
+                                    page.originalPath,
+                                  )}
+                                  onChange={() =>
+                                    toggleBlockedAccess(page.originalPath)
+                                  }
+                                  className="checkbox checkbox-primary checkbox-sm mt-1"
+                                />
+                                <div className="flex-1">
+                                  <p className="text-xs font-medium text-gray-800">
+                                    {page.originalPath}
+                                  </p>
+                                  <p className="text-xs text-gray-500">
+                                    {page.description}
+                                  </p>
+                                </div>
+                              </div>
+                            ))}
                           </div>
                         </div>
-                      ))}
-                    </div>
-                  </div>
-                </>
-              )}
-            </form>
+
+                        <div className="bg-gradient-to-r from-purple-50 to-white rounded-xl p-4 border border-purple-100">
+                          <h3 className="text-sm font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                            <Lock className="w-4 h-4 text-purple-500" />
+                            Blocked Access By API
+                          </h3>
+                          <div className="space-y-2 max-h-48 overflow-y-auto">
+                            {mockBackend.map((api) => (
+                              <div
+                                key={api.originalPath}
+                                className="flex items-start gap-3 p-2 bg-white rounded-lg hover:bg-purple-50 transition-colors"
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={selectedUser.blockedAccess?.includes(
+                                    api.originalPath,
+                                  )}
+                                  onChange={() =>
+                                    toggleBlockedAccess(api.originalPath)
+                                  }
+                                  className="checkbox checkbox-primary checkbox-sm mt-1"
+                                />
+                                <div className="flex-1">
+                                  <p className="text-xs font-medium text-gray-800">
+                                    {api.originalPath}
+                                  </p>
+                                  <p className="text-xs text-gray-500">
+                                    {api.description}
+                                  </p>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </form>
+              </div>
+            </div>
           </div>
         )}
       </div>
-      <ModalNewAccount key="newAccount" />
+
+      {/* Modals */}
+      <ModalNewAccount id="newAccount" />
     </div>
   );
 };

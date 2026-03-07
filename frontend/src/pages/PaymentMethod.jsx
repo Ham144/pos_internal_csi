@@ -6,7 +6,27 @@ import {
   deletePaymentMethod,
   togglePaymentMethodStatus,
 } from "../api/paymentMethodApi";
-import { Plus } from "lucide-react";
+
+import {
+  Plus,
+  CreditCard,
+  Percent,
+  Coins,
+  Trash2,
+  X,
+  AlertCircle,
+  CheckCircle2,
+  Loader2,
+  Banknote,
+  QrCode,
+  Wallet,
+  Landmark,
+  HelpCircle,
+  ToggleLeft,
+  ToggleRight,
+  Info,
+  Edit,
+} from "lucide-react";
 
 const PaymentMethod = () => {
   const queryClient = useQueryClient();
@@ -120,246 +140,225 @@ const PaymentMethod = () => {
   }
 
   return (
-    <div className="bg-base-100 min-h-screen">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Alert/Notifikasi */}
         {alert.show && (
-          <div className="toast toast-top toast-end z-50">
+          <div className="fixed top-4 right-4 z-50 animate-slideIn">
             <div
-              className={`alert ${
-                alert.type === "error" ? "alert-error" : "alert-success"
-              } shadow-lg`}
+              className={`flex items-center gap-3 px-6 py-4 rounded-2xl shadow-xl ${
+                alert.type === "error"
+                  ? "bg-gradient-to-r from-red-500 to-red-600"
+                  : "bg-gradient-to-r from-emerald-500 to-emerald-600"
+              } text-white`}
             >
-              <div>
-                {alert.type === "error" ? (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="stroke-current shrink-0 h-6 w-6"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                ) : (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="stroke-current shrink-0 h-6 w-6"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                )}
-                <span>{alert.message}</span>
-              </div>
+              {alert.type === "error" ? (
+                <AlertCircle className="w-6 h-6" />
+              ) : (
+                <CheckCircle2 className="w-6 h-6" />
+              )}
+              <span className="font-medium">{alert.message}</span>
             </div>
           </div>
         )}
 
         {/* Header Section */}
-        <div className="bg-base-200 rounded-box p-6 shadow-md mb-8">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div>
-              <h1 className="text-3xl font-bold text-base-content">
-                Metode Pembayaran
-              </h1>
-              <p className="text-base-content/70">
-                Kelola semua metode pembayaran yang akan muncul di aplikasi
-                mobile
-              </p>
+        <div className="bg-white rounded-2xl shadow-xl border border-blue-100 p-8 mb-8">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+            <div className="flex items-start gap-4">
+              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center shadow-lg shadow-blue-200">
+                <CreditCard className="w-7 h-7 text-white" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold text-gray-800">
+                  Metode Pembayaran
+                </h1>
+                <p className="text-gray-500 mt-1 flex items-center gap-1">
+                  Atur kategori pembayaran yang akan berguna untuk perhitungan
+                  dashboard sales report
+                  <div
+                    className="tooltip tooltip-right"
+                    data-tip="Metode pembayaran yang aktif akan tersedia untuk transaksi"
+                  >
+                    <HelpCircle className="w-4 h-4 text-gray-400" />
+                  </div>
+                </p>
+              </div>
             </div>
             <button
-              className="btn bg-green-400 gap-2"
+              className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2 font-medium shadow-blue-200"
               onClick={() => setIsModalOpen(true)}
             >
-              <Plus />
+              <Plus className="w-5 h-5" />
               Tambah Metode Pembayaran
             </button>
           </div>
         </div>
 
         {/* Tabel Metode Pembayaran */}
-        <div className="bg-base-100 rounded-box shadow-md overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-xl border border-blue-100 overflow-hidden">
           {isLoading ? (
-            <div className="flex justify-center items-center p-12">
-              <div className="flex flex-col items-center gap-2">
-                <span className="loading loading-spinner loading-lg text-primary"></span>
-                <p className="text-base-content/70">
+            <div className="flex justify-center items-center p-16">
+              <div className="flex flex-col items-center gap-4">
+                <Loader2 className="w-10 h-10 text-blue-600 animate-spin" />
+                <p className="text-gray-500 font-medium">
                   Memuat data metode pembayaran...
                 </p>
               </div>
             </div>
           ) : paymentMethods.length === 0 ? (
-            <div className="flex flex-col justify-center items-center p-12 text-center">
-              <div className="bg-base-200 p-4 rounded-full mb-4">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-12 w-12 text-base-content/50"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
-                  />
-                </svg>
+            <div className="flex flex-col justify-center items-center p-16 text-center">
+              <div className="w-20 h-20 rounded-full bg-blue-50 flex items-center justify-center mb-4">
+                <CreditCard className="w-10 h-10 text-blue-400" />
               </div>
-              <h3 className="text-xl font-bold mb-2">
+              <h3 className="text-xl font-bold text-gray-800 mb-2">
                 Belum Ada Metode Pembayaran
               </h3>
-              <p className="text-base-content/70 mb-4">
+              <p className="text-gray-500 mb-6 max-w-md">
                 Tambahkan metode pembayaran pertama Anda untuk mulai menerima
-                pembayaran.
+                pembayaran melalui aplikasi mobile.
               </p>
               <button
-                className="btn btn-success btn-sm"
+                className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2"
                 onClick={() => setIsModalOpen(true)}
               >
+                <Plus className="w-5 h-5" />
                 Tambah Metode Pembayaran
               </button>
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="table table-zebra w-full">
-                <thead className="bg-base-200">
-                  <tr>
-                    <th className="rounded-tl-lg">Metode Pembayaran</th>
-                    <th>Diskon</th>
-                    <th>Biaya Tambahan</th>
-                    <th>Status</th>
-                    <th className="rounded-tr-lg text-center">Aksi</th>
+              <table className="w-full">
+                <thead>
+                  <tr className="bg-gradient-to-r from-blue-600 to-blue-700">
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-white">
+                      Metode Pembayaran
+                    </th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-white">
+                      Diskon
+                    </th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-white">
+                      Biaya Tambahan
+                    </th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-white">
+                      Status
+                    </th>
+                    <th className="px-6 py-4 text-center text-sm font-semibold text-white">
+                      Aksi
+                    </th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="divide-y divide-blue-100">
                   {paymentMethods.map((method) => (
-                    <tr key={method._id} className="hover">
-                      <td className="font-medium">
-                        <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="h-4 w-4 text-primary"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
-                              />
-                            </svg>
+                    <tr
+                      key={method._id}
+                      className="hover:bg-blue-50/50 transition-all duration-200 group"
+                    >
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center">
+                            {method.method.toLowerCase().includes("qris") ? (
+                              <QrCode className="w-5 h-5 text-blue-600" />
+                            ) : method.method.toLowerCase().includes("bank") ? (
+                              <Landmark className="w-5 h-5 text-blue-600" />
+                            ) : method.method.toLowerCase().includes("cash") ? (
+                              <Banknote className="w-5 h-5 text-blue-600" />
+                            ) : method.method
+                                .toLowerCase()
+                                .includes("wallet") ? (
+                              <Wallet className="w-5 h-5 text-blue-600" />
+                            ) : (
+                              <CreditCard className="w-5 h-5 text-blue-600" />
+                            )}
                           </div>
-                          {method.method}
+                          <span className="font-medium text-gray-800">
+                            {method.method}
+                          </span>
                         </div>
                       </td>
-                      <td>
+                      <td className="px-6 py-4">
                         {method.discount ? (
-                          <div className="badge badge-accent text-white">
-                            {method.discount}%
+                          <div className="flex items-center gap-1">
+                            <Percent className="w-4 h-4 text-emerald-500" />
+                            <span className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-lg text-sm font-medium">
+                              {method.discount}%
+                            </span>
                           </div>
                         ) : (
-                          <span className="text-base-content/50">-</span>
+                          <span className="text-gray-400 text-sm">-</span>
                         )}
                       </td>
-                      <td>
+                      <td className="px-6 py-4">
                         {method.additional_fee ? (
-                          <div className="badge badge-warning text-white">
-                            Rp {method.additional_fee.toLocaleString("id-ID")}
+                          <div className="flex items-center gap-1">
+                            <Coins className="w-4 h-4 text-amber-500" />
+                            <span className="bg-amber-100 text-amber-700 px-3 py-1 rounded-lg text-sm font-medium">
+                              Rp {method.additional_fee.toLocaleString("id-ID")}
+                            </span>
                           </div>
                         ) : (
-                          <span className="text-base-content/50">-</span>
+                          <span className="text-gray-400 text-sm">-</span>
                         )}
                       </td>
-                      <td>
+                      <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
                           <span
-                            className={`badge ${
+                            className={`px-3 py-1 rounded-lg text-sm font-medium ${
                               method.status
-                                ? "badge-success text-white"
-                                : "badge-error text-white"
+                                ? "bg-emerald-100 text-emerald-700"
+                                : "bg-red-100 text-red-700"
                             }`}
                           >
                             {method.status ? "Aktif" : "Nonaktif"}
                           </span>
                         </div>
                       </td>
-                      <td>
+                      <td className="px-6 py-4">
                         <div className="flex justify-center gap-2">
+                          <div className="tooltip" data-tip={"manage"}>
+                            <button
+                              onClick={() => {
+                                // setSelectedMethod(method);
+                                // document
+                                //   .getElementById("edit-payment-method-modal")
+                                //   .showModal();
+                              }}
+                              disabled={toggleStatusMutation.isPending}
+                              className={`p-2 rounded-lg transition-all duration-200 ${
+                                method.status
+                                  ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
+                                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                              }`}
+                            >
+                              <Edit />
+                            </button>
+                          </div>
                           <div
                             className="tooltip"
                             data-tip={
                               method.status ? "Nonaktifkan" : "Aktifkan"
                             }
                           >
-                            <label className="swap swap-rotate">
-                              <input
-                                type="checkbox"
-                                checked={method.status}
-                                onChange={() => handleToggleStatus(method._id)}
-                                disabled={toggleStatusMutation.isPending}
-                                className="hidden"
-                              />
-                              <div
-                                className={`swap-on ${
-                                  method.status ? "text-success" : "text-error"
-                                } btn btn-circle btn-sm btn-ghost`}
-                              >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="h-5 w-5"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M5 13l4 4L19 7"
-                                  />
-                                </svg>
-                              </div>
-                              <div
-                                className={`swap-off ${
-                                  method.status ? "text-success" : "text-error"
-                                } btn btn-circle btn-sm btn-ghost`}
-                              >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="h-5 w-5"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M6 18L18 6M6 6l12 12"
-                                  />
-                                </svg>
-                              </div>
-                            </label>
+                            <button
+                              onClick={() => handleToggleStatus(method._id)}
+                              disabled={toggleStatusMutation.isPending}
+                              className={`p-2 rounded-lg transition-all duration-200 ${
+                                method.status
+                                  ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
+                                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                              }`}
+                            >
+                              {method.status ? (
+                                <ToggleRight className="w-5 h-5" />
+                              ) : (
+                                <ToggleLeft className="w-5 h-5" />
+                              )}
+                            </button>
                           </div>
 
                           <div className="tooltip" data-tip="Hapus">
                             <button
-                              className="btn btn-circle btn-sm btn-error text-white"
+                              className="p-2 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 transition-all duration-200"
                               onClick={() =>
                                 setDeleteConfirm({ show: true, id: method._id })
                               }
@@ -368,20 +367,7 @@ const PaymentMethod = () => {
                                 deleteMutation.isPending
                               }
                             >
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-4 w-4"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                                />
-                              </svg>
+                              <Trash2 className="w-5 h-5" />
                             </button>
                           </div>
                         </div>
@@ -396,32 +382,41 @@ const PaymentMethod = () => {
 
         {/* Modal Tambah Metode Pembayaran */}
         {isModalOpen && (
-          <div className="modal modal-open modal-bottom sm:modal-middle">
-            <div className="modal-box relative">
-              <button
-                className="btn btn-sm btn-circle absolute right-2 top-2"
-                onClick={() => {
-                  setIsModalOpen(false);
-                  setFormData({
-                    method: "",
-                    discount: "",
-                    additional_fee: "",
-                    status: true,
-                  });
-                }}
-              >
-                ✕
-              </button>
-              <h3 className="font-bold text-lg mb-6 ">
-                Tambah Metode Pembayaran
-              </h3>
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg relative animate-scaleIn">
+              {/* Header Modal */}
+              <div className="p-6 border-b border-blue-100">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center">
+                      <CreditCard className="w-5 h-5 text-white" />
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-800">
+                      Tambah Metode Pembayaran
+                    </h3>
+                  </div>
+                  <button
+                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                    onClick={() => {
+                      setIsModalOpen(false);
+                      setFormData({
+                        method: "",
+                        discount: "",
+                        additional_fee: "",
+                        status: true,
+                      });
+                    }}
+                  >
+                    <X className="w-5 h-5 text-gray-500" />
+                  </button>
+                </div>
+              </div>
 
-              <form onSubmit={handleAddPaymentMethod} className="space-y-4">
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text font-medium">
-                      Nama Metode Pembayaran
-                    </span>
+              {/* Form */}
+              <form onSubmit={handleAddPaymentMethod} className="p-6 space-y-5">
+                <div className="space-y-1">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Nama Metode Pembayaran
                   </label>
                   <input
                     type="text"
@@ -429,24 +424,30 @@ const PaymentMethod = () => {
                     value={formData.method}
                     onChange={handleInputChange}
                     placeholder="Contoh: QRIS, Bank Transfer, Cash"
-                    className="input input-bordered w-full focus:input-primary"
+                    className="w-full border border-gray-200 px-4 py-3 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                     required
                   />
-                  <label className="label">
-                    <span className="label-text-alt text-base-content/60">
-                      Masukkan nama metode pembayaran
-                    </span>
-                  </label>
+                  <p className="text-xs text-gray-500">
+                    Masukkan nama metode pembayaran
+                  </p>
                 </div>
 
-                <div className="divider">
-                  Detail Tambahan (Tidak perlu diisi)
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-gray-200"></div>
+                  </div>
+                  <div className="relative flex justify-center text-sm">
+                    <span className="px-4 bg-white text-gray-500">
+                      Detail Tambahan (Opsional)
+                    </span>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="form-control">
-                    <label className="label">
-                      <span className="label-text font-medium">Diskon (%)</span>
+                  <div className="space-y-1">
+                    <label className="block text-sm font-medium text-gray-700 flex items-center gap-1">
+                      <Percent className="w-4 h-4 text-blue-500" />
+                      Diskon (%)
                     </label>
                     <input
                       type="number"
@@ -455,21 +456,15 @@ const PaymentMethod = () => {
                       onChange={handleInputChange}
                       min="0"
                       max="100"
-                      placeholder="Diskon dalam persentase"
-                      className="input input-bordered w-full focus:input-primary"
+                      placeholder="0 - 100"
+                      className="w-full border border-gray-200 px-4 py-3 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                     />
-                    <label className="label">
-                      <span className="label-text-alt text-base-content/60">
-                        Opsional
-                      </span>
-                    </label>
                   </div>
 
-                  <div className="form-control">
-                    <label className="label">
-                      <span className="label-text font-medium">
-                        Biaya Tambahan (Rp)
-                      </span>
+                  <div className="space-y-1">
+                    <label className="block text-sm font-medium text-gray-700 flex items-center gap-1">
+                      <Coins className="w-4 h-4 text-amber-500" />
+                      Biaya Tambahan (Rp)
                     </label>
                     <input
                       type="number"
@@ -477,43 +472,55 @@ const PaymentMethod = () => {
                       value={formData.additional_fee}
                       onChange={handleInputChange}
                       min="0"
-                      placeholder="Biaya tambahan dalam Rupiah"
-                      className="input input-bordered w-full focus:input-primary"
+                      placeholder="Contoh: 5000"
+                      className="w-full border border-gray-200 px-4 py-3 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                     />
-                    <label className="label">
-                      <span className="label-text-alt text-base-content/60">
-                        Opsional
-                      </span>
-                    </label>
                   </div>
                 </div>
 
-                <div className="form-control">
-                  <label className="label cursor-pointer justify-start gap-2">
-                    <input
-                      type="checkbox"
-                      name="status"
-                      checked={formData.status}
-                      onChange={handleInputChange}
-                      className="toggle toggle-primary"
-                    />
-                    <div>
-                      <span className="label-text font-medium">
-                        Status Aktif
-                      </span>
-                      <p className="text-xs text-base-content/60 mt-1">
-                        {formData.status
-                          ? "Metode pembayaran ini akan segera tersedia untuk transaksi"
-                          : "Metode pembayaran ini tidak akan tersedia untuk transaksi"}
-                      </p>
+                <div className="bg-blue-50 rounded-xl p-4">
+                  <label className="flex items-center justify-between cursor-pointer">
+                    <div className="flex items-start gap-3">
+                      <div className="mt-0.5">
+                        <Info className="w-4 h-4 text-blue-500" />
+                      </div>
+                      <div>
+                        <span className="block font-medium text-gray-700">
+                          Status Aktif
+                        </span>
+                        <p className="text-xs text-gray-500 mt-1">
+                          {formData.status
+                            ? "Metode pembayaran akan langsung tersedia untuk transaksi"
+                            : "Metode pembayaran tidak akan ditampilkan di aplikasi"}
+                        </p>
+                      </div>
                     </div>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          status: !prev.status,
+                        }))
+                      }
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                        formData.status ? "bg-blue-600" : "bg-gray-300"
+                      }`}
+                    >
+                      <span
+                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                          formData.status ? "translate-x-6" : "translate-x-1"
+                        }`}
+                      />
+                    </button>
                   </label>
                 </div>
 
-                <div className="modal-action pt-4">
+                {/* Footer Modal */}
+                <div className="flex gap-3 pt-4">
                   <button
                     type="button"
-                    className="btn btn-outline"
+                    className="flex-1 px-4 py-3 border border-gray-200 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-all duration-200"
                     onClick={() => {
                       setIsModalOpen(false);
                       setFormData({
@@ -529,11 +536,14 @@ const PaymentMethod = () => {
                   </button>
                   <button
                     type="submit"
-                    className="btn btn-primary"
+                    className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-3 rounded-xl font-medium hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={createMutation.isPending}
                   >
                     {createMutation.isPending ? (
-                      <span className="loading loading-spinner loading-sm"></span>
+                      <div className="flex items-center justify-center gap-2">
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span>Menyimpan...</span>
+                      </div>
                     ) : (
                       "Simpan"
                     )}
@@ -541,69 +551,51 @@ const PaymentMethod = () => {
                 </div>
               </form>
             </div>
-            <div
-              className="modal-backdrop bg-neutral bg-opacity-50"
-              onClick={() => setIsModalOpen(false)}
-            ></div>
           </div>
         )}
 
         {/* Modal Konfirmasi Hapus */}
         {deleteConfirm.show && (
-          <div className="modal modal-open modal-bottom sm:modal-middle">
-            <div className="modal-box text-center">
-              <h3 className="font-bold text-lg mb-2">Konfirmasi Hapus</h3>
-              <div className="py-4">
-                <div className="flex justify-center mb-4">
-                  <div className="w-16 h-16 rounded-full bg-error/10 flex items-center justify-center">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-8 w-8 text-error"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                      />
-                    </svg>
-                  </div>
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md relative animate-scaleIn">
+              <div className="p-6 text-center">
+                <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
+                  <Trash2 className="w-8 h-8 text-red-500" />
                 </div>
-                <p className="text-base-content/80">
+                <h3 className="text-xl font-bold text-gray-800 mb-2">
+                  Konfirmasi Hapus
+                </h3>
+                <p className="text-gray-600 mb-2">
                   Apakah Anda yakin ingin menghapus metode pembayaran ini?
                 </p>
-                <p className="text-sm text-base-content/60 mt-2">
+                <p className="text-sm text-gray-500 mb-6">
                   Tindakan ini tidak dapat dibatalkan.
                 </p>
-              </div>
-              <div className="modal-action">
-                <button
-                  className="btn btn-outline"
-                  onClick={() => setDeleteConfirm({ show: false, id: null })}
-                  disabled={deleteMutation.isPending}
-                >
-                  Tidak
-                </button>
-                <button
-                  className="btn btn-error text-white"
-                  onClick={() => handleDeletePaymentMethod(deleteConfirm.id)}
-                  disabled={deleteMutation.isPending}
-                >
-                  {deleteMutation.isPending ? (
-                    <span className="loading loading-spinner loading-sm"></span>
-                  ) : (
-                    "Ya, Hapus"
-                  )}
-                </button>
+                <div className="flex gap-3">
+                  <button
+                    className="flex-1 px-4 py-3 border border-gray-200 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-all duration-200"
+                    onClick={() => setDeleteConfirm({ show: false, id: null })}
+                    disabled={deleteMutation.isPending}
+                  >
+                    Tidak
+                  </button>
+                  <button
+                    className="flex-1 bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-3 rounded-xl font-medium hover:shadow-lg transition-all duration-200 disabled:opacity-50"
+                    onClick={() => handleDeletePaymentMethod(deleteConfirm.id)}
+                    disabled={deleteMutation.isPending}
+                  >
+                    {deleteMutation.isPending ? (
+                      <div className="flex items-center justify-center gap-2">
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span>Menghapus...</span>
+                      </div>
+                    ) : (
+                      "Ya, Hapus"
+                    )}
+                  </button>
+                </div>
               </div>
             </div>
-            <div
-              className="modal-backdrop bg-neutral bg-opacity-50"
-              onClick={() => setDeleteConfirm({ show: false, id: null })}
-            ></div>
           </div>
         )}
       </div>
