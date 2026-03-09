@@ -59,7 +59,7 @@
 -bulPriceupdate ga nemu(spawn)
 -create manual di item_library (spawn)
 -perbarui data dari middleware (spawn)
--bulPrice update quantity (increase / decrease),
+-bulPrice update quantity (increase / decrease)
 -edit manual di item_library (increase / decrease)
 -sync mobile (increase / decrease)
 -void (decrease)
