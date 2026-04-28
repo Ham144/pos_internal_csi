@@ -134,7 +134,7 @@ const Artikel_Documentation = () => {
     }
   };
 
-  const handleDownload = async (docId) => {
+  const handleDownload = async () => {
     try {
       setIsDownloading(true);
 
@@ -195,6 +195,7 @@ const Artikel_Documentation = () => {
                     type="file"
                     className="hidden"
                     accept=".docx"
+                    te
                     onChange={handleFileChange}
                     disabled={uploadMutation.isLoading}
                   />

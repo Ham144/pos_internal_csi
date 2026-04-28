@@ -209,7 +209,7 @@ const Home = () => {
               <div className="text-center">
                 {/* Logo/Brand */}
                 <div className="flex justify-center mb-6">
-                  <div className="p-4 bg-white/10 rounded-3xl backdrop-blur-sm border border-white/20">
+                  <div className="p-4 bg-white rounded-3xl backdrop-blur-sm border border-white/20">
                     <img
                       src="/csi-logo2.png"
                       alt="Catur POS"

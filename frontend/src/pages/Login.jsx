@@ -220,43 +220,6 @@ export default function Login({ className, ...props }) {
                 </div>
               </div>
 
-              {/* Remember Me & Forgot Password */}
-              <div className="flex items-center justify-between">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    className="checkbox checkbox-sm checkbox-primary"
-                    checked={rememberMe}
-                    onChange={(e) => setRememberMe(e.target.checked)}
-                  />
-                  <span className="text-sm text-gray-600">Ingat saya</span>
-                </label>
-                <a
-                  href="#"
-                  className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1 group"
-                >
-                  Lupa password?
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </a>
-              </div>
-
-              {/* Security Info */}
-              <div className="bg-blue-50 rounded-xl p-4 border border-blue-100">
-                <div className="flex gap-3">
-                  <div className="flex-shrink-0">
-                    <Shield className="w-5 h-5 text-blue-600" />
-                  </div>
-                  <div>
-                    <p className="text-xs font-medium text-blue-800">
-                      Koneksi Aman
-                    </p>
-                    <p className="text-xs text-blue-600 mt-1">
-                      Data Anda terenkripsi dan aman
-                    </p>
-                  </div>
-                </div>
-              </div>
-
               {/* Login Button */}
               <Button
                 type="submit"

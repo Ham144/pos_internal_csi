@@ -551,7 +551,6 @@ export const mockBackend = [
     originalPath: "/api/v1/payment/payment/shopeepay",
     description: "API untuk pembayaran melalui ShopeePay (no used)",
   },
-
   // Inventory Stats Routes
   {
     originalPath: "/api/v1/inventory/getInventoryStats",
@@ -563,7 +562,6 @@ export const mockBackend = [
     description:
       "API untuk mencari inventory berdasarkan kategori stok (kosong, menipis, normal) dengan pagination dan filter",
   },
-
   // Purchase Order Status Routes
   {
     originalPath: "/api/v1/purchaseOrder/getPurchaseOrderByStatus",
