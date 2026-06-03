@@ -50,12 +50,6 @@
 //perubahan web
 [x] fitur: stack trace tiap item dari awal spawn hingga tiap perubahan item di item_library dan downloadable di buku besar item. meliputi :
 
-// saas
-[] add: optimasi dan sederhakan mobile
-[] add: perbaiki UI mobile
-[] add: landing page
-[] add: page "report list" tidak implemented, pakai di menu khusus admin (buat menu khusus admin)
-
 -bulPriceupdate ga nemu(spawn)
 -create manual di item_library (spawn)
 -perbarui data dari middleware (spawn)
@@ -63,3 +57,7 @@
 -edit manual di item_library (increase / decrease)
 -sync mobile (increase / decrease)
 -void (decrease)
+
+//fix
+[x] perbaiki export saat ini yang harganya saatdi export 300 padahal 300000
+[x] field nomorTransaksi juga perlu dikeluarkan saat export

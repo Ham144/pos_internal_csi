@@ -36,6 +36,10 @@ import {
   Ban,
 } from "lucide-react";
 
+// angka mentah untuk CSV — hindari 300.000 yang dibaca Excel sebagai 300
+const csvAngka = (nilai) =>
+  nilai != null && nilai !== "" ? String(nilai) : "";
+
 export const formatDate = (dateString) => {
   try {
     const date = new Date(dateString);
@@ -231,6 +235,7 @@ const Invoices = () => {
     const headers = [
       "Kode Invoice",
       "EXT CODE",
+      "Nomor Transaksi",
       "Tanggal Sync",
       "Tanggal Bill",
       "Kasir",
@@ -255,12 +260,13 @@ const Invoices = () => {
       const baseInfo = [
         invoice.kodeInvoice,
         invoice._id,
+        invoice.nomorTransaksi || "",
         formatDate(invoice.createdAt), //Waktu Sync
         formatDate(invoice.tanggalBayar), //waktu print billing bukan kwitansi
         getKasirName(invoice.salesPerson),
         getSpgNameById(invoice.spg),
-        invoice.subTotal?.toLocaleString("id-ID") || "-",
-        invoice.total?.toLocaleString("id-ID") || "-",
+        csvAngka(invoice.subTotal) || "-",
+        csvAngka(invoice.total) || "-",
         invoice.isVoid ? "Dibatalkan" : invoice.done ? "Selesai" : "Tertunda",
         invoice.isPrintedCustomerBilling ? "Sudah" : "Belum",
         invoice.done ? "Lunas" : "Belum",
@@ -278,10 +284,10 @@ const Invoices = () => {
         rows.push([
           ...baseInfo,
           item.sku,
-          item.RpHargaDasar?.toLocaleString("id-ID") || "",
+          csvAngka(item.RpHargaDasar),
           item.quantity,
-          diskEntry?.diskonInfo?.RpPotonganHarga?.toLocaleString("id-ID") || "",
-          item.totalRp?.toLocaleString("id-ID") || "",
+          csvAngka(diskEntry?.diskonInfo?.RpPotonganHarga),
+          csvAngka(item.totalRp),
           voucherEntry?.voucherInfo?.judulVoucher || "",
         ]);
       });
