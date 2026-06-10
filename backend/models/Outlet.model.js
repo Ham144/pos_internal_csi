@@ -40,6 +40,8 @@ const outletSchema = mongoose.Schema({
     type: String,
     default: "00:00", //00:00
   },
+  // daftar SKU yang menampilkan gambar di mobile (bukan wajib punya thumbnail)
+  favoritedInventoryIds: [String],
 });
 
 const Outlet = mongoose.model("Outlet", outletSchema);

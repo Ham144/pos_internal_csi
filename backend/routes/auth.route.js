@@ -39,14 +39,12 @@ router.post("/login", async (req, res) => {
 
     const originFull = req.originalUrl;
 
-    console.log(originFull);
-
     // Set cookie di sini
     res.cookie("token", token, {
       httpOnly: true, // agar tidak bisa diakses dari client-side JS
       secure:
         process.env.NODE_ENV === "production" &&
-        !originFull.startsWith("http://192.168.169.14")
+        !originFull.startsWith("http://192.168.169.12")
           ? true
           : false, // Ganti secure true jika production kalau prod https
       sameSite: "lax",
@@ -321,7 +319,7 @@ router.get("/getUserInfo", async (req, res) => {
   try {
     if (req.userId) {
       const userDB = await UserRefrensi.findById(req.userId).select(
-        "_id username blockedAccess roleName totalHargaPenjualan totalQuantityPenjualan targetHargaPenjualan targetQuantityPenjualan kodeKasir"
+        "_id username blockedAccess roleName totalHargaPenjualan totalQuantityPenjualan targetHargaPenjualan targetQuantityPenjualan kodeKasir",
       );
       if (!userDB) {
         return res.status(404).json({ message: "akun tidak ditemukan" });
@@ -353,7 +351,7 @@ router.get("/getUserInfoComplete", async (req, res) => {
 router.get("/getAllAccount", authorize, async (req, res) => {
   try {
     const userDBs = await UserRefrensi.find().select(
-      "-password -otp -otpExpiredAt"
+      "-password -otp -otpExpiredAt",
     );
     return res.json({ message: "suzzess", data: userDBs });
   } catch (error) {
@@ -388,7 +386,7 @@ router.post("/loginMobile", authorize, async (req, res) => {
 router.get("/getUserById/:id", async (req, res) => {
   const { id } = req.params;
   const userDB = await UserRefrensi.findById(id).select(
-    "username otp otpExpiredAt email telepon roleName kodeKasir"
+    "username otp otpExpiredAt email telepon roleName kodeKasir",
   );
   if (!userDB) {
     return res.status(404).json({ message: "akun tidak ditemukan" });

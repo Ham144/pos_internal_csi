@@ -5,6 +5,7 @@ import {
   deletePromo,
   getAllBarangPromo,
   updatePromo,
+  importPromoCsv,
 } from "../api/promoApi";
 import { getAllinventories } from "../api/itemLibraryApi";
 import { toast } from "react-hot-toast";
@@ -15,15 +16,37 @@ import {
   BellRingIcon,
   Check,
   CheckCircle2,
+  Download,
+  FileSpreadsheet,
   FileWarningIcon,
   InfoIcon,
   RefreshCcw,
   Trash2,
+  Upload,
   X,
 } from "lucide-react";
 import ModalConfirmation from "@/components/ModalConfirmation";
 import { getOuletList } from "@/api/outletApi";
 import ModalOutletOption from "@/components/ModalOutletOption";
+
+const formatPromoImportError = (data) => {
+  if (!data) return "Terjadi kesalahan";
+  const parts = [];
+  if (data.missingSkus?.length) {
+    parts.push(`SKU tidak terdaftar: ${data.missingSkus.join(", ")}`);
+  }
+  if (data.details?.length) {
+    data.details.forEach((d) => {
+      parts.push(
+        d.judul
+          ? `Baris ${d.row} (${d.judul}): ${d.reason}`
+          : `Baris ${d.row}: ${d.reason}`,
+      );
+    });
+  }
+  if (parts.length) return parts.join(" | ");
+  return data.message || "Terjadi kesalahan";
+};
 
 const Promo = () => {
   const [selectedPromo, setSelectedPromo] = useState(null);
@@ -37,6 +60,8 @@ const Promo = () => {
   const [tempPickPromo, setTempPickPromo] = useState(null);
   const [tempPickTerhubung, setTempPickTerhubung] = useState([null]);
   const [editingTerhubungItem, setEditingTerhubungItem] = useState(null);
+  const [file, setFile] = useState(null);
+  const [isOpen, setIsOpen] = useState(false);
 
   //zustand
   const { filter, setFilter } = useFilter();
@@ -81,6 +106,20 @@ const Promo = () => {
     queryKey: ["outlet"],
     queryFn: getOuletList,
   });
+
+  const { mutateAsync: handleImportCsvPromo, isPending: isImporting } =
+    useMutation({
+      mutationFn: importPromoCsv,
+      onSuccess: (response) => {
+        queryClient.invalidateQueries(["promo"]);
+        setIsOpen(false);
+        setFile(null);
+        toast.success(response?.message || "Import berhasil");
+      },
+      onError: (error) => {
+        toast.error(formatPromoImportError(error?.response?.data));
+      },
+    });
 
   const { mutateAsync: registerPromo } = useMutation({
     mutationFn: (body) => buatPromoBaru(body),
@@ -236,6 +275,83 @@ const Promo = () => {
     setFilteredPromoList(promoList?.data);
   }, [promoList]);
 
+  const handleFileChange = (event) => {
+    setFile(event.target.files[0]);
+  };
+
+  const handleImportPromo = () => {
+    setFile(null);
+    setIsOpen(true);
+  };
+
+  const handleSubmitImportPromo = async (e) => {
+    e.preventDefault();
+    if (!file) {
+      toast.error("Pilih file CSV terlebih dahulu");
+      return;
+    }
+    await handleImportCsvPromo(file);
+  };
+
+  const handleExportPromoTemplate = () => {
+    const headers = [
+      "Judul Promo",
+      "Mode",
+      "SKU Terkait",
+      "Outlet",
+      "Kuota",
+      "Berlaku Dari",
+      "Berlaku Hingga",
+      "Syarat Quantity",
+      "Syarat Total Rp",
+      "SKU Barang Bonus",
+      "Quantity Bonus",
+    ];
+    const templateRows = [
+      [
+        "Promo Beli 3 Gratis 1",
+        "particular",
+        "SKU001,SKU002",
+        "",
+        "100",
+        "2026-01-01",
+        "2026-12-31",
+        "3",
+        "",
+        "SKU003",
+        "1",
+      ],
+      [
+        "Promo Total Belanja",
+        "simple_total",
+        "",
+        "Outlet Jakarta",
+        "50",
+        "2026-06-01",
+        "2026-06-30",
+        "",
+        "500000",
+        "SKU004",
+        "2",
+      ],
+    ];
+    const csvContent = [
+      headers.join(";"),
+      ...templateRows.map((row) => row.join(";")),
+    ].join("\n");
+    const blob = new Blob(["\uFEFF" + csvContent], {
+      type: "text/csv;charset=utf-8;",
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "template_import_promo.csv";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="flex min-h-screen  bg-gray-100">
       <div className="flex flex-1 gap-x-4 min-h-[95vh] max-h-[95vh] overflow-y-hidden">
@@ -307,6 +423,35 @@ const Promo = () => {
                   <option value="active">Active</option>
                   <option value="inactive">Inactive</option>
                 </select>
+              </div>
+              <div className="dropdown dropdown-end">
+                <label
+                  tabIndex={0}
+                  className="btn btn-outline border-gray-300 hover:bg-blue-50 hover:border-blue-300"
+                >
+                  <Download className="w-5 h-5 mr-2" />
+                  Import/Export
+                </label>
+                <ul className="dropdown-content z-40 menu p-2 shadow-xl bg-white rounded-xl w-56 border border-blue-100">
+                  <li>
+                    <button
+                      onClick={handleImportPromo}
+                      className="flex items-center gap-2 text-gray-700 hover:bg-blue-50 rounded-lg p-3"
+                    >
+                      <Upload className="w-5 h-5 text-blue-600" />
+                      <span>Import CSV</span>
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      onClick={handleExportPromoTemplate}
+                      className="flex items-center gap-2 text-gray-700 hover:bg-blue-50 rounded-lg p-3"
+                    >
+                      <FileSpreadsheet className="w-5 h-5 text-green-600" />
+                      <span>Export Template</span>
+                    </button>
+                  </li>
+                </ul>
               </div>
               <button
                 className="btn"
@@ -1464,6 +1609,53 @@ const Promo = () => {
           selectedPromo?.authorizedOutlets || promoBaru?.authorizedOutlets || []
         }
       />
+
+      {isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-2xl w-96 overflow-hidden">
+            <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
+              <h2 className="text-lg font-semibold text-white">Upload CSV</h2>
+            </div>
+            <div className="p-6">
+              <form onSubmit={handleSubmitImportPromo} className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">
+                    Pilih file CSV
+                  </label>
+                  <input
+                    type="file"
+                    accept=".csv"
+                    onChange={handleFileChange}
+                    className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                  />
+                </div>
+                {file && (
+                  <div className="text-sm text-gray-600 bg-blue-50 p-3 rounded-lg">
+                    <span className="font-medium">File terpilih:</span>{" "}
+                    {file.name}
+                  </div>
+                )}
+                <div className="flex gap-2">
+                  <button
+                    type="submit"
+                    disabled={isImporting || !file}
+                    className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 text-white py-2 rounded-lg hover:from-blue-700 hover:to-blue-800 disabled:opacity-50"
+                  >
+                    {isImporting ? "Mengimport..." : "Upload"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsOpen(false)}
+                    className="flex-1 border border-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-50"
+                  >
+                    Batal
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

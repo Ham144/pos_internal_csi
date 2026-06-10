@@ -56,7 +56,7 @@ const ModalVoid = ({
                     {/* Data Diskon */}
                     <tr>
                       <td className="font-medium text-sm">
-                        diskon[diskon].quantityDariDataBase
+                        diskon.quantityTersedia
                       </td>
                       <td className="text-center">
                         <span className="badge bg-green-500 text-white gap-1 text-xs">
@@ -67,7 +67,7 @@ const ModalVoid = ({
                     {/* Data Promo */}
                     <tr>
                       <td className="font-medium text-sm">
-                        promo[promo].quantityDariDataBase
+                        promo.quantityBerlaku
                       </td>
                       <td className="text-center">
                         <span className="badge bg-green-500 text-white gap-1 text-xs">
@@ -78,11 +78,31 @@ const ModalVoid = ({
                     {/* Data voucher */}
                     <tr>
                       <td className="font-medium text-sm">
-                        voucher[voucher].quantityDariDataBase
+                        voucher.quantityTersedia
                       </td>
                       <td className="text-center">
                         <span className="badge bg-green-500 text-white gap-1 text-xs">
                           <span style={{ fontSize: "0.8em" }}>⬆️</span> Naik
+                        </span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="font-medium text-sm">voucher.terjadi</td>
+                      <td className="text-center">
+                        <span className="badge bg-red-500 text-white gap-1 text-xs">
+                          <span style={{ fontSize: "0.8em" }}>⬇️</span> Turun
+                        </span>
+                        <span className="block text-[10px] text-gray-500 mt-1">
+                          futureVoucher
+                        </span>
+                      </td>
+                    </tr>
+                    {/* Data Invoice */}
+                    <tr>
+                      <td className="font-medium text-sm">invoice.isVoid</td>
+                      <td className="text-center">
+                        <span className="badge bg-blue-500 text-white gap-1 text-xs">
+                          <span style={{ fontSize: "0.8em" }}>🔄</span> true
                         </span>
                       </td>
                     </tr>
@@ -120,6 +140,19 @@ const ModalVoid = ({
                     {/* Data User */}
                     <tr>
                       <td className="font-medium text-sm">
+                        userInfo (lookup kodeKasir)
+                      </td>
+                      <td className="text-center">
+                        <span className="badge bg-gray-500 text-white gap-1 text-xs">
+                          kodeInvoice.slice(2,5)
+                        </span>
+                        <span className="block text-[10px] text-gray-500 mt-1">
+                          bukan salesPerson
+                        </span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="font-medium text-sm">
                         userInfo.totalQuantityPenjualan
                       </td>
                       <td className="text-center">
@@ -137,7 +170,7 @@ const ModalVoid = ({
                           <span style={{ fontSize: "0.8em" }}>⬇️</span> Turun
                         </span>
                       </td>
-                    </tr>{" "}
+                    </tr>
                     <tr>
                       <td className="font-medium text-sm">
                         userInfo.skuTerjual
@@ -151,7 +184,7 @@ const ModalVoid = ({
                     {/* Data Inventaris */}
                     <tr>
                       <td className="font-medium text-sm">
-                        inventories[cosmos007pundi].quantityDariDataBase
+                        inventories[sku].quantity
                       </td>
                       <td className="text-center">
                         <span className="badge bg-green-500 text-white gap-1 text-xs">
@@ -161,7 +194,7 @@ const ModalVoid = ({
                     </tr>
                     <tr>
                       <td className="font-medium text-sm">
-                        inventories[cosmos007pundi].terjual
+                        inventories[sku].terjual
                       </td>
                       <td className="text-center">
                         <span className="badge bg-red-500 text-white gap-1 text-xs">
@@ -173,16 +206,18 @@ const ModalVoid = ({
                     <tr>
                       <td className="font-medium text-sm">outlet.pendapatan</td>
                       <td className="text-center">
-                        <span className="badge bg-green-500 text-white gap-1 text-xs">
-                          <span style={{ fontSize: "0.8em" }}>⬆️</span> Naik
+                        <span className="badge bg-red-500 text-white gap-1 text-xs">
+                          <span style={{ fontSize: "0.8em" }}>⬇️</span> Turun
                         </span>
                       </td>
                     </tr>
                     <tr>
-                      <td className="font-medium text-sm">outlet</td>
+                      <td className="font-medium text-sm">
+                        outlet.jumlahInvoice
+                      </td>
                       <td className="text-center">
-                        <span className="badge bg-blue-500 text-white gap-1 text-xs">
-                          <span style={{ fontSize: "0.8em" }}>🔄</span> Update
+                        <span className="badge bg-red-500 text-white gap-1 text-xs">
+                          <span style={{ fontSize: "0.8em" }}>⬇️</span> Turun
                         </span>
                       </td>
                     </tr>

@@ -61,3 +61,22 @@
 //fix
 [x] perbaiki export saat ini yang harganya saatdi export 300 padahal 300000
 [x] field nomorTransaksi juga perlu dikeluarkan saat export
+[x] fix: showPassword tidak kelihatan
+[x] fix: keluarkan data lebih lengkap untuk export csv
+
+bug fixing 2026-06-10
+[x] fix sync spg
+[x] fix eror ga keluar di page
+[x] gambar product tidak muncul / gagal upload
+[x] edit harga single kadang gagal-kadang berhasil
+[x] import purchase order bulk import telah disempurnakan
+[x] import item library telah disempurnakan
+[x] import diskon
+[x] import promo
+[x] tampilan lebih simple di mobile halaman invoices
+[x] sekarang favorites sinkron antar outlet, jadi tidak perlu setup 1-1
+[x] gambar favorites tidak muncul dimobile
+[x] rapikan format csv export
+[x] create new account tidak ada tombol save
+[fail] item isDisabled harusnya tidak muncul di mobile
+[x] optimasi kecepatan lanjutan

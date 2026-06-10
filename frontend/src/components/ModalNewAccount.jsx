@@ -169,6 +169,7 @@ const ModalNewAccount = () => {
             handleCreateNewUser();
           }}
           className="p-8"
+          style={{ maxHeight: "calc(100vh - 200px)", overflowY: "auto" }}
         >
           {/* Error Message */}
           {errorMessage && (
@@ -187,6 +188,24 @@ const ModalNewAccount = () => {
 
           {/* Grid Input Fields */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div className="col-span-2 flex justify-end gap-3">
+              <form method="dialog">
+                <button
+                  type="button"
+                  onClick={() => document.getElementById("newAccount").close()}
+                  className="px-6 py-3 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors font-medium"
+                >
+                  Batal
+                </button>
+              </form>
+              <button
+                type="submit"
+                className="px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-200 font-medium flex items-center gap-2 shadow-lg shadow-blue-500/25"
+              >
+                <Save className="w-5 h-5" />
+                Create Account
+              </button>
+            </div>
             {/* Username */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
@@ -427,11 +446,11 @@ const ModalNewAccount = () => {
               <div className="w-1 h-6 bg-blue-600 rounded-full"></div>
               Blocked Access By Page
             </h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
               {mockPages.map((page) => (
                 <div
                   key={page.originalPath}
-                  className="bg-gradient-to-br from-gray-50 to-white rounded-xl border border-gray-200 p-4 hover:border-blue-300 hover:shadow-md transition-all group"
+                  className="bg-gradient-to-br from-gray-50 to-white rounded-xl border border-gray-200 p-4 hover:border-blue-300 hover:shadow-md transition-all group cursor-pointer truncate text-xs"
                 >
                   <div className="flex items-start gap-3">
                     <input
@@ -468,11 +487,11 @@ const ModalNewAccount = () => {
               <div className="w-1 h-6 bg-purple-600 rounded-full"></div>
               Blocked Access By API Specific
             </h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
               {mockBackend.map((api) => (
                 <div
                   key={api.originalPath}
-                  className="bg-gradient-to-br from-purple-50 to-white rounded-xl border border-purple-200 p-4 hover:border-purple-300 hover:shadow-md transition-all group"
+                  className="bg-gradient-to-br from-purple-50 to-white rounded-xl border border-purple-200 p-4 hover:border-purple-300 hover:shadow-md transition-all group cursor-pointer truncate text-xs"
                 >
                   <div className="flex items-start gap-3">
                     <input
@@ -495,25 +514,6 @@ const ModalNewAccount = () => {
                 </div>
               ))}
             </div>
-          </div>
-
-          {/* Submit Button */}
-          <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
-            <form method="dialog">
-              <button
-                type="button"
-                className="px-6 py-3 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors font-medium"
-              >
-                Batal
-              </button>
-            </form>
-            <button
-              type="submit"
-              className="px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-200 font-medium flex items-center gap-2 shadow-lg shadow-blue-500/25"
-            >
-              <Save className="w-5 h-5" />
-              Create Account
-            </button>
           </div>
         </form>
       </div>

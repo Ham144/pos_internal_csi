@@ -49,7 +49,7 @@ router.put("/edit", async (req, res) => {
             ? parseInt(req?.body?.targetQuantityPenjualan)
             : 0,
         },
-      }
+      },
     );
     return res.json({ message: "berhasil memperbarui spg" });
   } catch (error) {
@@ -75,7 +75,7 @@ router.get("/spgList/mobile", async (req, res) => {
       },
     }).populate(
       "spgList",
-      "name email totalHargaPenjualan totalQuantityPenjualan targetHargaPenjualan targetQuantityPenjualan telepon"
+      "name email totalHargaPenjualan totalQuantityPenjualan targetHargaPenjualan targetQuantityPenjualan telepon",
     );
     if (!myOutlet) {
       return res
@@ -83,9 +83,8 @@ router.get("/spgList/mobile", async (req, res) => {
         .json({ message: "outlet tidak ditemukan untuk akun anda" });
     }
     const response = await SpgRefrensi.find({
-      _id: {
-        $in: myOutlet.spgList,
-      },
+      _id: { $in: myOutlet.spgList },
+      isDisabled: false,
     });
     return res.json({ message: "berhasil mendapatkan spg", data: response });
   } catch (error) {
@@ -93,7 +92,7 @@ router.get("/spgList/mobile", async (req, res) => {
   }
 });
 
-router.delete("/delete/:spgId", async (req, res) => {
+router.delete("/disable/:spgId", async (req, res) => {
   const { spgId } = req.params;
   if (!spgId) {
     return res.status(400).json({ message: "diperlukan spgId" });
@@ -103,16 +102,26 @@ router.delete("/delete/:spgId", async (req, res) => {
     return res.status(400).json({ message: "spg tidak ditemukan" });
   }
   try {
-    // Remove the SPG from any outlet's kasirList
-    await Outlet.updateMany(
-      { kasirList: spgId },
-      { $pull: { kasirList: spgId } }
-    );
+    const akanDisable = !spgDB.isDisabled;
+    await SpgRefrensi.findByIdAndUpdate(spgId, {
+      isDisabled: akanDisable,
+    });
 
-    await SpgRefrensi.findByIdAndDelete(spgId);
-    return res.json({ message: "berhasil menghapus spg" });
+    // lepas dari outlet saat dinonaktifkan agar tidak ikut referensi sync
+    if (akanDisable) {
+      await Outlet.updateMany(
+        { spgList: spgId },
+        { $pull: { spgList: spgId } },
+      );
+    }
+
+    return res.json({
+      message: akanDisable
+        ? "berhasil menonaktifkan spg"
+        : "berhasil mengaktifkan spg",
+    });
   } catch (error) {
-    return res.status(400).json({ message: "gagal menghapus spg", error });
+    return res.status(400).json({ message: "gagal mengubah status spg", error });
   }
 });
 

@@ -42,10 +42,25 @@ export const deletePromo = async (id) => {
 
 export const getAllPromoByProduct = async (sku) => {
   const response = await axios.get(
-    `${BASE_URL}/api/v1/promo/getAllPromoByProduct/${sku}`,
+    `${BASE_URL}/api/v1/promo/getAllPromoByProduct`,
     {
+      params: { sku },
       withCredentials: true,
-    }
+    },
   );
   return response;
+};
+
+export const importPromoCsv = async (file) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  const response = await axios.post(
+    `${BASE_URL}/api/v1/promo/importPromoCsv`,
+    formData,
+    {
+      withCredentials: true,
+      headers: { "Content-Type": "multipart/form-data" },
+    }
+  );
+  return response.data;
 };

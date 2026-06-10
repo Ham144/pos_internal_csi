@@ -6,7 +6,12 @@ import Outlet from "../models/Outlet.model.js";
 import Inventory from "../models/InventoryRefrensi.model.js";
 import Diskon from "../models/DaftarDiskon.model.js";
 import Promo from "../models/DaftarPromo.model.js";
+import DaftarVoucher from "../models/DaftarVoucher.model.js";
 import { stackTracingSku } from "../utils/stackTracingSku.js";
+
+// total qty semua baris di currentBill
+const totalQtyBill = (bills = []) =>
+  bills.reduce((sum, bill) => sum + Number(bill.quantity || 0), 0);
 
 const router = Router();
 
@@ -406,9 +411,10 @@ router.post("/voidInvoice", async (req, res) => {
     await Promise.all(
       invoiceDB.currentBill.map(async (bill) => {
         const inventoryDB = await Inventory.findOne({ sku: bill.sku });
+        if (!inventoryDB) return;
 
         const menjadi = Number(inventoryDB.quantity) + Number(bill.quantity);
-        if (inventoryDB && inventoryDB.quantity != menjadi) {
+        if (inventoryDB.quantity != menjadi) {
           await stackTracingSku(
             inventoryDB._id,
             req.user._id,
@@ -472,20 +478,21 @@ router.post("/voidInvoice", async (req, res) => {
       }
     }
 
-    // Modif kasir
-    const userDB = await User.findOne({ username: invoiceDB.salesPerson });
+    // Modif kasir — lookup sama seperti sync mobile (kodeKasir dari kodeInvoice)
+    const kodeKasir = invoiceDB.kodeInvoice?.slice(2, 5);
+    const userDB = await User.findOne({ kodeKasir });
     if (userDB) {
-      userDB.totalQuantityPenjualan -= invoiceDB.currentBill.length;
+      const qtyTotal = totalQtyBill(invoiceDB.currentBill);
+      userDB.totalQuantityPenjualan -= qtyTotal;
       userDB.totalHargaPenjualan -= invoiceDB.total;
 
-      // Update skuTerjual untuk kasir
-      if (userDB.skuTerjual && userDB.skuTerjual.length > 0) {
+      if (userDB.skuTerjual?.length > 0) {
         for (const bill of invoiceDB.currentBill) {
           const skuIndex = userDB.skuTerjual.findIndex(
-            (item) => item.sku === bill.sku
+            (item) => item.sku === bill.sku,
           );
           if (skuIndex !== -1) {
-            userDB.skuTerjual[skuIndex].quantity -= bill.quantity;
+            userDB.skuTerjual[skuIndex].totalQuantityPenjualan -= bill.quantity;
           }
         }
       }
@@ -497,30 +504,38 @@ router.post("/voidInvoice", async (req, res) => {
     if (invoiceDB.spg) {
       const spgDB = await Spg.findById(invoiceDB.spg);
       if (spgDB) {
-        spgDB.totalInvoice -= 1;
+        const qtyTotal = totalQtyBill(invoiceDB.currentBill);
         spgDB.totalHargaPenjualan -= invoiceDB.total;
 
-        // Update skuTerjual untuk SPG
-        if (spgDB.skuTerjual && spgDB.skuTerjual.length > 0) {
+        if (spgDB.skuTerjual?.length > 0) {
           for (const bill of invoiceDB.currentBill) {
             const skuIndex = spgDB.skuTerjual.findIndex(
-              (item) => item.sku === bill.sku
+              (item) => item.sku === bill.sku,
             );
             if (skuIndex !== -1) {
               spgDB.skuTerjual[skuIndex].quantity -= bill.quantity;
             }
           }
-
-          // Recalculate total quantity
-          const totalQuantityPenjualan = spgDB.skuTerjual.reduce(
+          spgDB.totalQuantityPenjualan = spgDB.skuTerjual.reduce(
             (acc, item) => acc + item.quantity,
-            0
+            0,
           );
-
-          spgDB.totalQuantityPenjualan = totalQuantityPenjualan;
+        } else {
+          spgDB.totalQuantityPenjualan -= qtyTotal;
         }
 
         await spgDB.save();
+      }
+    }
+
+    // voucher yang dipakai saat transaksi (bukan futureVoucher)
+    if (invoiceDB.implementedVoucher?.length) {
+      for (const voucherId of invoiceDB.implementedVoucher) {
+        const voucherDB = await DaftarVoucher.findById(voucherId);
+        if (voucherDB) {
+          voucherDB.quantityTersedia++;
+          await voucherDB.save();
+        }
       }
     }
 
@@ -529,14 +544,9 @@ router.post("/voidInvoice", async (req, res) => {
     const outletDB = await Outlet.findOne({ kodeOutlet });
     if (outletDB) {
       outletDB.pendapatan -= invoiceDB.total;
+      outletDB.jumlahInvoice = Math.max(0, (outletDB.jumlahInvoice || 0) - 1);
       await outletDB.save();
     }
-
-    // Modif invoice
-    invoiceDB.isVoid = true;
-    invoiceDB.confirmVoidById = req.user.userId;
-    invoiceDB.tanggalVoid = new Date();
-    await invoiceDB.save();
 
     return res.json({
       success: true,

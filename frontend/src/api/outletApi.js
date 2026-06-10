@@ -92,3 +92,20 @@ export const assignSpgToOutlet = async (spgIds, outletId) => {
     return error?.response?.data?.message;
   }
 };
+
+export const assignFavoritedInventoryToOutlet = async (skus, outletId) => {
+  const response = await axios.post(
+    `${BASE_URL}/api/v1/outlet/assignFavoritedInventoryToOutlet`,
+    { skus, outletId },
+    { withCredentials: true },
+  );
+  return response.data;
+};
+
+export const getFavoritedInventorySkus = async (outletId) => {
+  const response = await axios.get(
+    `${BASE_URL}/api/v1/outlet/favoritedInventorySkus/${outletId}`,
+    { withCredentials: true },
+  );
+  return response.data;
+};

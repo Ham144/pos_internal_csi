@@ -1,8 +1,8 @@
 const DEV_URL = "http://192.168.169.12:3000";
 const PROD_URL = import.meta.env.VITE_PROD_URL ?? "https://pos.mycsi.net";
 
-// export const NODE_ENV = "production";
-export let NODE_ENV = "development";
+export const NODE_ENV = "production";
+// export let NODE_ENV = "development";
 export const buildNumber = "1000";
 
 if (import.meta.env.VITE_DEMO) {
@@ -178,6 +178,10 @@ export const mockBackend = [
     description: "API untuk mengedit harga inventori secara massal dengan csv",
   },
   {
+    originalPath: "/api/v1/inventories/importInventoryCsv",
+    description: "API untuk import inventori dari file CSV",
+  },
+  {
     originalPath: "/api/v1/inventories/disableSingleInventoriToggle",
     description: "API untuk mengaktifkan/menonaktifkan inventori",
   },
@@ -256,6 +260,10 @@ export const mockBackend = [
     originalPath: "/api/v1/promo/getAllPromoByProduct",
     description: "API untuk mendapatkan promo berdasarkan produk",
   },
+  {
+    originalPath: "/api/v1/promo/importPromoCsv",
+    description: "API untuk import promo dari file CSV",
+  },
 
   // Diskon Routes
   {
@@ -277,6 +285,10 @@ export const mockBackend = [
   {
     originalPath: "/api/v1/diskon/getAllDiskonByProduct",
     description: "API untuk mendapatkan diskon berdasarkan produk",
+  },
+  {
+    originalPath: "/api/v1/diskon/registerMultiDiskon",
+    description: "API untuk import diskon dari file CSV",
   },
   // Voucher Routes
   {
@@ -394,6 +406,15 @@ export const mockBackend = [
   {
     originalPath: "/api/v1/outlet/assignUserToOutlet",
     description: "API untuk mengubah penugasan user/kasir ke outlet tertentu",
+  },
+  {
+    originalPath: "/api/v1/outlet/assignFavoritedInventoryToOutlet",
+    description:
+      "API untuk menetapkan SKU yang menampilkan gambar di mobile per outlet",
+  },
+  {
+    originalPath: "/api/v1/outlet/favoritedInventorySkus",
+    description: "API untuk mendapatkan daftar SKU favorit gambar per outlet",
   },
   {
     originalPath: "/api/v1/outlet/getOutlet",

@@ -224,40 +224,6 @@ const Home = () => {
                 <p className="text-xl md:text-2xl text-blue-100 mb-8 max-w-3xl mx-auto">
                   Sistem Manajemen Point of Sale Terintegrasi
                 </p>
-
-                {/* Quick Stats */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto mt-8">
-                  <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
-                    <div className="flex items-center justify-center gap-2 text-white">
-                      <ShoppingCart className="w-5 h-5" />
-                      <span className="text-2xl font-bold">1.2K+</span>
-                    </div>
-                    <p className="text-xs text-blue-200 mt-1">
-                      Transaksi Hari Ini
-                    </p>
-                  </div>
-                  <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
-                    <div className="flex items-center justify-center gap-2 text-white">
-                      <Package className="w-5 h-5" />
-                      <span className="text-2xl font-bold">5K+</span>
-                    </div>
-                    <p className="text-xs text-blue-200 mt-1">Total Produk</p>
-                  </div>
-                  <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
-                    <div className="flex items-center justify-center gap-2 text-white">
-                      <Users className="w-5 h-5" />
-                      <span className="text-2xl font-bold">50+</span>
-                    </div>
-                    <p className="text-xs text-blue-200 mt-1">Pengguna Aktif</p>
-                  </div>
-                  <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
-                    <div className="flex items-center justify-center gap-2 text-white">
-                      <Store className="w-5 h-5" />
-                      <span className="text-2xl font-bold">10</span>
-                    </div>
-                    <p className="text-xs text-blue-200 mt-1">Outlet</p>
-                  </div>
-                </div>
               </div>
             </div>
           </div>

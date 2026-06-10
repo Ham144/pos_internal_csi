@@ -35,7 +35,7 @@ export const uploadDocument = async (req, res) => {
             .toString(36)
             .substring(7)}.png`;
           const imagePath = path.join(imagesDir, imageName);
-
+            
           await fs.promises.writeFile(imagePath, imageBuffer);
 
           return {

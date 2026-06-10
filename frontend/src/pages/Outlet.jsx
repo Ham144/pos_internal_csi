@@ -2,6 +2,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import React, { useState, useRef, useEffect } from "react";
 import {
   assignSpgToOutlet,
+  assignFavoritedInventoryToOutlet,
+  getFavoritedInventorySkus,
   assignUserToOutlet,
   deleteOutlet,
   editOutlet,
@@ -35,6 +37,7 @@ import { getAllBrands } from "@/api/brandApi";
 import ModalRegisterOutlet from "@/components/ModalRegisterOutlet";
 import ModalConfirmation2 from "@/components/ModalConfirmation2";
 import ModalSpgMultiPick from "@/components/modalSpgMultiPick";
+import ModalFavoritedInventoryPick from "@/components/ModalFavoritedInventoryPick";
 import { getAllSpg } from "@/api/spgApi";
 
 const Outlet = () => {
@@ -49,6 +52,7 @@ const Outlet = () => {
   const modalPickKasirRef = useRef();
   const [outletToDelete, setOutletToDelete] = useState(null);
   const [selectedSpgIds, setSelectedSpgIds] = useState([]);
+  const [selectedFavoritedSkus, setSelectedFavoritedSkus] = useState([]);
 
   //tanstack
   const queryClient = useQueryClient();
@@ -75,6 +79,16 @@ const Outlet = () => {
       refetchOutlets();
     }
   }, [selectedOutlet, refetchOutlets]);
+
+  useEffect(() => {
+    if (!selectedOutlet?._id) {
+      setSelectedFavoritedSkus([]);
+      return;
+    }
+    getFavoritedInventorySkus(selectedOutlet._id)
+      .then((res) => setSelectedFavoritedSkus(res?.data?.skus || []))
+      .catch(() => setSelectedFavoritedSkus([]));
+  }, [selectedOutlet?._id]);
 
   const { mutateAsync: handleEditOutlet } = useMutation({
     mutationFn: async (body) => {
@@ -105,16 +119,13 @@ const Outlet = () => {
       toast.success("Berhasil mengedit outlet");
     },
     onError: (err) => {
-      toast(err.message);
+      toast.error(err.response.data.message);
     },
   });
 
   const { mutateAsync: handleAssignSpgToOutlet } = useMutation({
-    mutationFn: async () => {
-      return await assignSpgToOutlet(
-        selectedOutlet.spgList,
-        selectedOutlet._id,
-      );
+    mutationFn: async ({ spgIds, outletId }) => {
+      return await assignSpgToOutlet(spgIds, outletId);
     },
     onSuccess: () => {
       queryClient.invalidateQueries(["outlet", "spg"]);
@@ -122,7 +133,35 @@ const Outlet = () => {
       document.getElementById("modalSpgPick").close();
     },
     onError: (err) => {
-      toast.error(err.message);
+      toast.error(err.response.data.message);
+    },
+  });
+
+  const { mutateAsync: handleAssignFavoritedInventory } = useMutation({
+    mutationFn: async ({ skus, outletId }) => {
+      return await assignFavoritedInventoryToOutlet(skus, outletId);
+    },
+    onSuccess: (res) => {
+      queryClient.invalidateQueries(["outlet"]);
+      setSelectedFavoritedSkus(res?.data?.skus || []);
+      setSelectedOutlet((prev) =>
+        prev
+          ? {
+              ...prev,
+              favoritedInventoryIds: res?.data?.favoritedInventoryIds || [],
+            }
+          : prev,
+      );
+      toast.success(res?.message || "Berhasil menyimpan SKU tampil gambar");
+      document.getElementById("modalFavoritedInventoryPick")?.close();
+    },
+    onError: (err) => {
+      const msg =
+        err?.response?.data?.message ||
+        (err?.response?.data?.missingSkus?.length
+          ? `SKU tidak terdaftar: ${err.response.data.missingSkus.join(", ")}`
+          : "Gagal menyimpan SKU tampil gambar");
+      toast.error(msg);
     },
   });
 
@@ -155,7 +194,7 @@ const Outlet = () => {
       document.getElementById("newoutlet").close();
     },
     onError: (error) => {
-      toast.error(error?.response?.data?.message);
+      toast.error(error.response.data.message);
     },
   });
 
@@ -271,19 +310,53 @@ const Outlet = () => {
   };
 
   // Update handleSpgSelection function
-  const handleSpgSelection = (spgIds) => {
+  const handleSpgSelection = async (spgIds) => {
     if (selectedOutlet) {
       setSelectedOutlet((prev) => ({
         ...prev,
         spgList: spgIds,
       }));
-      handleAssignSpgToOutlet();
+      await handleAssignSpgToOutlet({
+        spgIds,
+        outletId: selectedOutlet._id,
+      });
     } else {
       setNewOutletForm((prev) => ({
         ...prev,
         spgList: spgIds,
       }));
     }
+  };
+
+  const handleRemoveSpgFromOutlet = async (spgId) => {
+    if (!selectedOutlet) return;
+    const newList = (selectedOutlet.spgList || []).filter(
+      (id) => String(id) !== String(spgId),
+    );
+    setSelectedOutlet((prev) => ({ ...prev, spgList: newList }));
+    await handleAssignSpgToOutlet({
+      spgIds: newList,
+      outletId: selectedOutlet._id,
+    });
+  };
+
+  const handleFavoritedSkuSelection = async (skus) => {
+    if (!selectedOutlet) return;
+    setSelectedFavoritedSkus(skus);
+    await handleAssignFavoritedInventory({
+      skus,
+      outletId: selectedOutlet._id,
+    });
+  };
+
+  const handleRemoveFavoritedSku = async (sku) => {
+    if (!selectedOutlet) return;
+    const newList = selectedFavoritedSkus.filter((s) => s !== sku);
+    setSelectedFavoritedSkus(newList);
+    await handleAssignFavoritedInventory({
+      skus: newList,
+      outletId: selectedOutlet._id,
+    });
   };
 
   return (
@@ -464,7 +537,11 @@ const Outlet = () => {
                     <td className="px-4 py-4">
                       <div className="flex flex-wrap gap-1 max-w-[200px]">
                         {spgList?.data
-                          ?.filter((spg) => outlet?.spgList?.includes(spg._id))
+                          ?.filter((spg) =>
+                            outlet?.spgList?.some(
+                              (id) => String(id) === String(spg._id),
+                            ),
+                          )
                           .slice(0, 2)
                           .map((spg) => (
                             <span
@@ -831,7 +908,9 @@ const Outlet = () => {
                         <div className="flex flex-wrap gap-2">
                           {spgList?.data
                             ?.filter((spg) =>
-                              selectedOutlet?.spgList?.includes(spg?._id),
+                              selectedOutlet?.spgList?.some(
+                                (id) => String(id) === String(spg?._id),
+                              ),
                             )
                             .map((spg) => (
                               <div
@@ -844,12 +923,7 @@ const Outlet = () => {
                                   className="ml-2 hover:text-red-500 transition-colors"
                                   onClick={(e) => {
                                     e.stopPropagation();
-                                    setSelectedOutlet((prev) => ({
-                                      ...prev,
-                                      spgList: prev.spgList.filter(
-                                        (id) => id !== spg._id,
-                                      ),
-                                    }));
+                                    handleRemoveSpgFromOutlet(spg._id);
                                   }}
                                 >
                                   <X className="w-3 h-3" />
@@ -868,6 +942,67 @@ const Outlet = () => {
                             }}
                           >
                             + Add
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* SKU tampil gambar di mobile */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5 flex items-center gap-1">
+                      <ImageIcon className="w-4 h-4 text-blue-500" />
+                      SKU Tampil Gambar (favorites)
+                      <div
+                        className="tooltip tooltip-bottom"
+                        data-tip="SKU yang menampilkan gambar di aplikasi mobile"
+                      >
+                        <HelpCircle className="w-4 h-4 text-gray-400" />
+                      </div>
+                    </label>
+                    <div
+                      onClick={() =>
+                        document
+                          .getElementById("modalFavoritedInventoryPick")
+                          .showModal()
+                      }
+                      className="w-full border border-gray-200 bg-gray-50 px-4 py-3 rounded-xl cursor-pointer hover:border-blue-500 transition-all duration-200"
+                    >
+                      {!selectedFavoritedSkus?.length ? (
+                        <span className="text-gray-400 text-sm">
+                          Pilih SKU yang menampilkan gambar
+                        </span>
+                      ) : (
+                        <div className="flex flex-wrap gap-2">
+                          {selectedFavoritedSkus.map((sku) => (
+                            <div
+                              key={sku}
+                              className="flex items-center bg-teal-100 text-teal-700 rounded-lg px-3 py-1.5 text-sm"
+                            >
+                              <span>{sku}</span>
+                              <button
+                                type="button"
+                                className="ml-2 hover:text-red-500 transition-colors"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleRemoveFavoritedSku(sku);
+                                }}
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            </div>
+                          ))}
+                          <button
+                            type="button"
+                            className="text-teal-600 hover:bg-teal-100 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              document
+                                .getElementById("modalFavoritedInventoryPick")
+                                .showModal();
+                            }}
+                          >
+                            + Tambah
                           </button>
                         </div>
                       )}
@@ -976,6 +1111,10 @@ const Outlet = () => {
         }
         setSelectedSpgIds={handleSpgSelection}
         key={"modalSpgMultiPick"}
+      />
+      <ModalFavoritedInventoryPick
+        selectedSkus={selectedFavoritedSkus}
+        setSelectedSkus={handleFavoritedSkuSelection}
       />
     </div>
   );

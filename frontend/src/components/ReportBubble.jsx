@@ -105,7 +105,7 @@ const ReportBubble = () => {
         fileInputRef.current.value = "";
       }
     } catch (error) {
-      toast.error(error.message || "Gagal mengirim laporan");
+      toast.error(error.response.data.message || "Gagal mengirim laporan");
     } finally {
       setIsLoading(false);
     }

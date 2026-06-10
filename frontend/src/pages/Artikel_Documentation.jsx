@@ -90,7 +90,7 @@ const Artikel_Documentation = () => {
     onError: (error) => {
       console.error("Upload error:", error);
       toast.error(
-        error.response?.data?.message ||
+        error?.response?.data?.message ||
           error.message ||
           "Error uploading document",
       );

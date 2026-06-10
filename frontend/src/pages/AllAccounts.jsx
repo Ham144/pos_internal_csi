@@ -25,6 +25,9 @@ import {
   Store,
   Key,
   Lock,
+  ShieldCheck,
+  Ban,
+  ShieldX,
 } from "lucide-react";
 
 const AllAccounts = () => {
@@ -34,6 +37,7 @@ const AllAccounts = () => {
   const [filteredAccounts, setFilteredAccounts] = useState([]);
   const [selectedRole, setSelectedRole] = useState("all");
   const [uniqueRoles, setUniqueRoles] = useState([]);
+  const [showPassword, setShowPassword] = useState(false);
 
   const queryClient = useQueryClient();
   const { data: spgList } = useQuery({
@@ -151,6 +155,7 @@ const AllAccounts = () => {
         blockedAccess: user?.blockedAccess || [],
         type: user?.type == "SPG" ? "SPG" : user?.roleName,
         kodeKasir: user?.kodeKasir || "",
+        isDisabled: user?.isDisabled || false,
       });
     }, 0);
     setShowEditForm(true);
@@ -371,7 +376,7 @@ const AllAccounts = () => {
                       Email
                     </th>
                     <th className="px-4 py-4 text-left text-sm font-semibold text-white">
-                      Telepon
+                      Status
                     </th>
                     <th className="px-4 py-4 text-right text-sm font-semibold text-white">
                       Target Harga
@@ -413,7 +418,17 @@ const AllAccounts = () => {
                         {user.email || "-"}
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-600">
-                        {user.telepon || "-"}
+                        {user.isDisabled ? "Nonaktif" : "Aktif"}
+                        <div
+                          className="tooltip tooltip-bottom flex items-center gap-1"
+                          data-tip="untuk format kodeInvoice"
+                        >
+                          {user.isDisabled ? (
+                            <ShieldX className="w-4 h-4 text-red-200" />
+                          ) : (
+                            <ShieldCheck className="w-4 h-4 text-green-200" />
+                          )}
+                        </div>
                       </td>
                       <td className="px-4 py-3 text-right font-mono text-sm">
                         <span className="text-green-600 font-semibold">
@@ -512,10 +527,16 @@ const AllAccounts = () => {
                         }
                       }
                     }}
-                    className="flex flex-col items-center p-2 rounded-xl border-2 border-red-200 text-red-600 hover:bg-red-50 transition-colors"
+                    className={`flex flex-col items-center p-2 rounded-xl border-2 border-red-200 text-white hover:bg-red-50 transition-colors ${selectedUser?.isDisabled ? "bg-green-500 text-white" : "bg-red-500 text-white"}`}
                   >
-                    <Trash2 className="w-5 h-5 mb-1" />
-                    <span className="text-xs font-medium">Hapus</span>
+                    {selectedUser?.isDisabled ? (
+                      <ShieldCheck className="w-5 h-5 mb-1" />
+                    ) : (
+                      <Ban className="w-5 h-5 mb-1" />
+                    )}
+                    <span className="text-xs font-medium">
+                      {selectedUser?.isDisabled ? "Enable" : "Disable"}
+                    </span>
                   </button>
                   <button
                     type="submit"

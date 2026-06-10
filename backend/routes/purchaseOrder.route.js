@@ -7,6 +7,11 @@ import csv from "csv-parser";
 import InventoryRefrensi from "../models/InventoryRefrensi.model.js";
 import UserRefrensi from "../models/User.model.js";
 import { stackTracingSku } from "../utils/stackTracingSku.js";
+import { validatePoItems } from "../utils/validatePoSkus.js";
+import {
+  csvCell,
+  detectCsvSeparatorFromFile,
+} from "../utils/csvDelimiter.js";
 
 const router = Router();
 // Buat direktori uploads jika belum ada
@@ -34,8 +39,7 @@ router.post("/importPurchaseOrder", upload.single("file"), async (req, res) => {
     return res.status(400).json({ error: "No file uploaded!" });
   }
 
-  const __dirname = path.resolve();
-  const filePath = path.join(__dirname, "/uploads", file.filename);
+  const filePath = file.path || path.join(process.cwd(), uploadPath, file.filename);
 
   //dapatkan current login user
   const currentLoginUserId = req.user.userId;
@@ -47,34 +51,33 @@ router.post("/importPurchaseOrder", upload.single("file"), async (req, res) => {
     const results = [];
     let currentPO = null;
 
-    // Baca file CSV
+    const separator = detectCsvSeparatorFromFile(filePath);
+
+    // Baca file CSV — auto-detect delimiter ; atau ,
     fs.createReadStream(filePath)
-      .pipe(csv())
+      .pipe(csv({ separator }))
       .on("data", (row) => {
-        // Jika ada Purchase Code, ini adalah PO baru
-        if (row["Purchase Code (Erp)"]?.trim()) {
-          // Simpan PO sebelumnya jika ada
-          if (currentPO) {
-            results.push(currentPO);
-          }
-          // Buat PO baru
+        const erp = csvCell(row, "Purchase Code (Erp)");
+        const sku = csvCell(row, "SKU");
+
+        if (erp) {
+          if (currentPO) results.push(currentPO);
           currentPO = {
-            Erp: row["Purchase Code (Erp)"],
-            plat: row["Plat"] || "",
+            Erp: erp,
+            plat: csvCell(row, "Plat") || "",
             items: [],
           };
         }
 
-        // Tambahkan item ke PO saat ini
-        if (currentPO && row["SKU"]?.trim()) {
+        if (currentPO && sku) {
           currentPO.items.push({
-            sku: row["SKU"].trim(),
-            request: Number(row["Request"]) || 0,
-            barcodeItem: row["Barcode"]?.trim() || "",
-            keterangan: row["Keterangan"]?.trim() || "",
+            sku,
+            request: Number(csvCell(row, "Request")) || 0,
+            barcodeItem: csvCell(row, "Barcode") || "",
+            keterangan: csvCell(row, "Keterangan") || "",
             received: 0,
             tanggalTerpenuhi: null,
-            dibuatOleh: currentLoginUser.username || "",
+            dibuatOleh: currentLoginUser?.username || "",
           });
         }
       })
@@ -88,70 +91,64 @@ router.post("/importPurchaseOrder", upload.single("file"), async (req, res) => {
         }
 
         try {
-          // 🔍 VALIDASI SKU DUPLIKAT DALAM SATU PO
+          const details = [];
+          const allMissing = new Set();
+          const allDuplicated = new Set();
+
           for (const po of results) {
-            const skuSet = new Set();
-            const duplicatedSkus = new Set();
-            for (const item of po.items) {
-              const sku = item.sku.toUpperCase(); // jaga-jaga casing beda
-              if (skuSet.has(sku)) {
-                duplicatedSkus.add(sku);
-              } else {
-                skuSet.add(sku);
-              }
+            if (!po.items?.length) {
+              details.push({ erp: po.Erp, type: "empty", skus: [] });
+              continue;
             }
 
-            if (duplicatedSkus.size > 0) {
-              throw new Error(
-                `SKU duplikat dalam PO ${po.Erp}: ${Array.from(
-                  duplicatedSkus
-                ).join(", ")}`
-              );
+            const { missingSkus, duplicatedSkus, normalizedItems } =
+              await validatePoItems(po.items);
+
+            duplicatedSkus.forEach((s) => allDuplicated.add(s));
+            missingSkus.forEach((s) => allMissing.add(s));
+
+            if (duplicatedSkus.length) {
+              details.push({ erp: po.Erp, type: "duplicate", skus: duplicatedSkus });
             }
+            if (missingSkus.length) {
+              details.push({ erp: po.Erp, type: "missing", skus: missingSkus });
+            }
+
+            po.items = normalizedItems;
           }
 
-          // Simpan semua PO ke database
+          if (details.length) {
+            return res.status(400).json({
+              message: "Gagal import purchase order",
+              details,
+              missingSkus: [...allMissing],
+              duplicatedSkus: [...allDuplicated],
+            });
+          }
+
           const savedPOs = await Promise.all(
-            results.map(async (po) => {
-              // Validasi SKU apakah ada di Inventory
-              const missingSkus = [];
-              for (const item of po.items) {
-                const inventoryExists = await InventoryRefrensi.findOne({
-                  sku: item?.sku?.toUpperCase(),
-                });
-                if (!inventoryExists) {
-                  missingSkus.push(item.sku);
-                }
-              }
-
-              if (missingSkus.length > 0) {
-                throw new Error(
-                  `SKU tidak ditemukan: ${missingSkus.join(", ")}`
-                );
-              }
-
-              return await PurchaseOrder.create(po);
-            })
+            results.map((po) =>
+              PurchaseOrder.create({
+                ...po,
+                Erp: po.Erp?.trim(),
+              }),
+            ),
           );
 
           res.json({
-            message: "Purchase Orders berhasil dibuat",
+            message: `${savedPOs.length} Purchase Order berhasil diimport`,
             data: savedPOs,
           });
         } catch (error) {
           res.status(400).json({
-            message: "Gagal membuat Purchase Orders",
+            message: "Gagal import purchase order",
             error: error.message,
-            duplicatedSkus: error.message.includes("duplikat dalam PO")
-              ? error.message.split(": ")[1].split(", ")
-              : [],
-            missingSkus: error.message.includes("SKU tidak ditemukan")
-              ? error.message.split(": ")[1].split(", ")
-              : [],
           });
+        } finally {
+          if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath);
+          }
         }
-
-        fs.unlinkSync(filePath);
       })
       .on("error", (err) => {
         console.error("Error reading CSV file:", err);
@@ -225,63 +222,37 @@ router.post("/createPurchaseOrder", async (req, res) => {
     });
   }
 
-  // 🔐 Validasi SKU Duplikat
-  const skuSet = new Set();
-  const duplicatedSkus = new Set();
-  for (const item of items) {
-    const sku = item.sku?.toUpperCase();
-    if (skuSet.has(sku)) {
-      duplicatedSkus.add(sku);
-    } else {
-      skuSet.add(sku);
-    }
-  }
+  const { missingSkus, duplicatedSkus, normalizedItems } =
+    await validatePoItems(items);
 
-  if (duplicatedSkus.size > 0) {
+  if (duplicatedSkus.length > 0) {
     return res.status(400).json({
       message: "Terdapat SKU duplikat dalam 1 PO",
-      duplicatedSkus: Array.from(duplicatedSkus),
+      duplicatedSkus,
     });
   }
-
-  const undefinedSkuItems = items.filter(
-    (item) => typeof item.sku === "undefined"
-  );
-  if (undefinedSkuItems.length > 0) {
-    return res.status(400).json({
-      message: `Terdapat ${undefinedSkuItems.length} item(s) dengan SKU undefined`,
-    });
-  }
-
-  const skus = items.map((item) => item.sku);
-  const foundSkus = await InventoryRefrensi.find({
-    sku: { $in: [...skus] },
-  }).select("sku");
-
-  const missingSkus = skus.filter(
-    (sku) => !foundSkus.map((item) => item.sku).includes(sku)
-  );
 
   if (missingSkus.length > 0) {
     return res.status(400).json({
       message: "Beberapa SKU tidak terdaftar di database",
-      missingSkus: missingSkus,
+      missingSkus,
     });
   }
 
   try {
     const newPurchaseOrder = await PurchaseOrder.create({
-      Erp: Erp?.toUpperCase(),
+      Erp: Erp?.trim(),
       plat: plat || "",
       dibuatOleh: myUSer.username || "",
-      items: items.map((item) => ({
-        barcode: item.barcode,
-        description: item.description,
+      items: normalizedItems.map((item) => ({
+        barcodeItem: item.barcodeItem || "",
+        description: item.description || "",
         received: item.received || 0,
         sku: item.sku,
         request: item.request,
         keterangan: item.keterangan || "",
         tanggalTerpenuhi: null,
+        dibuatOleh: myUSer.username || "",
       })),
     });
 

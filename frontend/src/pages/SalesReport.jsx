@@ -55,6 +55,7 @@ import {
 import { getPurchaseOrderList } from "@/api/purchaseOrderApi";
 import { useUserInfo } from "@/store";
 import ModalDetailInvoicesByPaymentMethod from "@/components/ModalDetailInvoicesByPaymentMethod";
+import { parseRpHargaDasar } from "@/utils/parseRpHargaDasar";
 
 ChartJS.register(
   CategoryScale,
@@ -76,6 +77,28 @@ const formatCurrency = (amount) => {
     maximumFractionDigits: 0,
   }).format(amount);
 };
+
+// angka mentah untuk CSV
+const csvAngka = (nilai) => {
+  const n = parseRpHargaDasar(nilai);
+  return n != null ? String(n) : "";
+};
+
+const formatCsvDate = (dateString) => {
+  if (!dateString) return "";
+  try {
+    return new Date(dateString).toLocaleDateString("id-ID", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
+  } catch {
+    return "";
+  }
+};
+
+const ringkasList = (arr, getLabel) =>
+  arr?.map(getLabel).filter(Boolean).join(" | ") || "";
 
 const SalesReport = () => {
   // ============= FILTER STATE =============
@@ -164,194 +187,178 @@ const SalesReport = () => {
   });
 
   async function handleDownloadRangkingPaymentMethodDetail() {
-    const loadingToastId = toast.loading(
-      "Waiting for all data to be loaded...",
-    );
-    function delay(ms) {
-      return new Promise((resolve) => setTimeout(resolve, ms));
-    }
-    await delay(4000);
-    toast.dismiss(loadingToastId);
-    console.log(
-      "tunggu 4 detik untuk jaga jaga ada query tanstack yang berat masih belum dimuat",
-    );
-    toast.success("All data loaded successfully");
-
-    const responses = await Promise.all(
-      paymentMethodRanking?.data?.paymentMethodRank?.map(async (item) => {
-        return await getInvoicesByPaymentMethod({
-          paymentMethod: item._id,
-          startDate: dateRange.startDate,
-          endDate: dateRange.endDate,
-          transactionStatus,
-          outlet: selectedOutlet,
-        });
-      }),
-    );
-    // Menggabungkan semua detail invoice dalam satu array
-    const allInvoices = responses.flatMap((response) => response.data || []);
-    if (allInvoices.length === 0) {
-      toast("Tidak ada detail invoice untuk didownload");
+    const rankList = paymentMethodRanking?.data?.paymentMethodRank;
+    if (!rankList?.length) {
+      toast.error("Data ranking metode bayar belum tersedia");
       return;
     }
 
-    // Header custom sesuai permintaan user
-    const finalHeaders_const = [
-      "kodeInvoice",
-      "tanggalBayar",
-      "salesPerson",
-      "spg",
-      "sku",
-      "description",
-      "quantity",
-      "RpHargaDasar",
-      "totalRp",
-      "diskon",
-      "promo",
-      "futurVoucher",
-      "total",
-      "paymentMethod",
-      "catatan",
-    ];
+    const loadingToastId = toast.loading("Mengambil data invoice...");
 
-    // Mapping header ke label Indonesia
-    const headerLabelMap = {
-      kodeInvoice: "kodeInvoice",
-      tanggalBayar: "Tanggal Transaksi",
-      salesPerson: "salesPerson",
-      spg: "spg",
-      sku: "sku",
-      description: "description",
-      quantity: "quantity",
-      RpHargaDasar: "harga/pcs",
-      totalRp: "Harga total Qty",
-      diskon: "diskon",
-      promo: "promo",
-      futurVoucher: "futurVoucher",
-      total: "amount",
-      paymentMethod: "paymentMethod",
-      catatan: "catatan",
-    };
+    try {
+      const responses = await Promise.all(
+        rankList.map((item) =>
+          getInvoicesByPaymentMethod({
+            paymentMethod: item._id,
+            startDate: dateRange.startDate,
+            endDate: dateRange.endDate,
+            transactionStatus,
+            outlet: selectedOutlet,
+          }),
+        ),
+      );
 
-    const csvOutputRows = [];
-    csvOutputRows.push(
-      finalHeaders_const.map((h) => `"${headerLabelMap[h] || h}"`).join(";"),
-    );
-
-    const escapeCell = (val) => {
-      const valueString = val === null || val === undefined ? "" : String(val);
-      if (typeof val === "object" && val !== null) {
-        try {
-          if (
-            Array.isArray(val) &&
-            val.length > 0 &&
-            typeof val[0] === "object"
-          ) {
-            const itemStrings = val.map((objItem) =>
-              Object.entries(objItem)
-                .map(([k, v]) => `${k}: ${v}`)
-                .join(", "),
-            );
-            return `"${itemStrings.join(" | ").replace(/"/g, '""')}"`;
-          }
-          return `"${JSON.stringify(val).replace(/"/g, '""')}"`;
-        } catch (e) {
-          return `"[Object]"`;
-        }
+      const allInvoices = responses.flatMap((response) => response.data || []);
+      if (allInvoices.length === 0) {
+        toast.error("Tidak ada detail invoice untuk didownload");
+        return;
       }
-      return `"${valueString.replace(/"/g, '""')}"`;
-    };
 
-    allInvoices.forEach((invoice) => {
-      const billItems = invoice.currentBill || [];
-      const rowCount = Math.max(1, billItems.length);
-      let prevRow = null;
-      for (let i = 0; i < rowCount; i++) {
-        const row = new Array(finalHeaders_const.length).fill("");
-        finalHeaders_const.forEach((header, idx) => {
-          if (header === "createdAt") {
-            row[idx] = new Date(invoice.createdAt).toLocaleDateString("id-ID", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            });
-          } else if (header === "kodeInvoice") {
-            row[idx] = i === 0 ? invoice.kodeInvoice : "";
-          } else if (header === "tanggalBayar") {
-            row[idx] =
-              i === 0 && invoice.tanggalBayar
-                ? new Date(invoice.tanggalBayar).toLocaleDateString("id-ID", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })
-                : "";
-          } else if (header === "salesPerson") {
-            row[idx] = i === 0 ? invoice.salesPerson || "" : "";
-          } else if (header === "spg") {
-            const spgObj = spgList?.data?.find((s) => s._id === invoice.spg);
-            row[idx] = i === 0 ? spgObj?.name || invoice.spg || "" : "";
-          } else if (header === "sku") {
-            row[idx] = billItems[i] ? billItems[i].sku || "" : "";
-          } else if (header === "description") {
-            row[idx] = billItems[i] ? billItems[i].description || "" : "";
-          } else if (header === "quantity") {
-            row[idx] = billItems[i] ? billItems[i].quantity || "" : "";
-          } else if (header === "RpHargaDasar") {
-            row[idx] = billItems[i] ? billItems[i].RpHargaDasar || "" : "";
-          } else if (header === "totalRp") {
-            row[idx] = billItems[i] ? billItems[i].totalRp || "" : "";
-          } else if (
-            [
-              "diskon",
-              "promo",
-              "futurVoucher",
-              "total",
-              "paymentMethod",
-              "catatan",
-            ].includes(header)
-          ) {
-            row[idx] = i === 0 ? invoice[header] || "" : "";
-          }
-        });
-        // forward fill selain kolom currentBill (sku, description, quantity, RpHargaDasar, totalRp)
-        if (prevRow) {
+      const labelMetodeBayar = (nilai) => {
+        if (!nilai) return "";
+        const pm = paymentMethodList?.find(
+          (p) => p._id === nilai || p.method === nilai,
+        );
+        return pm?.method || nilai;
+      };
+
+      const finalHeaders_const = [
+        "kodeInvoice",
+        "tanggalBayar",
+        "salesPerson",
+        "spg",
+        "sku",
+        "description",
+        "quantity",
+        "RpHargaDasar",
+        "totalRp",
+        "diskon",
+        "promo",
+        "futurVoucher",
+        "total",
+        "paymentMethod",
+        "nomorTransaksi",
+        "catatan",
+      ];
+
+      const headerLabelMap = {
+        kodeInvoice: "kodeInvoice",
+        tanggalBayar: "Tanggal Transaksi",
+        salesPerson: "salesPerson",
+        spg: "spg",
+        sku: "sku",
+        description: "description",
+        quantity: "quantity",
+        RpHargaDasar: "harga/pcs",
+        totalRp: "Harga total Qty",
+        diskon: "diskon",
+        promo: "promo",
+        futurVoucher: "futureVoucher",
+        total: "amount",
+        paymentMethod: "Metode Pembayaran",
+        nomorTransaksi: "Nomor Transaksi",
+        catatan: "catatan",
+      };
+
+      const csvOutputRows = [];
+      csvOutputRows.push(
+        finalHeaders_const.map((h) => `"${headerLabelMap[h] || h}"`).join(";"),
+      );
+
+      const escapeCell = (val) => {
+        const valueString =
+          val === null || val === undefined ? "" : String(val);
+        return `"${valueString.replace(/"/g, '""')}"`;
+      };
+
+      allInvoices.forEach((invoice) => {
+        const billItems = invoice.currentBill || [];
+        const rowCount = Math.max(1, billItems.length);
+        const spgObj = spgList?.data?.find((s) => s._id === invoice.spg);
+
+        for (let i = 0; i < rowCount; i++) {
+          const item = billItems[i];
+          const row = new Array(finalHeaders_const.length).fill("");
+
           finalHeaders_const.forEach((header, idx) => {
-            if (
-              ![
-                "sku",
-                "description",
-                "quantity",
-                "RpHargaDasar",
-                "totalRp",
-              ].includes(header) &&
-              row[idx] === ""
-            ) {
-              row[idx] = prevRow[idx];
+            if (header === "kodeInvoice") {
+              row[idx] = i === 0 ? invoice.kodeInvoice || "" : "";
+            } else if (header === "tanggalBayar") {
+              row[idx] =
+                i === 0 ? formatCsvDate(invoice.tanggalBayar) : "";
+            } else if (header === "salesPerson") {
+              row[idx] = i === 0 ? invoice.salesPerson || "" : "";
+            } else if (header === "spg") {
+              row[idx] =
+                i === 0 ? spgObj?.name || invoice.spg || "" : "";
+            } else if (header === "sku") {
+              row[idx] = item?.sku || "";
+            } else if (header === "description") {
+              row[idx] = item?.description || "";
+            } else if (header === "quantity") {
+              row[idx] = item?.quantity ?? "";
+            } else if (header === "RpHargaDasar") {
+              row[idx] = csvAngka(item?.RpHargaDasar);
+            } else if (header === "totalRp") {
+              row[idx] = csvAngka(item?.totalRp);
+            } else if (header === "paymentMethod") {
+              row[idx] =
+                i === 0 ? labelMetodeBayar(invoice.paymentMethod) : "";
+            } else if (header === "nomorTransaksi") {
+              row[idx] = i === 0 ? invoice.nomorTransaksi || "" : "";
+            } else if (header === "diskon") {
+              row[idx] =
+                i === 0
+                  ? ringkasList(
+                      invoice.diskon,
+                      (d) => d.diskonInfo?.judulDiskon || d.sku,
+                    )
+                  : "";
+            } else if (header === "promo") {
+              row[idx] =
+                i === 0
+                  ? ringkasList(
+                      invoice.promo,
+                      (p) => p.promoInfo?.judulPromo || p.sku,
+                    )
+                  : "";
+            } else if (header === "futurVoucher") {
+              row[idx] =
+                i === 0
+                  ? ringkasList(
+                      invoice.futureVoucher,
+                      (v) => v.voucherInfo?.judulVoucher || v.sku,
+                    )
+                  : "";
+            } else if (header === "total") {
+              row[idx] = i === 0 ? csvAngka(invoice.total) : "";
+            } else if (header === "catatan") {
+              row[idx] = item?.catatan || "";
             }
           });
-        }
-        prevRow = row;
-        csvOutputRows.push(row.map((val) => escapeCell(val)).join(";"));
-      }
-    });
 
-    const csvString = csvOutputRows.join("\n");
-    // Membuat blob untuk file CSV dan mendownloadnya
-    const blob = new Blob([csvString], { type: "text/csv" });
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    const date = new Date().toLocaleDateString("id-ID", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-    link.download = `Statement catur POS - filter:: ${selectedOutletObj?.namaOutlet} : ${date} - ${dateRange.startDate}: ${dateRange.endDate}.csv`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    window.URL.revokeObjectURL(url);
+          csvOutputRows.push(row.map((val) => escapeCell(val)).join(";"));
+        }
+      });
+
+      const blob = new Blob(["\uFEFF" + csvOutputRows.join("\n")], {
+        type: "text/csv;charset=utf-8;",
+      });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      const date = formatCsvDate(new Date());
+      link.download = `Statement catur POS - filter:: ${selectedOutletObj?.namaOutlet} : ${date} - ${dateRange.startDate}: ${dateRange.endDate}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      toast.success("Export berhasil");
+    } catch {
+      toast.error("Gagal export detail invoice");
+    } finally {
+      toast.dismiss(loadingToastId);
+    }
   }
 
   useEffect(() => {

@@ -4,9 +4,27 @@ import {
   getAllinventories,
   updateSingleInventory,
   createSingleInventory,
-  updateBulkPrices,
+  importInventoryCsv,
   toggleDisableInventory,
 } from "../api/itemLibraryApi";
+
+const formatInventoryImportError = (data) => {
+  if (!data) return "Terjadi kesalahan";
+  const parts = [];
+  if (data.duplicatedSkus?.length) {
+    parts.push(`SKU duplikat: ${data.duplicatedSkus.join(", ")}`);
+  }
+  const detailList = data.details || data.errors || [];
+  detailList.forEach((d) => {
+    if (d.sku) {
+      parts.push(`Baris ${d.row} (${d.sku}): ${d.reason}`);
+    } else {
+      parts.push(`Baris ${d.row}: ${d.reason}`);
+    }
+  });
+  if (parts.length) return parts.join(" | ");
+  return data.message || "Terjadi kesalahan";
+};
 import toast from "react-hot-toast";
 import { getAllBarangPromo, getAllPromoByProduct } from "../api/promoApi";
 import { getAllDiskon, getAllDiskonByProduct } from "../api/diskonApi";
@@ -50,6 +68,7 @@ import {
 } from "lucide-react";
 import { getImage, uploadThumbail } from "../api/thumbnailApi";
 import StackTraceBySku from "@/components/StackTraceBySku";
+import { parseRpHargaDasar } from "@/utils/parseRpHargaDasar";
 
 const ItemLibrary = () => {
   //router and query hooks
@@ -154,8 +173,9 @@ const ItemLibrary = () => {
       setselectedInventory(null);
     },
     onError: (error) => {
-      toast.error("gagal mengubah status inventory");
-      console.log("ini error dari tanstack: ", error);
+      toast.error(
+        error.response.data.message || "gagal mengubah status inventory",
+      );
     },
   });
 
@@ -224,13 +244,19 @@ const ItemLibrary = () => {
         sku: selectedInventory.sku,
       }),
     onSuccess: () => {
-      queryClient.invalidateQueries(["thumbnail"]);
+      queryClient.invalidateQueries(["thumbnail", selectedInventory?.sku]);
       setSelectedImage(null);
+    },
+    onError: (error) => {
+      toast.error(
+        error?.response?.data?.message || "Gagal mengupload thumbnail",
+      );
     },
   });
   const { data: thumbnail } = useQuery({
-    queryFn: () => getImage(selectedInventory?._id),
-    queryKey: ["thumbnail", selectedInventory?._id],
+    queryFn: () => getImage(selectedInventory?.sku),
+    queryKey: ["thumbnail", selectedInventory?.sku],
+    enabled: !!selectedInventory?.sku,
   });
   //------thumbnail api end---
 
@@ -269,8 +295,10 @@ const ItemLibrary = () => {
 
   const { mutateAsync: handleUpdateInventory } = useMutation({
     mutationFn: async (body) => {
-      // Tunggu response dari updateSingleInventory
-      const response = await updateSingleInventory(body);
+      const response = await updateSingleInventory({
+        ...body,
+        RpHargaDasar: parseRpHargaDasar(body.RpHargaDasar),
+      });
       return response;
     },
     mutationKey: ["inventories"],
@@ -284,19 +312,23 @@ const ItemLibrary = () => {
         await queryClient.invalidateQueries(["inventories"]);
         await refetchInventories();
       } else {
-        toast.error("Gagal mengupdate: Tidak ada response dari server");
+        toast.error(
+          response?.response?.data?.message ||
+            "Gagal mengupdate: Tidak ada response dari server",
+        );
       }
     },
     onError: (error) => {
-      toast.error("gagal mengupdate");
-      console.log("ini error dari tanstack: ", error);
+      toast.error(error?.response?.data?.message || "gagal mengupdate");
     },
   });
 
   const { mutateAsync: handleCreateSingleInventory } = useMutation({
     mutationFn: async (body) => {
-      // Tunggu response dari createSingleInventory
-      const response = await createSingleInventory(body);
+      const response = await createSingleInventory({
+        ...body,
+        RpHargaDasar: parseRpHargaDasar(body.RpHargaDasar),
+      });
       return response;
     },
     onSuccess: async (response) => {
@@ -307,11 +339,14 @@ const ItemLibrary = () => {
         await refetchInventories();
         toast.success("berhasil register new single inventory");
       } else {
-        toast.error("Gagal membuat inventory: Tidak ada response dari server");
+        toast.error(
+          response?.response?.data?.message ||
+            "Gagal membuat inventory: Tidak ada response dari server",
+        );
       }
     },
     onError: (error) => {
-      toast.error(error.message);
+      toast.error(error?.response?.data?.message || "gagal membuat inventory");
     },
   });
   const exportCSV = () => {
@@ -356,93 +391,46 @@ const ItemLibrary = () => {
       csvRows.push(row.join(";"));
     });
 
-    const csvContent = "data:text/csv;charset=utf-8," + csvRows.join("\n");
-    const encodedUri = encodeURI(csvContent);
+    const blob = new Blob(["\uFEFF" + csvRows.join("\n")], {
+      type: "text/csv;charset=utf-8;",
+    });
+    const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute(
-      "download",
-      "contoh_csv_untuk_create_or_update_inventory_tak_menerima_quantity.csv",
-    ); // Nama file template yang lebih sesuai
+    link.href = url;
+    link.download =
+      "contoh_csv_untuk_create_or_update_inventory_tak_menerima_quantity.csv";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
+
+  const { mutateAsync: handleImportCsv, isPending: isImporting } = useMutation({
+    mutationFn: importInventoryCsv,
+    onSuccess: (response) => {
+      queryClient.invalidateQueries(["inventories"]);
+      refetchInventories();
+      toast.success(response?.message || "Import berhasil");
+    },
+    onError: (error) => {
+      toast.error(formatInventoryImportError(error?.response?.data));
+    },
+  });
 
   const handleCSVUpload = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-      const text = e.target.result;
-      const rows = text.split("\n");
-      const headers = rows[0].split(";");
-      const skuIndex = headers.findIndex(
-        (h) => h.trim().toLowerCase() === "sku",
-      );
-      const priceIndex = headers.findIndex(
-        (h) => h.trim().toLowerCase() === "harga dasar",
-      );
-
-      if (skuIndex === -1 || priceIndex === -1) {
-        toast.error("Invalid CSV format. Please use the template.");
-        return;
-      }
-
-      const updates = rows
-        .slice(1)
-        .filter((row) => row.trim())
-        .map((row) => {
-          const columns = row.split(";");
-          const priceStr = columns[priceIndex].trim();
-          // Remove any existing commas and convert dots to actual decimal points
-          const normalizedPrice = priceStr.replace(/,/g, "");
-          return {
-            sku: columns[skuIndex]?.trim(),
-            RpHargaDasar: parseFloat(normalizedPrice || 0),
-            description: columns[2]?.trim(),
-            brand: columns[3]?.trim(),
-            barcodeItem: columns[4]?.trim(),
-          };
-        })
-        .filter((update) => {
-          if (!update.sku || isNaN(update.RpHargaDasar)) {
-            console.warn(
-              `Invalid row skipped: SKU=${update.sku}, Price=${update.RpHargaDasar}`,
-            );
-            return false;
-          }
-          return true;
-        });
-
-      if (updates.length === 0) {
-        toast.error("No valid data found in CSV");
-        return;
-      }
-
-      try {
-        const response = await updateBulkPrices(updates);
-        if (response.success) {
-          toast.success(response?.message);
-          queryClient.invalidateQueries(["inventories"]);
-        } else {
-          toast.error(response.message || "Failed to update prices");
-        }
-      } catch (error) {
-        console.error("Error updating prices:", error);
-        toast.error(error.response?.data?.message || "Failed to update prices");
-      }
-    };
-    reader.readAsText(file);
+    await handleImportCsv(file);
   };
 
   const handleOnChange = (e) => {
     const { name, value } = e.target;
+    const parsedValue =
+      name === "RpHargaDasar" ? value.replace(/[^\d]/g, "") : value;
     if (newSingleInventory) {
-      setNewSingleInventory({ ...newSingleInventory, [name]: value });
+      setNewSingleInventory({ ...newSingleInventory, [name]: parsedValue });
     } else {
-      setselectedInventory({ ...selectedInventory, [name]: value });
+      setselectedInventory({ ...selectedInventory, [name]: parsedValue });
     }
   };
 
@@ -703,8 +691,8 @@ const ItemLibrary = () => {
 
         // convert decimal string to number for RpHargaDasar
         if (sortConfig.field === "RpHargaDasar") {
-          aValue = parseFloat(aValue?.["$numberDecimal"] || 0);
-          bValue = parseFloat(bValue?.["$numberDecimal"] || 0);
+          aValue = parseRpHargaDasar(aValue) ?? 0;
+          bValue = parseRpHargaDasar(bValue) ?? 0;
         }
 
         // normalize string
@@ -811,13 +799,16 @@ const ItemLibrary = () => {
                 </label>
                 <ul className="dropdown-content z-40 menu p-2 shadow-xl bg-white rounded-xl w-52 border border-blue-100">
                   <li>
-                    <label className="flex items-center gap-2 text-gray-700 hover:bg-blue-50 rounded-lg p-2 cursor-pointer">
+                    <label
+                      className={`flex items-center gap-2 text-gray-700 hover:bg-blue-50 rounded-lg p-2 cursor-pointer ${isImporting ? "opacity-50 pointer-events-none" : ""}`}
+                    >
                       <Upload className="w-4 h-4 text-blue-600" />
-                      Import CSV
+                      {isImporting ? "Mengimpor..." : "Import CSV"}
                       <input
                         type="file"
                         accept=".csv"
                         className="hidden"
+                        disabled={isImporting}
                         onChange={handleCSVUpload}
                         onClick={(e) => (e.target.value = null)}
                       />
@@ -825,7 +816,7 @@ const ItemLibrary = () => {
                   </li>
                   <li>
                     <a
-                      onClick={() => exportCSV(inventories)}
+                      onClick={exportCSV}
                       className="flex items-center gap-2 text-gray-700 hover:bg-blue-50 rounded-lg p-2 cursor-pointer"
                     >
                       <Download className="w-4 h-4 text-blue-600" />
@@ -1008,7 +999,9 @@ const ItemLibrary = () => {
                               style: "currency",
                               currency: "IDR",
                               minimumFractionDigits: 0,
-                            }).format(item.RpHargaDasar?.$numberDecimal)}
+                            }).format(
+                              parseRpHargaDasar(item.RpHargaDasar) ?? 0,
+                            )}
                           </span>
                         </td>
                         <td className="px-4 py-3 text-sm">
@@ -1137,31 +1130,7 @@ const ItemLibrary = () => {
 
           <div className="p-4 space-y-4">
             {/* Action Buttons */}
-            <div className="grid grid-cols-3 gap-2">
-              <button
-                onClick={() => {
-                  if (
-                    window.confirm(
-                      "Disabled Produk ini? Produk tidak akan bisa dijual dan tidak tampil di mobile",
-                    )
-                  ) {
-                    handleToggleDisableInventory(selectedInventory._id);
-                  }
-                }}
-                className={`flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 ${
-                  selectedInventory?.isDisabled
-                    ? "bg-green-500 text-white hover:bg-green-600"
-                    : "bg-red-500 text-white hover:bg-red-600"
-                }`}
-              >
-                {selectedInventory?.isDisabled ? (
-                  <ShieldCheck className="w-5 h-5" />
-                ) : (
-                  <Trash2 className="w-5 h-5" />
-                )}
-                {selectedInventory?.isDisabled ? "Enable" : "Disable"}
-              </button>
-
+            <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={() => {
                   setselectedInventory(null);
@@ -1179,12 +1148,8 @@ const ItemLibrary = () => {
                     handleCreateSingleInventory(newSingleInventory);
                   } else {
                     if (selectedImage) {
-                      try {
-                        await handleUploadImage();
-                        await handleUpdateInventory(selectedInventory);
-                      } catch (err) {
-                        console.error(err);
-                      }
+                      await handleUploadImage();
+                      await handleUpdateInventory(selectedInventory);
                     } else {
                       handleUpdateInventory(selectedInventory);
                     }
@@ -1285,7 +1250,9 @@ const ItemLibrary = () => {
                 <input
                   type="text"
                   name="RpHargaDasar"
-                  value={handleShowValue()?.RpHargaDasar?.$numberDecimal}
+                  value={
+                    parseRpHargaDasar(handleShowValue()?.RpHargaDasar) ?? ""
+                  }
                   onChange={handleOnChange}
                   className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200"
                   placeholder="0"

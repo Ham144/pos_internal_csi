@@ -260,7 +260,8 @@ const Summary = () => {
               Terjadi kesalahan saat memuat data penjualan. Silakan coba lagi
               nanti.
               <div className="mt-2 text-xs text-gray-600">
-                Detail: {invoiceStatsError.message || "Unknown error"}
+                Detail:{" "}
+                {invoiceStatsError?.response?.data?.message || "Unknown error"}
               </div>
             </div>
           ) : (
@@ -510,8 +511,8 @@ const Summary = () => {
                                   item.quantity <= 0
                                     ? "bg-red-100 text-red-800"
                                     : item.quantity <= 10
-                                    ? "bg-yellow-100 text-yellow-800"
-                                    : "bg-green-100 text-green-800"
+                                      ? "bg-yellow-100 text-yellow-800"
+                                      : "bg-green-100 text-green-800"
                                 }`}
                               >
                                 {item.quantity}
@@ -521,7 +522,7 @@ const Summary = () => {
                               {formatCurrency(
                                 item.RpHargaDasar
                                   ? item.RpHargaDasar.$numberDecimal
-                                  : 0
+                                  : 0,
                               )}
                             </td>
                           </tr>
@@ -546,7 +547,7 @@ const Summary = () => {
                     <button
                       onClick={() =>
                         handleInventoryPageChange(
-                          Math.max(1, inventoryPage - 1)
+                          Math.max(1, inventoryPage - 1),
                         )
                       }
                       disabled={inventoryPage === 1}
@@ -563,8 +564,8 @@ const Summary = () => {
                         handleInventoryPageChange(
                           Math.min(
                             inventoriesByCategory.pagination.totalPages,
-                            inventoryPage + 1
-                          )
+                            inventoryPage + 1,
+                          ),
                         )
                       }
                       disabled={
@@ -678,7 +679,7 @@ const Summary = () => {
                             </td>
                             <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
                               {new Date(invoice.createdAt).toLocaleDateString(
-                                "id-ID"
+                                "id-ID",
                               )}
                             </td>
                             <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
@@ -724,8 +725,8 @@ const Summary = () => {
                         handleInvoicePageChange(
                           Math.min(
                             invoicesByStatus.pagination.totalPages,
-                            invoicePage + 1
-                          )
+                            invoicePage + 1,
+                          ),
                         )
                       }
                       disabled={
@@ -871,7 +872,7 @@ const Summary = () => {
                             </td>
                             <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
                               {new Date(po.createdAt).toLocaleDateString(
-                                "id-ID"
+                                "id-ID",
                               )}
                             </td>
                             <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">

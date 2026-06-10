@@ -24,10 +24,10 @@ export const getAllSpg = async () => {
 
 export const deleteSpg = async (spgId) => {
   const response = await axios.delete(
-    `${BASE_URL}/api/v1/spg/delete/${spgId}`,
+    `${BASE_URL}/api/v1/spg/disable/${spgId}`,
     {
       withCredentials: true,
-    }
+    },
   );
   return response.data;
 };
@@ -40,7 +40,7 @@ export const getSpgById = async (spgId) => {
     },
     {
       withCredentials: true,
-    }
+    },
   );
   return response.data;
 };

@@ -108,7 +108,7 @@ router.post("/syncDiskonPromoVoucher", authenticate, async (req, res) => {
               ? bill?.futureVoucher?.map((v) => v._id)
               : null,
           },
-          { upsert: true, new: true }
+          { upsert: true, new: true },
         );
       }
       const invoiceDB = await Invoice.findById(bill?._id);
@@ -125,10 +125,10 @@ router.post("/syncDiskonPromoVoucher", authenticate, async (req, res) => {
             bill?.totalQuantityPenjualanFromApp
           ) {
             kasirDB.totalHargaPenjualan += Number(
-              bill?.totalHargaPenjualanFromApp || 0
+              bill?.totalHargaPenjualanFromApp || 0,
             );
             kasirDB.totalQuantityPenjualan += Number(
-              bill?.totalQuantityPenjualanFromApp || 0
+              bill?.totalQuantityPenjualanFromApp || 0,
             );
             await kasirDB.save();
           }
@@ -233,7 +233,7 @@ router.post("/syncDiskonPromoVoucher", authenticate, async (req, res) => {
           const outletUpdate = await Outlet.findOneAndUpdate(
             { kodeOutlet: kodeOutlet },
             { $inc: { jumlahInvoice: 1 } },
-            { new: true }
+            { new: true },
           );
 
           const INCcodeInvoice = outletUpdate.jumlahInvoice;
@@ -258,12 +258,12 @@ router.post("/syncDiskonPromoVoucher", authenticate, async (req, res) => {
           if (invoiceWithSameCode) {
             // Jika kode sudah digunakan, naikkan lagi jumlah invoice di outlet
             console.log(
-              "Kode invoice duplikat terdeteksi, mencoba dengan nilai baru"
+              "Kode invoice duplikat terdeteksi, mencoba dengan nilai baru",
             );
             const outletUpdateRetry = await Outlet.findOneAndUpdate(
               { kodeOutlet: kodeOutlet },
               { $inc: { jumlahInvoice: 1 } },
-              { new: true }
+              { new: true },
             );
 
             const newINCcodeInvoice = outletUpdateRetry.jumlahInvoice;
@@ -458,7 +458,7 @@ router.post("/syncDiskonPromoVoucher", authenticate, async (req, res) => {
                   alamat: bill?.customer?.alamat,
                 },
               },
-              { upsert: true, new: true }
+              { upsert: true, new: true },
             );
           }
 
@@ -475,10 +475,10 @@ router.post("/syncDiskonPromoVoucher", authenticate, async (req, res) => {
               bill?.totalQuantityPenjualanFromApp
             ) {
               kasirDB.totalHargaPenjualan += Number(
-                bill?.totalHargaPenjualanFromApp || 0
+                bill?.totalHargaPenjualanFromApp || 0,
               );
               kasirDB.totalQuantityPenjualan += Number(
-                bill?.totalQuantityPenjualanFromApp || 0
+                bill?.totalQuantityPenjualanFromApp || 0,
               );
               await kasirDB.save();
             }
@@ -503,7 +503,7 @@ router.post("/syncDiskonPromoVoucher", authenticate, async (req, res) => {
               "decrease",
               oldQuantity,
               newQuantity,
-              bill?._id
+              bill?._id,
             );
           }
         }
@@ -520,13 +520,13 @@ router.post("/syncDiskonPromoVoucher", authenticate, async (req, res) => {
       // Pastikan quantity tidak negatif
       const quantityDiff = Math.max(
         Number(promo.quantityDariDataBase) - Number(promo.quantityBerlaku),
-        0
+        0,
       );
       const newQuantity = Math.max(promoDB?.quantityBerlaku - quantityDiff, 0);
 
       await DaftarPromo.updateOne(
         { _id: promo._id },
-        { $set: { quantityBerlaku: newQuantity } }
+        { $set: { quantityBerlaku: newQuantity } },
       );
     });
 
@@ -540,13 +540,13 @@ router.post("/syncDiskonPromoVoucher", authenticate, async (req, res) => {
       // Pastikan quantity tidak negatif
       const quantityDiff = Math.max(
         diskon.quantityDariDataBase - diskon.quantityTersedia,
-        0
+        0,
       );
       const newQuantity = Math.max(diskonDB.quantityTersedia - quantityDiff, 0);
 
       await DaftartDiskon.updateOne(
         { _id: diskon._id },
-        { $set: { quantityTersedia: newQuantity } }
+        { $set: { quantityTersedia: newQuantity } },
       );
     });
 
@@ -564,14 +564,14 @@ router.post("/syncDiskonPromoVoucher", authenticate, async (req, res) => {
         voucher?.quantityDariDataBase - voucher?.quantityTersedia;
       const newQuantity = Math.max(
         voucherDB?.quantityTersedia - quantityDiff,
-        0
+        0,
       );
 
       if (quantityDiff > 0) {
         //update voucher refrensi DB
         await DaftarVoucher.updateOne(
           { _id: voucher._id },
-          { $set: { quantityTersedia: newQuantity } }
+          { $set: { quantityTersedia: newQuantity } },
         );
 
         //cari updated bill yang baru untuk mengambil email customer
@@ -613,7 +613,7 @@ router.post("/syncDiskonPromoVoucher", authenticate, async (req, res) => {
             if (existingVoucher) {
               console.log(
                 "GeneratedVoucher sudah ada untuk voucher dan customer ini:",
-                existingVoucher._id
+                existingVoucher._id,
               );
               return;
             }
@@ -633,18 +633,18 @@ router.post("/syncDiskonPromoVoucher", authenticate, async (req, res) => {
               "GeneratedVoucher berhasil dibuat dengan ID:",
               newVoucher._id,
               "kode:",
-              random5Char
+              random5Char,
             );
           } catch (error) {
             console.error(
               "Error saat membuat GeneratedVoucher:",
-              error.message
+              error.message,
             );
           }
         } else {
           console.log(
             "Tidak dapat membuat GeneratedVoucher: Email customer tidak tersedia",
-            voucher._id
+            voucher._id,
           );
         }
       }
@@ -675,7 +675,7 @@ router.post("/syncDiskonPromoVoucher", authenticate, async (req, res) => {
                 totalQuantityPenjualan:
                   parseInt(singleSpg.totalQuantityPenjualanFromApp) || 0,
               },
-            }
+            },
           );
 
           // Handle SKU terjual dari skuTerjualFromApp
@@ -702,7 +702,7 @@ router.post("/syncDiskonPromoVoucher", authenticate, async (req, res) => {
                     $inc: {
                       "skuTerjual.$.quantity": itemQuantity,
                     },
-                  }
+                  },
                 );
               } else {
                 // Add new SKU - pastikan quantity disimpan
@@ -715,7 +715,7 @@ router.post("/syncDiskonPromoVoucher", authenticate, async (req, res) => {
                         quantity: itemQuantity,
                       },
                     },
-                  }
+                  },
                 );
               }
             }
@@ -735,7 +735,7 @@ router.post("/syncDiskonPromoVoucher", authenticate, async (req, res) => {
 
               // Cari apakah sku sudah ada di database
               const existingItem = existingSkuTerjual.find(
-                (dbItem) => dbItem.sku === item.sku
+                (dbItem) => dbItem.sku === item.sku,
               );
 
               if (existingItem) {
@@ -749,7 +749,7 @@ router.post("/syncDiskonPromoVoucher", authenticate, async (req, res) => {
                     $inc: {
                       "skuTerjual.$.quantity": itemQuantity,
                     },
-                  }
+                  },
                 );
               } else {
                 // Tambahkan item baru jika belum ada di database - pastikan quantity disimpan
@@ -762,7 +762,7 @@ router.post("/syncDiskonPromoVoucher", authenticate, async (req, res) => {
                         quantity: itemQuantity,
                       },
                     },
-                  }
+                  },
                 );
               }
             }
@@ -785,7 +785,7 @@ router.post("/syncDiskonPromoVoucher", authenticate, async (req, res) => {
               updatedUser?.totalQuantityPenjualanFromApp || 0,
           },
         },
-        { new: true }
+        { new: true },
       );
     }
 
@@ -799,7 +799,7 @@ router.post("/syncDiskonPromoVoucher", authenticate, async (req, res) => {
         ...(updatedBill ? billTersimpanSyncPromises : []),
         ...(updatedSpg ? spgSyncPromises : []),
         userSyncPromise,
-      ].filter(Boolean)
+      ].filter(Boolean),
     )
       .then(async () => {
         //ambil data terbaru setelah update
@@ -843,23 +843,37 @@ router.post("/syncDiskonPromoVoucher", authenticate, async (req, res) => {
           kasirList: { $in: [updatedUser?._id] },
         }).select("-logo");
 
+        const favoritedInventorySkus =
+          newOutletData?.favoritedInventoryIds?.filter(Boolean) || [];
+
+        const outletSpgIds = newOutletData?.spgList || [];
         const newSpgList = await SpgRefrensi.find({
-          _id: {
-            $in: [...newOutletData.spgList],
-          },
+          isDisabled: { $ne: true },
+          _id: { $in: outletSpgIds },
         });
+        // id spg yang harus dihapus dari cache mobile
+        const activeSpgIds = new Set(newSpgList.map((s) => String(s._id)));
+        const mobileSpgIds = (updatedSpg || []).map((s) => String(s._id));
+        const removedSpgIds = [
+          ...new Set([
+            ...outletSpgIds
+              .map((id) => String(id))
+              .filter((id) => !activeSpgIds.has(id)),
+            ...mobileSpgIds.filter((id) => !activeSpgIds.has(id)),
+          ]),
+        ];
 
         //proses tanpa perubahan hanya ambil dari DB dan update AsyncStorage
         const newPaymentMethodData = await PaymentMethod.find({});
         if (!newOutletData || !newPaymentMethodData) {
           console.log(
-            "newOutletData atau newPaymentMethodData tampaknya belum ada?"
+            "newOutletData atau newPaymentMethodData tampaknya belum ada?",
           );
         }
 
         //kumpulin sku inventory yand dikirim dari mobile
         const queryForInventory = {};
-        queryForInventory.isDisabled = false;
+        queryForInventory.isDisabled = { $ne: true };
         //jika outlet tidak punya brandIds maka ambil semua
         const selectedBrand = await BrandRefrensi.find({
           $or: [{ _id: { $in: updatedOutlet?.brandIds } }, { _id: [] }],
@@ -868,7 +882,7 @@ router.post("/syncDiskonPromoVoucher", authenticate, async (req, res) => {
         queryForInventory.brand = { $in: brandList };
 
         const skuInventory = inventoriesOffline?.map(
-          (inventory) => inventory.sku
+          (inventory) => inventory.sku,
         );
         if (skuInventory?.length > 0) {
           queryForInventory.sku = { $in: skuInventory };
@@ -889,7 +903,7 @@ router.post("/syncDiskonPromoVoucher", authenticate, async (req, res) => {
         }
 
         const newInventoryData = await InventoryRefrensi.find(
-          queryForInventory
+          queryForInventory,
         ).sort({ updatedAt: -1 });
 
         const limitedNewCustomerList = await Pelanggan.find()
@@ -910,12 +924,11 @@ router.post("/syncDiskonPromoVoucher", authenticate, async (req, res) => {
           .limit(50);
 
         const newUserInfoData = await UserRefrensi.findById(
-          updatedUser?._id
+          updatedUser?._id,
         ).select(
-          "_id username blockedAccess roleName totalHargaPenjualan totalQuantityPenjualan targetHargaPenjualan targetQuantityPenjualan kodeKasir"
+          "_id username blockedAccess roleName totalHargaPenjualan totalQuantityPenjualan targetHargaPenjualan targetQuantityPenjualan kodeKasir",
         );
 
-        // Setelah semua selesai, kirim response sukses
         res.status(200).json({
           message: "Sync completed successfully.",
           data: {
@@ -924,16 +937,18 @@ router.post("/syncDiskonPromoVoucher", authenticate, async (req, res) => {
             newVoucherData,
             newInventoryData,
             newSpgList,
+            removedSpgIds,
             limitedNewCustomerList,
             limitedNewBillTersimpan,
             newUserInfoData,
             newOutletData,
             newPaymentMethodData,
+            favoritedInventorySkus,
           },
         });
       })
       .catch((error) => {
-        console.log("error sinkronisasi : ", error);
+        res.status(500).json({ message: "Sync failed.", error: error.message });
       });
   } catch (error) {
     // Tangani error dan kirimkan pesan yang sesuai

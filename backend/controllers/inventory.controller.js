@@ -6,7 +6,17 @@ import Brand from "../models/brand.model.js";
 import Outlet from "../models/Outlet.model.js";
 import UserRefrensi from "../models/User.model.js";
 import mongoose from "mongoose";
+import fs from "fs";
+import path from "path";
+import csv from "csv-parser";
 import { stackTracingSku } from "../utils/stackTracingSku.js";
+import { parseRpHargaDasar } from "../utils/parseRpHargaDasar.js";
+import { prepareBulkInventoryUpdates } from "../utils/prepareBulkInventoryUpdates.js";
+import { resolveSkuFromReq } from "../utils/resolveSku.js";
+import {
+  csvCell,
+  detectCsvSeparatorFromFile,
+} from "../utils/csvDelimiter.js";
 
 //ini untuk buat manual inventory, jarang dipake karena biasanya sudah ada didapat dari api pihak ketiga
 export const registerSingleInventori = async (req, res) => {
@@ -36,6 +46,13 @@ export const registerSingleInventori = async (req, res) => {
         message: "gagal membuat inventory, brand tidak boleh kosong",
       });
     }
+    const hargaBaru = parseRpHargaDasar(RpHargaDasar);
+    if (hargaBaru === null || hargaBaru < 0) {
+      return res.status(400).json({
+        message:
+          "gagal membuat inventory, harga tidak boleh kurang dari 0 atau tidak valid",
+      });
+    }
 
     const response = await InventoryRefrensi.create({
       _id: sku,
@@ -43,7 +60,7 @@ export const registerSingleInventori = async (req, res) => {
       description,
       isDisabled,
       quantity: Number(quantity),
-      RpHargaDasar: parseFloat(RpHargaDasar),
+      RpHargaDasar: hargaBaru,
       barcodeItem: barcodeItem,
       brand,
     });
@@ -54,14 +71,14 @@ export const registerSingleInventori = async (req, res) => {
       "register single inventory: Membuat item baru dari item_library manual",
       "spawn",
       0,
-      response?.quantity || 0
+      response?.quantity || 0,
     );
 
     if (promos) {
       const addPromos = promos.map((promoId) => {
         DaftarPromo.updateOne(
           { _id: promoId },
-          { $addToSet: { skuList: sku } }
+          { $addToSet: { skuList: sku } },
         );
       });
       await Promise.all(addPromos);
@@ -70,7 +87,7 @@ export const registerSingleInventori = async (req, res) => {
       diskons.map((diskonId) => {
         DaftartDiskon.updateOne(
           { _id: diskonId },
-          { $addToSet: { skuList: sku } }
+          { $addToSet: { skuList: sku } },
         );
       });
     }
@@ -100,7 +117,7 @@ export const disableSingleInventoriToggle = async (req, re) => {
     const success = await InventoryRefrensi.findOneAndUpdate(
       { sku },
       { isDisabled: !this.isDisabled },
-      { upsert: false, new: true }
+      { upsert: false, new: true },
     );
     if (!success) return res.status(400).json({ message: "gagal disbale" });
     return res.json({ message: "berhasil menghapus" });
@@ -141,6 +158,14 @@ export const updateSingleInventori = async (req, res) => {
         .json({ success: false, message: "SKU tidak ditemukan." });
     }
 
+    const hargaBaru = parseRpHargaDasar(RpHargaDasar);
+    if (hargaBaru === null || hargaBaru < 0) {
+      return res.status(400).json({
+        message:
+          "gagal memperbarui inventory, harga tidak boleh kurang dari 0 atau tidak valid",
+      });
+    }
+
     const numericQuantity =
       typeof quantity === "string" ? parseInt(quantity) : quantity;
 
@@ -155,7 +180,7 @@ export const updateSingleInventori = async (req, res) => {
           "update single inventory: Mengubah quantity",
           category,
           item.quantity,
-          numericQuantity
+          numericQuantity,
         );
       }
     }
@@ -163,7 +188,7 @@ export const updateSingleInventori = async (req, res) => {
     // Update fields
     item.quantity =
       numericQuantity !== undefined ? numericQuantity : item.quantity;
-    item.RpHargaDasar = RpHargaDasar ?? item.RpHargaDasar;
+    item.RpHargaDasar = hargaBaru;
     item.isDisabled = isDisabled ?? item.isDisabled;
     item.barcodeItem = barcodeItem ?? item.barcodeItem;
     item.description = description ?? item.description;
@@ -176,9 +201,9 @@ export const updateSingleInventori = async (req, res) => {
         promosToDelete.map((promoId) =>
           DaftarPromo.updateOne(
             { _id: promoId }, // Filter berdasarkan ID promo
-            { $pull: { skuList: sku } } // Hapus sku dari skuList jika ada
-          )
-        )
+            { $pull: { skuList: sku } }, // Hapus sku dari skuList jika ada
+          ),
+        ),
       );
     }
 
@@ -187,9 +212,9 @@ export const updateSingleInventori = async (req, res) => {
         promosToAdd.map((promoId) =>
           DaftarPromo.updateOne(
             { _id: promoId }, // Filter berdasarkan ID promo
-            { $addToSet: { skuList: sku } } // Tambahkan sku ke skuList jika belum ada
-          )
-        )
+            { $addToSet: { skuList: sku } }, // Tambahkan sku ke skuList jika belum ada
+          ),
+        ),
       );
     }
 
@@ -198,9 +223,9 @@ export const updateSingleInventori = async (req, res) => {
         diskonsToAdd.map((diskonId) =>
           DaftartDiskon.updateOne(
             { _id: diskonId },
-            { $addToSet: { skuTanpaSyarat: sku } }
-          )
-        )
+            { $addToSet: { skuTanpaSyarat: sku } },
+          ),
+        ),
       );
     }
 
@@ -209,9 +234,9 @@ export const updateSingleInventori = async (req, res) => {
         diskonsToDelete.map((diskonId) =>
           DaftartDiskon.updateOne(
             { _id: diskonId },
-            { $pull: { skuTanpaSyarat: sku } }
-          )
-        )
+            { $pull: { skuTanpaSyarat: sku } },
+          ),
+        ),
       );
     }
 
@@ -220,9 +245,9 @@ export const updateSingleInventori = async (req, res) => {
         voucherToBlock.map((voucherId) =>
           DaftarVoucher.updateOne(
             { _id: voucherId },
-            { $addToSet: { skuPengecualian: sku } }
-          )
-        )
+            { $addToSet: { skuPengecualian: sku } },
+          ),
+        ),
       );
     }
 
@@ -231,9 +256,9 @@ export const updateSingleInventori = async (req, res) => {
         voucherToOpenBlock.map((voucherId) =>
           DaftarVoucher.updateOne(
             { _id: voucherId },
-            { $pull: { skuPengecualian: sku } }
-          )
-        )
+            { $pull: { skuPengecualian: sku } },
+          ),
+        ),
       );
     }
 
@@ -306,8 +331,100 @@ export const getAllinventories = async (req, res) => {
   return res.json({ message: "berhasil", data, totalItems, totalPages });
 };
 
-//ini untuk mengupdate harga dengan csv beserta
-//create item baru jika tidak ditemukan di DB
+// eksekusi bulk update/setelah validasi baris import
+const runBulkInventoryUpdate = async (req, res, updates) => {
+  const { prepared, errors, duplicatedSkus } =
+    await prepareBulkInventoryUpdates(updates);
+
+  if (errors.length) {
+    return res.status(400).json({
+      success: false,
+      message: "Gagal memproses data inventory",
+      errors,
+      duplicatedSkus,
+      details: errors.map((e) => ({
+        row: e.row,
+        sku: e.sku,
+        reason: e.reason,
+      })),
+    });
+  }
+
+  const traceSummary = { spawn: 0, increase: 0, decrease: 0, other: 0 };
+
+  const updateOperations = prepared.map((item) => {
+    const setFields = {
+      _id: item.sku,
+      sku: item.sku,
+      RpHargaDasar: item.RpHargaDasar,
+      description: item.description,
+      quantity: item.quantity,
+    };
+    if (item.brand) setFields.brand = item.brand;
+    if (item.barcodeItem) setFields.barcodeItem = item.barcodeItem;
+
+    return {
+      updateOne: {
+        filter: { sku: item.sku },
+        update: { $set: setFields },
+        upsert: true,
+      },
+    };
+  });
+
+  const result = await InventoryRefrensi.bulkWrite(updateOperations);
+
+  for (const item of prepared) {
+    if (item.isNew) {
+      traceSummary.spawn++;
+      await stackTracingSku(
+        item.sku,
+        req.user.userId,
+        "Update Bulk Price - Bulk Import",
+        "spawn",
+        0,
+        item.quantity,
+      );
+      continue;
+    }
+
+    // hanya trace qty jika kolom quantity dikirim eksplisit
+    if (!item.quantityProvided) continue;
+
+    const prevQuantity = item.existing?.quantity || 0;
+    const receivedQuantity = item.receivedQuantity;
+    if (prevQuantity === receivedQuantity) continue;
+
+    const category =
+      receivedQuantity > prevQuantity
+        ? "increase"
+        : receivedQuantity < prevQuantity
+          ? "decrease"
+          : "other";
+
+    traceSummary[category]++;
+    await stackTracingSku(
+      item.sku,
+      req.user.userId,
+      "Update Bulk Price - Bulk Import",
+      category,
+      prevQuantity,
+      receivedQuantity,
+    );
+  }
+
+  return res.json({
+    success: true,
+    message: `Berhasil memperbarui ${result.modifiedCount} item & membuat ${
+      result.upsertedCount || 0
+    } item baru.`,
+    updatedCount: result.modifiedCount,
+    insertedCount: result.upsertedCount || 0,
+    traceSummary,
+  });
+};
+
+// update harga massal + buat item baru jika belum ada di DB
 export const updateBulkPrices = async (req, res) => {
   const { updates } = req.body;
 
@@ -318,104 +435,9 @@ export const updateBulkPrices = async (req, res) => {
     });
   }
 
-  let traceSummary = {
-    spawn: 0,
-    increase: 0,
-    decrease: 0,
-    other: 0,
-  };
-
   try {
-    // 1. Persiapkan list SKU
-    const skuList = updates.map((u) => u.sku.trim().toUpperCase());
-
-    // 2. Ambil data lama
-    const existingInventories = await InventoryRefrensi.find({
-      sku: { $in: skuList },
-    });
-    const existingMap = new Map();
-    existingInventories.forEach((inv) => existingMap.set(inv.sku, inv));
-
-    // 3. Buat bulk operation
-    const updateOperations = updates.map((update) => {
-      const sku = update.sku.trim().toUpperCase();
-      console.log(update);
-
-      // Buat update object yang hanya berisi field yang tidak kosong
-      const updateFields = { _id: sku };
-
-      if (update?.RpHargaDasar !== undefined && update?.RpHargaDasar !== "") {
-        updateFields.RpHargaDasar = update.RpHargaDasar;
-      }
-
-      if (update?.description !== undefined && update?.description !== "") {
-        updateFields.description = update.description;
-      }
-
-      if (update?.brand !== undefined && update?.brand !== "") {
-        updateFields.brand = update.brand.trim().toUpperCase();
-      }
-
-      if (update?.barcodeItem !== undefined && update?.barcodeItem !== "") {
-        updateFields.barcodeItem = update.barcodeItem;
-      }
-
-      return {
-        updateOne: {
-          filter: { sku },
-          update: {
-            $set: updateFields,
-          },
-          upsert: true,
-        },
-      };
-    });
-
-    // 4. Jalankan bulkWrite
-    const result = await InventoryRefrensi.bulkWrite(updateOperations);
-
-    // 5. Loop lagi dan simpan StackTrace
-    for (const update of updates) {
-      const sku = update.sku.trim().toUpperCase();
-      const existing = existingMap.get(sku);
-      const isSpawned = !existing;
-
-      const prevQuantity = existing?.quantity || 0;
-      const receivedQuantity = update.quantity ?? 0;
-
-      const category = isSpawned
-        ? "spawn"
-        : receivedQuantity > prevQuantity
-        ? "increase"
-        : receivedQuantity < prevQuantity
-        ? "decrease"
-        : "other";
-
-      // Optional: skip if quantity tidak berubah
-      if (!isSpawned && prevQuantity === receivedQuantity) continue;
-
-      traceSummary[category]++;
-      await stackTracingSku(
-        sku, // pakai sku karena _id juga = sku
-        req.user.userId,
-        "Update Bulk Price - Bulk Import",
-        category,
-        prevQuantity,
-        receivedQuantity
-      );
-    }
-
-    return res.json({
-      success: true,
-      message: `Berhasil memperbarui ${result.modifiedCount} item & membuat ${
-        result.upsertedCount || 0
-      } item baru.`,
-      updatedCount: result.modifiedCount,
-      insertedCount: result.upsertedCount || 0,
-      traceSummary,
-    });
+    return await runBulkInventoryUpdate(req, res, updates);
   } catch (error) {
-    console.error("Bulk update error:", error);
     return res.status(500).json({
       success: false,
       message: "Gagal memperbarui harga",
@@ -424,9 +446,65 @@ export const updateBulkPrices = async (req, res) => {
   }
 };
 
+// import CSV inventory (delimiter ;)
+export const importInventoryCsv = async (req, res) => {
+  const file = req.file;
+  if (!file) {
+    return res.status(400).json({ message: "File CSV diperlukan" });
+  }
+
+  const filePath =
+    file.path || path.join(process.cwd(), "uploads", file.filename);
+  const rows = [];
+
+  const separator = detectCsvSeparatorFromFile(filePath);
+
+  try {
+    await new Promise((resolve, reject) => {
+      fs.createReadStream(filePath)
+        .pipe(csv({ separator }))
+        .on("data", (row) => {
+          const sku = csvCell(row, "Sku") || csvCell(row, "SKU");
+          if (!sku) return;
+
+          rows.push({
+            sku,
+            RpHargaDasar: csvCell(row, "Harga Dasar"),
+            description: csvCell(row, "Deskripsi"),
+            brand: csvCell(row, "Brand"),
+            barcodeItem: csvCell(row, "Barcode"),
+          });
+        })
+        .on("end", resolve)
+        .on("error", reject);
+    });
+  } catch {
+    return res.status(400).json({ message: "Gagal membaca file CSV" });
+  } finally {
+    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+  }
+
+  if (!rows.length) {
+    return res.status(400).json({ message: "Tidak ada data valid di CSV" });
+  }
+
+  try {
+    return await runBulkInventoryUpdate(req, res, rows);
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Gagal import inventory",
+      error: error.message,
+    });
+  }
+};
+
 export const getInventoryById = async (req, res) => {
   try {
-    const { skuId } = req.params;
+    const skuId = resolveSkuFromReq(req);
+    if (!skuId) {
+      return res.status(400).json({ message: "sku diperlukan" });
+    }
 
     const inventory = await InventoryRefrensi.findOne({
       sku: skuId,
@@ -474,7 +552,10 @@ export const getAllinventoriesMobile = async (req, res) => {
   });
   const brandName = brandList.map((brand) => brand.name);
 
-  const complex = {};
+  const complex = {
+    // item disabled tidak boleh masuk ke mobile
+    isDisabled: { $ne: true },
+  };
   if (brandName.length > 0) {
     complex.brand = { $in: brandName };
   }
@@ -499,5 +580,6 @@ export const getAllinventoriesMobile = async (req, res) => {
     .limit(Number(limit))
     .skip((Number(page) - 1) * Number(limit))
     .sort({ updatedAt: -1 });
+
   return res.json({ message: "berhasil", data, totalItems });
 };

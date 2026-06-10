@@ -96,8 +96,8 @@ const PurchaseOrderReceive = () => {
     },
     onError: (error) => {
       console.log("Error dari onError:", error); // Debugging
-      toast.error(error.message || "Gagal mengupdate item");
-    },
+      toast.error(error?.response?.data?.message || "Gagal mengupdate item");
+    },  
   });
   const handlePickItem = (item) => {
     document.getElementById("editItemModal").showModal();

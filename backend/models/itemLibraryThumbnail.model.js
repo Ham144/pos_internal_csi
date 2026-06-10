@@ -5,7 +5,8 @@ const itemLibraryThumbnailSchema = new mongoose.Schema({
     buffer: Buffer,
     externalLinkAlternatif: String,
     sku: String,
-    originalName: String
+    originalName: String,
+    mimetype: String,
 })
 
 const ImteLibraryThumbnail = mongoose.model('itemLibraryThumbnail', itemLibraryThumbnailSchema)

@@ -42,9 +42,24 @@ export const createDiskon = async (body) => {
 
 export const getAllDiskonByProduct = async (sku) => {
   const response = await axios.get(
-    `${BASE_URL}/api/v1/diskon/getAllDiskonByProduct/${sku}`,
+    `${BASE_URL}/api/v1/diskon/getAllDiskonByProduct`,
+    {
+      params: { sku },
+      withCredentials: true,
+    },
+  );
+  return response.data;
+};
+
+export const importDiskonCsv = async (file) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  const response = await axios.post(
+    `${BASE_URL}/api/v1/diskon/registerMultiDiskon`,
+    formData,
     {
       withCredentials: true,
+      headers: { "Content-Type": "multipart/form-data" },
     }
   );
   return response.data;

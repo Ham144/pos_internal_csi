@@ -5,6 +5,7 @@ import {
   getPurchaseOrderList,
   updatePurchaseOrder,
   deletePurchaseOrder,
+  importCsvPo,
 } from "../api/purchaseOrderApi";
 import { toast } from "react-hot-toast";
 import { getAllinventories } from "../api/itemLibraryApi";
@@ -14,6 +15,32 @@ import ModalOptions from "../components/ModalOptions";
 import { useNavigate } from "react-router";
 import ModalDetailPurchaseOrder from "@/components/ModalDetailPurchaseOrder";
 
+const formatPoError = (data) => {
+  if (!data) return "Terjadi kesalahan";
+  const parts = [];
+  if (data.missingSkus?.length) {
+    parts.push(`SKU tidak terdaftar: ${data.missingSkus.join(", ")}`);
+  }
+  if (data.duplicatedSkus?.length) {
+    parts.push(`SKU duplikat: ${data.duplicatedSkus.join(", ")}`);
+  }
+  if (data.details?.length) {
+    data.details.forEach((d) => {
+      if (d.erp && d.skus?.length) {
+        const label =
+          d.type === "duplicate"
+            ? "duplikat"
+            : d.type === "missing"
+              ? "tidak terdaftar"
+              : "kosong";
+        parts.push(`PO ${d.erp} (${label}): ${d.skus.join(", ")}`);
+      }
+    });
+  }
+  if (parts.length) return parts.join(" | ");
+  return data.message || data.error || "Terjadi kesalahan";
+};
+
 import {
   Download,
   Upload,
@@ -21,8 +48,6 @@ import {
   FileText,
   Trash2,
   X,
-  CheckCircle,
-  AlertCircle,
   Info,
   Edit,
   Eye,
@@ -30,11 +55,7 @@ import {
   Truck,
   Barcode,
   FileSpreadsheet,
-  HelpCircle,
-  ChevronLeft,
-  ChevronRight,
   Save,
-  RotateCw,
 } from "lucide-react";
 
 export default function PurchaseOrdersCreate() {
@@ -72,8 +93,7 @@ export default function PurchaseOrdersCreate() {
       setSelectedOrder();
     },
     onError: (error) => {
-      console.log(error);
-      toast.error(error?.response?.data?.message);
+      toast.error(formatPoError(error?.response?.data));
     },
   });
 
@@ -87,10 +107,23 @@ export default function PurchaseOrdersCreate() {
       setSelectedOrder();
     },
     onError: (error) => {
-      toast.error(error?.response?.data?.message);
-      toast.error(error?.response?.data?.missingSkus.join(", "));
+      toast.error(formatPoError(error?.response?.data));
     },
   });
+
+  const { mutateAsync: handleImportCsvPo, isPending: isImporting } =
+    useMutation({
+      mutationFn: importCsvPo,
+      onSuccess: (response) => {
+        queryClient.invalidateQueries(["purchaseOrder"]);
+        setIsOpen(false);
+        setFile(null);
+        toast.success(response?.message || "Import berhasil");
+      },
+      onError: (error) => {
+        toast.error(formatPoError(error?.response?.data));
+      },
+    });
 
   const { mutateAsync: handleDeletePurchaseOrder } = useMutation({
     mutationFn: async (orderId) => {
@@ -134,73 +167,10 @@ export default function PurchaseOrdersCreate() {
   const handleSubmitImportPO = async (e) => {
     e.preventDefault();
     if (!file) {
-      alert("Please select a CSV file.");
+      toast.error("Pilih file CSV terlebih dahulu");
       return;
     }
-
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-      const text = e.target.result;
-      const rows = text.split("\n");
-
-      // Skip header row
-      const dataRows = rows.slice(1);
-
-      const purchaseOrders = [];
-      let currentPO = null;
-
-      dataRows.forEach((row) => {
-        if (!row.trim()) return; // Skip empty rows
-
-        const columns = row.split(",").map((col) => col.trim());
-        const [erp, plat, sku, request, barcode, keterangan] = columns;
-
-        // Jika ada Erp, ini adalah PO baru
-        if (erp) {
-          if (currentPO) {
-            purchaseOrders.push(currentPO);
-          }
-          currentPO = {
-            Erp: erp,
-            plat: plat || "",
-            items: [],
-          };
-        }
-
-        // Jika ada SKU, tambahkan sebagai item
-        if (sku) {
-          currentPO.items.push({
-            sku: sku,
-            request: parseInt(request) || 0,
-            barcodeItem: barcode || "",
-            keterangan: keterangan || "",
-            received: 0,
-          });
-        }
-      });
-
-      // Jangan lupa untuk push PO terakhir
-      if (currentPO) {
-        purchaseOrders.push(currentPO);
-      }
-
-      try {
-        for (const order of purchaseOrders) {
-          await handleCreatePurchaseOrder(order);
-        }
-        setIsOpen(false);
-        setFile(null);
-        toast.success(
-          `Successfully created ${purchaseOrders.length} purchase orders`,
-        );
-      } catch (error) {
-        console.error("Error creating purchase orders:", error);
-        toast.error(
-          error?.response?.data?.message || "Failed to create purchase orders",
-        );
-      }
-    };
-    reader.readAsText(file);
+    await handleImportCsvPo(file);
   };
 
   const statusPercentage = (order) => {
@@ -254,13 +224,21 @@ export default function PurchaseOrdersCreate() {
       ["PO-002", "B5678EF", "12DSETWI", "5", "BARC123", "keqw3rwq"], // PO baru
     ];
 
-    const rows = [headers, ...templateRows];
-    const csvContent = rows.map((row) => row.join(",")).join("\n");
-
+    const csvContent = [
+      headers.join(";"),
+      ...templateRows.map((row) => row.join(";")),
+    ].join("\n");
+    const blob = new Blob(["\uFEFF" + csvContent], {
+      type: "text/csv;charset=utf-8;",
+    });
+    const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
-    link.href = `data:text/csv;charset=utf-8,${encodeURIComponent(csvContent)}`;
+    link.href = url;
     link.download = "purchase_order_template.csv";
+    document.body.appendChild(link);
     link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   const handleKonfirmasiSkuPurchaseCode = () => {
@@ -377,11 +355,11 @@ export default function PurchaseOrdersCreate() {
       });
     });
 
-    // Konversi ke CSV string
-    const csvContent = rows.map((e) => e.join(",")).join("\n");
+    const csvContent = rows.map((e) => e.join(";")).join("\n");
 
-    // Trigger download
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const blob = new Blob(["\uFEFF" + csvContent], {
+      type: "text/csv;charset=utf-8;",
+    });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
@@ -906,9 +884,10 @@ export default function PurchaseOrdersCreate() {
                 <div className="flex gap-2">
                   <button
                     type="submit"
-                    className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 text-white py-2 rounded-lg hover:from-blue-700 hover:to-blue-800"
+                    disabled={isImporting || !file}
+                    className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 text-white py-2 rounded-lg hover:from-blue-700 hover:to-blue-800 disabled:opacity-50"
                   >
-                    Upload
+                    {isImporting ? "Mengimport..." : "Upload"}
                   </button>
                   <button
                     type="button"

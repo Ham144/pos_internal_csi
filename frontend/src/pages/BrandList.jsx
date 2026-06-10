@@ -54,13 +54,13 @@ const BrandList = () => {
   if (error)
     return (
       <div className="min-h-screen flex items-center justify-center text-red-500">
-        Error: {error.message}
+        Error: {error?.response?.data?.message || "Error loading brand list"}
       </div>
     );
 
   //filter brand list
   const filteredBrandList = brandList?.data?.data?.filter((brand) =>
-    brand.name.toLowerCase().includes(search.toLowerCase())
+    brand.name.toLowerCase().includes(search.toLowerCase()),
   );
 
   return (

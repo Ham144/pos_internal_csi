@@ -16,6 +16,7 @@ const SpgSchema = new mongoose.Schema({
       quantity: { type: Number, default: 0 },
     },
   ],
+  isDisabled: { type: Boolean, default: false },
 });
 
 // Register SpgRefrensi model

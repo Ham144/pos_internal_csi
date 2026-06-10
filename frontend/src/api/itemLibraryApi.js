@@ -38,10 +38,11 @@ export const getAllinventories = async (queryKey) => {
 export const getInventoryById = async (skuId) => {
   try {
     const response = await axios.get(
-      `${BASE_URL}/api/v1/inventories/getInventoryById/${skuId}`,
+      `${BASE_URL}/api/v1/inventories/getInventoryById`,
       {
+        params: { skuId },
         withCredentials: true,
-      }
+      },
     );
     return response.data;
   } catch (error) {
@@ -83,21 +84,26 @@ export const createSingleInventory = async (body) => {
 };
 
 export const updateBulkPrices = async (updates) => {
-  try {
-    const response = await axios.post(
-      `${BASE_URL}/api/v1/inventories/updateBulkPrices`,
-      {
-        updates,
-      },
-      {
-        withCredentials: true,
-      }
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Error updating bulk prices:", error);
-    throw error;
-  }
+  const response = await axios.post(
+    `${BASE_URL}/api/v1/inventories/updateBulkPrices`,
+    { updates },
+    { withCredentials: true },
+  );
+  return response.data;
+};
+
+export const importInventoryCsv = async (file) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  const response = await axios.post(
+    `${BASE_URL}/api/v1/inventories/importInventoryCsv`,
+    formData,
+    {
+      withCredentials: true,
+      headers: { "Content-Type": "multipart/form-data" },
+    },
+  );
+  return response.data;
 };
 
 export const toggleDisableInventory = async (id) => {

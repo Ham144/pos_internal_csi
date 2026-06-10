@@ -6,6 +6,7 @@ import {
   updateDiskon,
   deleteDiskon,
   createDiskon,
+  importDiskonCsv,
 } from "../api/diskonApi";
 import toast from "react-hot-toast";
 import { useFilter } from "../store";
@@ -13,14 +14,36 @@ import FilterInventories from "../components/filterInventories";
 import {
   BellRingIcon,
   CheckCircle2,
+  Download,
+  FileSpreadsheet,
   FileWarningIcon,
   Info,
   InfoIcon,
   RefreshCcw,
   Trash2,
+  Upload,
   X,
 } from "lucide-react";
 import ModalConfirmation from "@/components/ModalConfirmation";
+
+const formatDiskonImportError = (data) => {
+  if (!data) return "Terjadi kesalahan";
+  const parts = [];
+  if (data.missingSkus?.length) {
+    parts.push(`SKU tidak terdaftar: ${data.missingSkus.join(", ")}`);
+  }
+  if (data.details?.length) {
+    data.details.forEach((d) => {
+      parts.push(
+        d.judul
+          ? `Baris ${d.row} (${d.judul}): ${d.reason}`
+          : `Baris ${d.row}: ${d.reason}`,
+      );
+    });
+  }
+  if (parts.length) return parts.join(" | ");
+  return data.message || "Terjadi kesalahan";
+};
 
 const Diskon = () => {
   const [selectedDiskon, setselectedDiskon] = useState();
@@ -28,6 +51,8 @@ const Diskon = () => {
   const [iseditingDiskon, setIseditingDiskon] = useState(false);
 
   const [tempBarangTerhubung, setTempBarangTerhubung] = useState([]);
+  const [file, setFile] = useState(null);
+  const [isOpen, setIsOpen] = useState(false);
 
   //tanstack
   const queryClient = useQueryClient();
@@ -127,6 +152,20 @@ const Diskon = () => {
       console.log("Delete error:", error);
     },
   });
+
+  const { mutateAsync: handleImportCsvDiskon, isPending: isImporting } =
+    useMutation({
+      mutationFn: importDiskonCsv,
+      onSuccess: (response) => {
+        queryClient.invalidateQueries(["diskon"]);
+        setIsOpen(false);
+        setFile(null);
+        toast.success(response?.message || "Import berhasil");
+      },
+      onError: (error) => {
+        toast.error(formatDiskonImportError(error?.response?.data));
+      },
+    });
 
   const { mutateAsync: handleCreateDiskon } = useMutation({
     mutationFn: (body) => {
@@ -261,6 +300,74 @@ const Diskon = () => {
     return value.toString().replace(/[^\d]/g, "");
   };
 
+  const handleFileChange = (event) => {
+    setFile(event.target.files[0]);
+  };
+
+  const handleImportDiskon = () => {
+    setFile(null);
+    setIsOpen(true);
+  };
+
+  const handleSubmitImportDiskon = async (e) => {
+    e.preventDefault();
+    if (!file) {
+      toast.error("Pilih file CSV terlebih dahulu");
+      return;
+    }
+    await handleImportCsvDiskon(file);
+  };
+
+  const handleExportDiskonTemplate = () => {
+    const headers = [
+      "Judul Diskon",
+      "Deskripsi",
+      "Berlaku Dari",
+      "Berlaku Hingga",
+      "Potongan Rp",
+      "Potongan %",
+      "SKU Terkait",
+      "Kuota",
+    ];
+    const templateRows = [
+      [
+        "Diskon Lebaran",
+        "Potongan harga lebaran",
+        "2026-01-01",
+        "2026-12-31",
+        "5000",
+        "",
+        "SKU001,SKU002",
+        "100",
+      ],
+      [
+        "Diskon Persen",
+        "Potongan persentase",
+        "2026-06-01",
+        "2026-06-30",
+        "",
+        "10",
+        "SKU003",
+        "50",
+      ],
+    ];
+    const csvContent = [
+      headers.join(";"),
+      ...templateRows.map((row) => row.join(";")),
+    ].join("\n");
+    const blob = new Blob(["\uFEFF" + csvContent], {
+      type: "text/csv;charset=utf-8;",
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "template_import_diskon.csv";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div>
       <div className="flex gap-6 min-h-[95vh] max-h-[95vh] overflow-y-hidden bg-gray-100 ">
@@ -307,8 +414,37 @@ const Diskon = () => {
           </div>
           <div className="p-4  bg-white sticky top-0 z-10">
             <div className="flex justify-end gap-3">
+              <div className="dropdown dropdown-end">
+                <label
+                  tabIndex={0}
+                  className="btn btn-outline border-gray-300 hover:bg-blue-50 hover:border-blue-300"
+                >
+                  <Download className="w-5 h-5 mr-2" />
+                  Import/Export
+                </label>
+                <ul className="dropdown-content z-40 menu p-2 shadow-xl bg-white rounded-xl w-56 border border-blue-100">
+                  <li>
+                    <button
+                      onClick={handleImportDiskon}
+                      className="flex items-center gap-2 text-gray-700 hover:bg-blue-50 rounded-lg p-3"
+                    >
+                      <Upload className="w-5 h-5 text-blue-600" />
+                      <span>Import CSV</span>
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      onClick={handleExportDiskonTemplate}
+                      className="flex items-center gap-2 text-gray-700 hover:bg-blue-50 rounded-lg p-3"
+                    >
+                      <FileSpreadsheet className="w-5 h-5 text-green-600" />
+                      <span>Export Template</span>
+                    </button>
+                  </li>
+                </ul>
+              </div>
               <button
-                className="btn btn-primary"
+                className="btn"
                 onClick={() => {
                   handleNewDiskon();
                 }}
@@ -385,7 +521,7 @@ const Diskon = () => {
                                 day: "2-digit",
                                 month: "short",
                                 year: "numeric",
-                              }
+                              },
                             )
                           : "Not set"}
                       </span>
@@ -404,7 +540,7 @@ const Diskon = () => {
                                 day: "2-digit",
                                 month: "short",
                                 year: "numeric",
-                              }
+                              },
                             )
                           : "Not set"}
                       </span>
@@ -627,8 +763,8 @@ const Diskon = () => {
                             ? "fixed"
                             : "percentage"
                           : diskonBaru?.RpPotonganHarga !== null
-                          ? "fixed"
-                          : "percentage"
+                            ? "fixed"
+                            : "percentage"
                       }
                       onChange={(e) => {
                         const isFixed = e.target.value === "fixed";
@@ -697,7 +833,7 @@ const Diskon = () => {
                         value={
                           iseditingDiskon
                             ? formatCurrency(
-                                selectedDiskon?.RpPotonganHarga?.$numberDecimal
+                                selectedDiskon?.RpPotonganHarga?.$numberDecimal,
                               )
                             : formatCurrency(diskonBaru?.RpPotonganHarga)
                         }
@@ -741,12 +877,14 @@ const Diskon = () => {
                                 ?.$numberDecimal
                               ? Math.round(
                                   selectedDiskon.percentPotonganHarga
-                                    .$numberDecimal * 100
+                                    .$numberDecimal * 100,
                                 )
                               : ""
                             : diskonBaru?.percentPotonganHarga
-                            ? Math.round(diskonBaru.percentPotonganHarga * 100)
-                            : ""
+                              ? Math.round(
+                                  diskonBaru.percentPotonganHarga * 100,
+                                )
+                              : ""
                         }
                         onChange={(e) => {
                           const value = parseFloat(e.target.value);
@@ -959,6 +1097,53 @@ const Diskon = () => {
         onConfirm={() => handleDeleteDiskon(selectedDiskon._id)}
         key={"deleteDiskon"}
       />
+
+      {isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-2xl w-96 overflow-hidden">
+            <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
+              <h2 className="text-lg font-semibold text-white">Upload CSV</h2>
+            </div>
+            <div className="p-6">
+              <form onSubmit={handleSubmitImportDiskon} className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">
+                    Pilih file CSV
+                  </label>
+                  <input
+                    type="file"
+                    accept=".csv"
+                    onChange={handleFileChange}
+                    className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                  />
+                </div>
+                {file && (
+                  <div className="text-sm text-gray-600 bg-blue-50 p-3 rounded-lg">
+                    <span className="font-medium">File terpilih:</span>{" "}
+                    {file.name}
+                  </div>
+                )}
+                <div className="flex gap-2">
+                  <button
+                    type="submit"
+                    disabled={isImporting || !file}
+                    className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 text-white py-2 rounded-lg hover:from-blue-700 hover:to-blue-800 disabled:opacity-50"
+                  >
+                    {isImporting ? "Mengimport..." : "Upload"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsOpen(false)}
+                    className="flex-1 border border-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-50"
+                  >
+                    Batal
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

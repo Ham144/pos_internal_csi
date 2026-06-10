@@ -1,6 +1,7 @@
 import { Router } from "express";
 import Outlet from "../models/Outlet.model.js";
 import sharp from "sharp";
+import { findInventoryBySku } from "../utils/validatePoSkus.js";
 
 const router = Router();
 
@@ -324,6 +325,80 @@ router.post("/assignSpgToOutlet", async (req, res) => {
   } catch (error) {
     console.error("Error assigning spg to outlet:", error);
     return res.status(500).json({ message: "Gagal menambahkan spg ke outlet" });
+  }
+});
+
+// sku yang tampil gambar di mobile — cukup terdaftar di inventory, thumbnail opsional
+router.post("/assignFavoritedInventoryToOutlet", async (req, res) => {
+  const { outletId, skus } = req.body;
+
+  if (!outletId) {
+    return res.status(400).json({ message: "outletId diperlukan" });
+  }
+
+  try {
+    const outletToUpdate = await Outlet.findById(outletId);
+    if (!outletToUpdate) {
+      return res.status(404).json({ message: "Outlet tidak ditemukan" });
+    }
+
+    const uniqueSkus = [
+      ...new Set((skus || []).map((s) => s?.trim()).filter(Boolean)),
+    ];
+
+    const canonicalSkus = [];
+    const missingSkus = [];
+
+    for (const rawSku of uniqueSkus) {
+      const inventory = await findInventoryBySku(rawSku);
+      if (inventory) {
+        canonicalSkus.push(inventory.sku);
+      } else {
+        missingSkus.push(rawSku);
+      }
+    }
+
+    if (missingSkus.length) {
+      return res.status(400).json({
+        message: `SKU tidak terdaftar: ${missingSkus.join(", ")}`,
+        missingSkus,
+      });
+    }
+
+    outletToUpdate.favoritedInventoryIds = canonicalSkus;
+    await outletToUpdate.save();
+
+    return res.json({
+      message: "Berhasil menyimpan SKU tampil gambar",
+      data: {
+        skus: canonicalSkus,
+        favoritedInventoryIds: outletToUpdate.favoritedInventoryIds,
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Gagal menyimpan SKU tampil gambar",
+      error: error.message,
+    });
+  }
+});
+
+router.get("/favoritedInventorySkus/:outletId", async (req, res) => {
+  try {
+    const outlet = await Outlet.findById(req.params.outletId);
+    if (!outlet) {
+      return res.status(404).json({ message: "Outlet tidak ditemukan" });
+    }
+
+    return res.json({
+      message: "berhasil",
+      data: { skus: outlet.favoritedInventoryIds || [] },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Gagal mendapatkan SKU favorit",
+      error: error.message,
+    });
   }
 });
 

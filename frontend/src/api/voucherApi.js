@@ -45,10 +45,11 @@ export const deleteVoucher = async (id) => {
 
 export const getAllVoucherByProduct = async (sku) => {
   const response = await axios.get(
-    `${BASE_URL}/api/v1/voucher/getAllVoucherTerblokirByProduct/${sku}`,
+    `${BASE_URL}/api/v1/voucher/getAllVoucherTerblokirByProduct`,
     {
+      params: { sku },
       withCredentials: true,
-    }
+    },
   );
   return response.data;
 };
