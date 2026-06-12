@@ -13,6 +13,19 @@ import { stackTracingSku } from "../utils/stackTracingSku.js";
 const totalQtyBill = (bills = []) =>
   bills.reduce((sum, bill) => sum + Number(bill.quantity || 0), 0);
 
+const totalRpBill = (bills = []) =>
+  bills.reduce((sum, bill) => sum + Number(bill.totalRp || 0), 0);
+
+// selaras sync mobile: outlet += bill.total || bill.subTotal
+const invoicePendapatan = (invoice) =>
+  Number(invoice?.total) ||
+  Number(invoice?.subTotal) ||
+  totalRpBill(invoice?.currentBill);
+
+// kasir/spg: mobile pakai subTotal item, bukan total final setelah potongan
+const invoiceSubtotalPenjualan = (invoice) =>
+  Number(invoice?.subTotal) || totalRpBill(invoice?.currentBill);
+
 const router = Router();
 
 //untuk mobile perlu kode outlet biar ga berat ambil semua
@@ -103,7 +116,7 @@ router.get("/getInvoiceFilterComplex", async (req, res) => {
       if (done === "true") {
         filter.done = true;
         console.log(
-          "Filter: Selesai (isVoid = false atau tidak ada, done = true)"
+          "Filter: Selesai (isVoid = false atau tidak ada, done = true)",
         );
       }
       // Tab Tertunda: done=false
@@ -386,113 +399,155 @@ router.get("/getInvoiceStats", async (req, res) => {
 //untuk pembatalan invoice yang telah dibayar
 
 router.post("/voidInvoice", async (req, res) => {
+  const { invoiceId } = req.body;
+  const userId = req.user?.userId;
+
+  // klaim void atomik — cegah double void paralel
+  let invoiceDB;
   try {
-    const { invoiceId } = req.body;
-    const invoiceDB = await Invoice.findOneAndUpdate(
-      { _id: invoiceId }, // Cari invoice yang ID-nya cocok DAN belum di-void
+    invoiceDB = await Invoice.findOneAndUpdate(
+      { _id: invoiceId, isVoid: { $ne: true }, done: true },
       {
         $set: {
           isVoid: true,
-          confirmVoidById: req.user.userId,
-          tanggalVoid: new Date()
-        }
+          confirmVoidById: userId,
+          tanggalVoid: new Date(),
+        },
       },
-      { new: false } // 'new: false' akan mengembalikan dokumen SEBELUM diupdate
+      { new: false },
     );
+  } catch (error) {
+    return res
+      .status(400)
+      .json({ message: "Gagal membatalkan invoice", error: error.message });
+  }
 
-    if (!invoiceDB) {
+  if (!invoiceDB) {
+    const exists = await Invoice.findById(invoiceId);
+    if (!exists) {
       return res.status(404).json({ message: "Invoice Tidak ditemukan" });
     }
-    // Validation
-    const isVoid = invoiceDB?.isVoid;
-    if (isVoid) {
+    if (exists.isVoid) {
       return res.status(400).json({ message: "Invoice sudah pernah di void" });
     }
+    return res
+      .status(400)
+      .json({ message: "Invoice belum lunas, tidak bisa di void" });
+  }
+
+  const pendapatanVoid = invoicePendapatan(invoiceDB);
+  const subtotalVoid = invoiceSubtotalPenjualan(invoiceDB);
+  const qtyTotal = totalQtyBill(invoiceDB.currentBill);
+
+  try {
     await Promise.all(
-      invoiceDB.currentBill.map(async (bill) => {
+      (invoiceDB.currentBill || []).map(async (bill) => {
+        const qty = Number(bill.quantity) || 0;
+        if (!bill.sku || qty <= 0) return;
+
         const inventoryDB = await Inventory.findOne({ sku: bill.sku });
         if (!inventoryDB) return;
 
-        const menjadi = Number(inventoryDB.quantity) + Number(bill.quantity);
-        if (inventoryDB.quantity != menjadi) {
-          await stackTracingSku(
-            inventoryDB._id,
-            req.user._id,
-            "Void: pengembalian stock karena pembatalan invoice terbayar telah di batalkan",
-            "increase",
-            inventoryDB.quantity,
-            menjadi,
-            invoiceDB._id
-          );
+        const qtyBaru = Number(inventoryDB.quantity) + qty;
+        await stackTracingSku(
+          inventoryDB._id,
+          userId,
+          "Void: pengembalian stock karena pembatalan invoice terbayar telah di batalkan",
+          "increase",
+          inventoryDB.quantity,
+          qtyBaru,
+          invoiceDB._id,
+        );
 
-          inventoryDB.quantity += bill.quantity;
-          inventoryDB.terjual -= bill.quantity;
-          await inventoryDB.save();
-        }
-      })
+        inventoryDB.quantity = qtyBaru;
+        inventoryDB.terjual = Math.max(0, Number(inventoryDB.terjual) - qty);
+        await inventoryDB.save();
+      }),
     );
 
-    // Modif diskon
-    if (invoiceDB?.diskon?.length) {
-      for (const diskon of invoiceDB.diskon) {
-        const diskonDB = await Diskon.findById(diskon.diskonInfo.diskonId);
-        if (diskonDB) {
-          diskonDB.quantityTersedia++;
-          await diskonDB.save();
-        }
+    for (const diskon of invoiceDB.diskon || []) {
+      const diskonId = diskon?.diskonInfo?.diskonId;
+      if (!diskonId) continue;
+      const diskonDB = await Diskon.findById(diskonId);
+      if (diskonDB) {
+        diskonDB.quantityTersedia += 1;
+        await diskonDB.save();
       }
     }
 
-    // Modif promo
-    if (invoiceDB?.promo?.length) {
-      await Promise.all(
-        invoiceDB.promo.map(async (promo) => {
-          const promoDB = await Promo.findById(promo.promoInfo.promoId);
-          if (!promoDB) return;
+    await Promise.all(
+      (invoiceDB.promo || []).map(async (promo) => {
+        const promoId = promo?.promoInfo?.promoId;
+        if (!promoId) return;
 
-          promoDB.quantityBerlaku++;
+        const promoDB = await Promo.findById(promoId);
+        if (promoDB) {
+          promoDB.quantityBerlaku += 1;
+          await promoDB.save();
+        }
 
-          const inventoryDB = await Inventory.findOne({
-            sku: promo.promoInfo?.skuBarangBonus,
-          });
+        const bonusSku = promo.promoInfo?.skuBarangBonus;
+        const bonusQty = Number(promo.promoInfo?.quantityBonus) || 0;
+        if (!bonusSku || bonusQty <= 0) return;
 
-          if (inventoryDB) {
-            inventoryDB.quantity += promo.promoInfo?.quantityBonus;
-            await inventoryDB.save();
-          }
-        })
-      );
-    }
+        const inventoryDB = await Inventory.findOne({ sku: bonusSku });
+        if (!inventoryDB) return;
 
-    //modif futureVouchers
-    if (invoiceDB?.futureVoucher?.length) {
-      for (const voucher of invoiceDB?.futureVoucher) {
-        const voucherDB = await DaftarVoucher.findById(
-          voucher.voucherInfo.voucherId
+        const qtyBaru = Number(inventoryDB.quantity) + bonusQty;
+        await stackTracingSku(
+          inventoryDB._id,
+          userId,
+          "Void: pengembalian stock barang bonus promo",
+          "increase",
+          inventoryDB.quantity,
+          qtyBaru,
+          invoiceDB._id,
         );
-        if (voucherDB) {
-          voucherDB.quantityTersedia++;
-          voucherDB.terjadi--;
-          await voucherDB.save();
-        }
+
+        inventoryDB.quantity = qtyBaru;
+        inventoryDB.terjual = Math.max(
+          0,
+          Number(inventoryDB.terjual) - bonusQty,
+        );
+        await inventoryDB.save();
+      }),
+    );
+
+    for (const voucher of invoiceDB.futureVoucher || []) {
+      const voucherId = voucher?.voucherInfo?.voucherId;
+      if (!voucherId) continue;
+      const voucherDB = await DaftarVoucher.findById(voucherId);
+      if (voucherDB) {
+        voucherDB.quantityTersedia += 1;
+        voucherDB.terjadi = Math.max(0, Number(voucherDB.terjadi) - 1);
+        await voucherDB.save();
       }
     }
 
-    // Modif kasir — lookup sama seperti sync mobile (kodeKasir dari kodeInvoice)
     const kodeKasir = invoiceDB.kodeInvoice?.slice(2, 5);
     const userDB = await User.findOne({ kodeKasir });
     if (userDB) {
-      const qtyTotal = totalQtyBill(invoiceDB.currentBill);
-      userDB.totalQuantityPenjualan -= qtyTotal;
-      userDB.totalHargaPenjualan -= invoiceDB.total;
+      userDB.totalQuantityPenjualan = Math.max(
+        0,
+        Number(userDB.totalQuantityPenjualan || 0) - qtyTotal,
+      );
+      userDB.totalHargaPenjualan = Math.max(
+        0,
+        Number(userDB.totalHargaPenjualan || 0) - subtotalVoid,
+      );
 
       if (userDB.skuTerjual?.length > 0) {
-        for (const bill of invoiceDB.currentBill) {
+        for (const bill of invoiceDB.currentBill || []) {
+          const qty = Number(bill.quantity) || 0;
+          if (!bill.sku || qty <= 0) continue;
           const skuIndex = userDB.skuTerjual.findIndex(
             (item) => item.sku === bill.sku,
           );
           if (skuIndex !== -1) {
-            userDB.skuTerjual[skuIndex].totalQuantityPenjualan -= bill.quantity;
+            userDB.skuTerjual[skuIndex].totalQuantityPenjualan = Math.max(
+              0,
+              Number(userDB.skuTerjual[skuIndex].totalQuantityPenjualan) - qty,
+            );
           }
         }
       }
@@ -500,50 +555,58 @@ router.post("/voidInvoice", async (req, res) => {
       await userDB.save();
     }
 
-    // Modif spg
     if (invoiceDB.spg) {
       const spgDB = await Spg.findById(invoiceDB.spg);
       if (spgDB) {
-        const qtyTotal = totalQtyBill(invoiceDB.currentBill);
-        spgDB.totalHargaPenjualan -= invoiceDB.total;
+        spgDB.totalHargaPenjualan = Math.max(
+          0,
+          Number(spgDB.totalHargaPenjualan || 0) - subtotalVoid,
+        );
 
         if (spgDB.skuTerjual?.length > 0) {
-          for (const bill of invoiceDB.currentBill) {
+          for (const bill of invoiceDB.currentBill || []) {
+            const qty = Number(bill.quantity) || 0;
+            if (!bill.sku || qty <= 0) continue;
             const skuIndex = spgDB.skuTerjual.findIndex(
               (item) => item.sku === bill.sku,
             );
             if (skuIndex !== -1) {
-              spgDB.skuTerjual[skuIndex].quantity -= bill.quantity;
+              spgDB.skuTerjual[skuIndex].quantity = Math.max(
+                0,
+                Number(spgDB.skuTerjual[skuIndex].quantity) - qty,
+              );
             }
           }
           spgDB.totalQuantityPenjualan = spgDB.skuTerjual.reduce(
-            (acc, item) => acc + item.quantity,
+            (acc, item) => acc + Math.max(0, Number(item.quantity) || 0),
             0,
           );
         } else {
-          spgDB.totalQuantityPenjualan -= qtyTotal;
+          spgDB.totalQuantityPenjualan = Math.max(
+            0,
+            Number(spgDB.totalQuantityPenjualan || 0) - qtyTotal,
+          );
         }
 
         await spgDB.save();
       }
     }
 
-    // voucher yang dipakai saat transaksi (bukan futureVoucher)
-    if (invoiceDB.implementedVoucher?.length) {
-      for (const voucherId of invoiceDB.implementedVoucher) {
-        const voucherDB = await DaftarVoucher.findById(voucherId);
-        if (voucherDB) {
-          voucherDB.quantityTersedia++;
-          await voucherDB.save();
-        }
+    for (const voucherId of invoiceDB.implementedVoucher || []) {
+      const voucherDB = await DaftarVoucher.findById(voucherId);
+      if (voucherDB) {
+        voucherDB.quantityTersedia += 1;
+        await voucherDB.save();
       }
     }
 
-    // Modif outlet
-    const kodeOutlet = invoiceDB.kodeInvoice.slice(0, 2);
+    const kodeOutlet = invoiceDB.kodeInvoice?.slice(0, 2);
     const outletDB = await Outlet.findOne({ kodeOutlet });
     if (outletDB) {
-      outletDB.pendapatan -= invoiceDB.total;
+      outletDB.pendapatan = Math.max(
+        0,
+        Number(outletDB.pendapatan || 0) - pendapatanVoid,
+      );
       outletDB.jumlahInvoice = Math.max(0, (outletDB.jumlahInvoice || 0) - 1);
       await outletDB.save();
     }
@@ -553,6 +616,14 @@ router.post("/voidInvoice", async (req, res) => {
       message: "Berhasil dibatalkan",
     });
   } catch (error) {
+    // rollback flag void jika gagal di tengah jalan
+    await Invoice.findByIdAndUpdate(invoiceId, {
+      $set: {
+        isVoid: false,
+        confirmVoidById: null,
+        tanggalVoid: null,
+      },
+    });
     return res
       .status(400)
       .json({ message: "Gagal membatalkan invoice", error: error.message });

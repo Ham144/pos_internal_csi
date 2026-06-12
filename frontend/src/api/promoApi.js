@@ -60,6 +60,7 @@ export const importPromoCsv = async (file) => {
     {
       withCredentials: true,
       headers: { "Content-Type": "multipart/form-data" },
+      timeout: 120000,
     }
   );
   return response.data;

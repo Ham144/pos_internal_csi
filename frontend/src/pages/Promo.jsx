@@ -29,8 +29,14 @@ import ModalConfirmation from "@/components/ModalConfirmation";
 import { getOuletList } from "@/api/outletApi";
 import ModalOutletOption from "@/components/ModalOutletOption";
 
-const formatPromoImportError = (data) => {
-  if (!data) return "Terjadi kesalahan";
+const formatPromoImportError = (data, error) => {
+  if (!data) {
+    const status = error?.response?.status;
+    if (!error?.response || status === 502 || status === 504) {
+      return "Server tidak merespons. Coba lagi atau periksa log backend.";
+    }
+    return "Terjadi kesalahan";
+  }
   const parts = [];
   if (data.missingSkus?.length) {
     parts.push(`SKU tidak terdaftar: ${data.missingSkus.join(", ")}`);
@@ -117,7 +123,7 @@ const Promo = () => {
         toast.success(response?.message || "Import berhasil");
       },
       onError: (error) => {
-        toast.error(formatPromoImportError(error?.response?.data));
+        toast.error(formatPromoImportError(error?.response?.data, error));
       },
     });
 

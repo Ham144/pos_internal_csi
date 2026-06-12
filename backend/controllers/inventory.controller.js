@@ -8,15 +8,11 @@ import UserRefrensi from "../models/User.model.js";
 import mongoose from "mongoose";
 import fs from "fs";
 import path from "path";
-import csv from "csv-parser";
 import { stackTracingSku } from "../utils/stackTracingSku.js";
 import { parseRpHargaDasar } from "../utils/parseRpHargaDasar.js";
 import { prepareBulkInventoryUpdates } from "../utils/prepareBulkInventoryUpdates.js";
 import { resolveSkuFromReq } from "../utils/resolveSku.js";
-import {
-  csvCell,
-  detectCsvSeparatorFromFile,
-} from "../utils/csvDelimiter.js";
+import { csvCell, parseCsvFile } from "../utils/csvDelimiter.js";
 
 //ini untuk buat manual inventory, jarang dipake karena biasanya sudah ada didapat dari api pihak ketiga
 export const registerSingleInventori = async (req, res) => {
@@ -455,29 +451,19 @@ export const importInventoryCsv = async (req, res) => {
 
   const filePath =
     file.path || path.join(process.cwd(), "uploads", file.filename);
-  const rows = [];
-
-  const separator = detectCsvSeparatorFromFile(filePath);
+  let rows = [];
 
   try {
-    await new Promise((resolve, reject) => {
-      fs.createReadStream(filePath)
-        .pipe(csv({ separator }))
-        .on("data", (row) => {
-          const sku = csvCell(row, "Sku") || csvCell(row, "SKU");
-          if (!sku) return;
-
-          rows.push({
-            sku,
-            RpHargaDasar: csvCell(row, "Harga Dasar"),
-            description: csvCell(row, "Deskripsi"),
-            brand: csvCell(row, "Brand"),
-            barcodeItem: csvCell(row, "Barcode"),
-          });
-        })
-        .on("end", resolve)
-        .on("error", reject);
-    });
+    const parsed = await parseCsvFile(filePath, ["sku"]);
+    rows = parsed.rows
+      .map((row) => ({
+        sku: csvCell(row, "Sku") || csvCell(row, "SKU"),
+        RpHargaDasar: csvCell(row, "Harga Dasar"),
+        description: csvCell(row, "Deskripsi"),
+        brand: csvCell(row, "Brand"),
+        barcodeItem: csvCell(row, "Barcode"),
+      }))
+      .filter((row) => row.sku);
   } catch {
     return res.status(400).json({ message: "Gagal membaca file CSV" });
   } finally {

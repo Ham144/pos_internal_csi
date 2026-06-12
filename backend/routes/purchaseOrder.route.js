@@ -3,15 +3,11 @@ import PurchaseOrder from "../models/PurchaseOrder.model.js";
 import multer from "multer";
 import fs from "fs";
 import path from "path";
-import csv from "csv-parser";
 import InventoryRefrensi from "../models/InventoryRefrensi.model.js";
 import UserRefrensi from "../models/User.model.js";
 import { stackTracingSku } from "../utils/stackTracingSku.js";
 import { validatePoItems } from "../utils/validatePoSkus.js";
-import {
-  csvCell,
-  detectCsvSeparatorFromFile,
-} from "../utils/csvDelimiter.js";
+import { parsePurchaseOrdersFromCsv } from "../utils/parsePoImportCsv.js";
 
 const router = Router();
 // Buat direktori uploads jika belum ada
@@ -48,116 +44,116 @@ router.post("/importPurchaseOrder", upload.single("file"), async (req, res) => {
   }).select("username");
 
   try {
-    const results = [];
-    let currentPO = null;
+    const { results, separator } = await parsePurchaseOrdersFromCsv(filePath);
 
-    const separator = detectCsvSeparatorFromFile(filePath);
-
-    // Baca file CSV — auto-detect delimiter ; atau ,
-    fs.createReadStream(filePath)
-      .pipe(csv({ separator }))
-      .on("data", (row) => {
-        const erp = csvCell(row, "Purchase Code (Erp)");
-        const sku = csvCell(row, "SKU");
-
-        if (erp) {
-          if (currentPO) results.push(currentPO);
-          currentPO = {
-            Erp: erp,
-            plat: csvCell(row, "Plat") || "",
-            items: [],
-          };
-        }
-
-        if (currentPO && sku) {
-          currentPO.items.push({
-            sku,
-            request: Number(csvCell(row, "Request")) || 0,
-            barcodeItem: csvCell(row, "Barcode") || "",
-            keterangan: csvCell(row, "Keterangan") || "",
-            received: 0,
-            tanggalTerpenuhi: null,
-            dibuatOleh: currentLoginUser?.username || "",
-          });
-        }
-      })
-      .on("end", async () => {
-        if (currentPO) {
-          results.push(currentPO);
-        }
-
-        if (results.length === 0) {
-          return res.status(400).json({ message: "Gagal ekstrak file" });
-        }
-
-        try {
-          const details = [];
-          const allMissing = new Set();
-          const allDuplicated = new Set();
-
-          for (const po of results) {
-            if (!po.items?.length) {
-              details.push({ erp: po.Erp, type: "empty", skus: [] });
-              continue;
-            }
-
-            const { missingSkus, duplicatedSkus, normalizedItems } =
-              await validatePoItems(po.items);
-
-            duplicatedSkus.forEach((s) => allDuplicated.add(s));
-            missingSkus.forEach((s) => allMissing.add(s));
-
-            if (duplicatedSkus.length) {
-              details.push({ erp: po.Erp, type: "duplicate", skus: duplicatedSkus });
-            }
-            if (missingSkus.length) {
-              details.push({ erp: po.Erp, type: "missing", skus: missingSkus });
-            }
-
-            po.items = normalizedItems;
-          }
-
-          if (details.length) {
-            return res.status(400).json({
-              message: "Gagal import purchase order",
-              details,
-              missingSkus: [...allMissing],
-              duplicatedSkus: [...allDuplicated],
-            });
-          }
-
-          const savedPOs = await Promise.all(
-            results.map((po) =>
-              PurchaseOrder.create({
-                ...po,
-                Erp: po.Erp?.trim(),
-              }),
-            ),
-          );
-
-          res.json({
-            message: `${savedPOs.length} Purchase Order berhasil diimport`,
-            data: savedPOs,
-          });
-        } catch (error) {
-          res.status(400).json({
-            message: "Gagal import purchase order",
-            error: error.message,
-          });
-        } finally {
-          if (fs.existsSync(filePath)) {
-            fs.unlinkSync(filePath);
-          }
-        }
-      })
-      .on("error", (err) => {
-        console.error("Error reading CSV file:", err);
-        res.status(500).json({ error: "Failed to process CSV file" });
+    if (results.length === 0) {
+      return res.status(400).json({
+        message: "Gagal ekstrak file",
+        hint: "Pastikan header CSV: Purchase Code (Erp);Plat;SKU;Request;Barcode;Keterangan",
+        delimiter: separator,
       });
+    }
+
+    const details = [];
+    const allMissing = new Set();
+    const allDuplicated = new Set();
+
+    for (const po of results) {
+      if (!po.items?.length) {
+        details.push({ erp: po.Erp, type: "empty", skus: [] });
+        continue;
+      }
+
+      const { missingSkus, duplicatedSkus, normalizedItems } =
+        await validatePoItems(po.items);
+
+      duplicatedSkus.forEach((s) => allDuplicated.add(s));
+      missingSkus.forEach((s) => allMissing.add(s));
+
+      if (duplicatedSkus.length) {
+        details.push({ erp: po.Erp, type: "duplicate", skus: duplicatedSkus });
+      }
+      if (missingSkus.length) {
+        details.push({ erp: po.Erp, type: "missing", skus: missingSkus });
+      }
+
+      po.items = normalizedItems;
+    }
+
+    if (details.length) {
+      return res.status(400).json({
+        message: "Gagal import purchase order",
+        details,
+        missingSkus: [...allMissing],
+        duplicatedSkus: [...allDuplicated],
+        delimiter: separator,
+      });
+    }
+
+    // Erp duplikat dalam satu file CSV tidak boleh
+    const erpInFile = new Set();
+    const duplicateInFile = [];
+    for (const po of results) {
+      const erp = po.Erp?.trim();
+      if (!erp) continue;
+      if (erpInFile.has(erp)) duplicateInFile.push(erp);
+      else erpInFile.add(erp);
+    }
+
+    if (duplicateInFile.length) {
+      return res.status(400).json({
+        message: `Kode PO duplikat dalam file: ${[...new Set(duplicateInFile)].join(", ")}`,
+        duplicateInFile: [...new Set(duplicateInFile)],
+      });
+    }
+
+    const savedPOs = [];
+    let replacedCount = 0;
+
+    for (const po of results) {
+      const erp = po.Erp?.trim();
+      const deleted = await PurchaseOrder.deleteOne({ Erp: erp });
+      if (deleted.deletedCount > 0) replacedCount++;
+
+      const created = await PurchaseOrder.create({
+        Erp: erp,
+        plat: po.plat || "",
+        dibuatOleh: currentLoginUser?.username || "",
+        items: po.items.map((item) => ({
+          sku: item.sku,
+          barcodeItem: item.barcodeItem || "",
+          request: item.request ?? 0,
+          keterangan: item.keterangan || "",
+          received: 0,
+          tanggalTerpenuhi: null,
+        })),
+      });
+      savedPOs.push(created);
+    }
+
+    const summary = savedPOs
+      .map((p) => `${p.Erp} (${p.items.length} item)`)
+      .join(", ");
+
+    return res.json({
+      message: `${savedPOs.length} PO diimport: ${summary}${
+        replacedCount ? ` · ${replacedCount} mengganti data lama` : ""
+      }`,
+      importedCount: savedPOs.length,
+      replacedCount,
+      summary: savedPOs.map((p) => ({
+        erp: p.Erp,
+        itemCount: p.items.length,
+      })),
+      data: savedPOs,
+    });
   } catch (error) {
-    return res
-      .status(500)
-      .json({ error: "Terjadi kesalahan saat membaca file CSV." });
+    return res.status(500).json({
+      message: "Gagal import purchase order",
+      error: error.message,
+    });
+  } finally {
+    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
   }
 });
 

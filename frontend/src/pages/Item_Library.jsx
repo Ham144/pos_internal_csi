@@ -14,7 +14,17 @@ const formatInventoryImportError = (data) => {
   if (data.duplicatedSkus?.length) {
     parts.push(`SKU duplikat: ${data.duplicatedSkus.join(", ")}`);
   }
-  const detailList = data.details || data.errors || [];
+  const missing = (data.details || data.errors || []).filter((d) =>
+    d.reason?.startsWith("SKU tidak terdaftar"),
+  );
+  if (missing.length) {
+    parts.push(
+      `SKU tidak terdaftar: ${missing.map((d) => d.sku).filter(Boolean).join(", ")}`,
+    );
+  }
+  const detailList = (data.details || data.errors || []).filter(
+    (d) => !d.reason?.startsWith("SKU tidak terdaftar"),
+  );
   detailList.forEach((d) => {
     if (d.sku) {
       parts.push(`Baris ${d.row} (${d.sku}): ${d.reason}`);

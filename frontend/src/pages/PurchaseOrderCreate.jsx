@@ -18,6 +18,12 @@ import ModalDetailPurchaseOrder from "@/components/ModalDetailPurchaseOrder";
 const formatPoError = (data) => {
   if (!data) return "Terjadi kesalahan";
   const parts = [];
+  if (data.duplicateInFile?.length) {
+    parts.push(`Kode PO duplikat dalam file: ${data.duplicateInFile.join(", ")}`);
+  }
+  if (data.duplicateErp?.length) {
+    parts.push(`Kode PO sudah terdaftar: ${data.duplicateErp.join(", ")}`);
+  }
   if (data.missingSkus?.length) {
     parts.push(`SKU tidak terdaftar: ${data.missingSkus.join(", ")}`);
   }
@@ -37,6 +43,7 @@ const formatPoError = (data) => {
       }
     });
   }
+  if (data.hint) parts.push(data.hint);
   if (parts.length) return parts.join(" | ");
   return data.message || data.error || "Terjadi kesalahan";
 };
@@ -57,6 +64,53 @@ import {
   FileSpreadsheet,
   Save,
 } from "lucide-react";
+
+const IMPORT_CSV_RULES = [
+  {
+    kondisi: "Satu file CSV",
+    perilaku: "Bisa berisi banyak PO (banyak Erp berbeda)",
+  },
+  {
+    kondisi: "Baris pertama tiap PO",
+    perilaku: "Isi kolom Purchase Code (Erp) + SKU + Request",
+  },
+  {
+    kondisi: "Baris lanjutan (Erp kosong)",
+    perilaku: "Item tambahan untuk PO di atasnya",
+  },
+  {
+    kondisi: "Erp sudah ada di sistem",
+    perilaku: "Hapus PO lama, timpa dari CSV (received direset)",
+  },
+];
+
+function ImportCsvPetunjuk({ compact = false }) {
+  return (
+    <div className={compact ? "text-xs" : "text-sm"}>
+      <p className="mb-2 font-medium text-gray-700">Cara kerja import CSV</p>
+      <div className="overflow-x-auto rounded-lg border border-blue-100">
+        <table className="table table-xs w-full">
+          <thead className="bg-blue-50">
+            <tr>
+              <th className="text-gray-700">Kondisi</th>
+              <th className="text-gray-700">Perilaku</th>
+            </tr>
+          </thead>
+          <tbody>
+            {IMPORT_CSV_RULES.map((row) => (
+              <tr key={row.kondisi} className="border-t border-blue-50">
+                <td className="whitespace-nowrap text-gray-600">
+                  {row.kondisi}
+                </td>
+                <td className="text-gray-800">{row.perilaku}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
 
 export default function PurchaseOrdersCreate() {
   const [file, setFile] = useState(null);
@@ -326,31 +380,23 @@ export default function PurchaseOrdersCreate() {
 
     // Header CSV
     rows.push([
-      "Erp",
+      "Purchase Code (Erp)",
       "Plat",
-      "Dibuat Oleh",
-      "Dipenuhi Oleh",
       "SKU",
       "Request",
-      "Received",
+      "Barcode",
       "Keterangan",
-      "Tanggal Terpenuhi",
-      "Time",
     ]);
 
-    // Isi data dari setiap PO dan item-nya
     purchaseOrderList?.data.forEach((po) => {
-      po.items.forEach((item) => {
+      po.items.forEach((item, idx) => {
         rows.push([
-          po.Erp,
-          po.plat,
-          po.dibuatOleh,
-          po.dipenuhiOleh,
+          idx === 0 ? po.Erp : "",
+          idx === 0 ? po.plat : "",
           item.sku,
           item.request,
-          item.received,
-          item.keterangan,
-          new Date(item.tanggalTerpenuhi).toLocaleString("id-ID"), // Format tanggal
+          item.barcodeItem || "",
+          item.keterangan || "",
         ]);
       });
     });
@@ -429,19 +475,22 @@ export default function PurchaseOrdersCreate() {
                 <li>
                   <button
                     onClick={handleImportPurchaseOrder}
-                    className="flex items-center gap-2 text-gray-700 hover:bg-blue-50 rounded-lg p-3"
+                    className="flex flex-col items-start gap-0.5 text-gray-700 hover:bg-blue-50 rounded-lg p-3"
                   >
-                    <Upload className="w-5 h-5 text-blue-600" />
-                    <span>Import CSV</span>
+                    <span className="flex items-center gap-2">
+                      <Upload className="w-5 h-5 text-blue-600" />
+                      Import CSV
+                    </span>
+                    <span className="pl-7 text-xs font-normal text-gray-500">
+                      Banyak PO per file · Erp kosong = item lanjutan
+                    </span>
                   </button>
                 </li>
                 <li>
                   <button
                     onClick={() => {
                       const confirmed = window.confirm(
-                        "Anda akan meng-export template. Pastikan Anda membaca instruksi: " +
-                          "Ganti 'Purchase Code (Erp)' untuk membuat PO baru yang unik. " +
-                          "Jika 'Purchase Code (Erp)' sama dengan yang sudah ada, akan terjadi error.",
+                        "Export template CSV. Erp yang sudah ada akan dihapus dan diganti seluruhnya dari file import.",
                       );
                       if (confirmed) handleExportPurchaseOrder();
                     }}
@@ -456,10 +505,10 @@ export default function PurchaseOrdersCreate() {
           </div>
         </div>
 
-        {/* Info Badge */}
-        <div className="mt-4 flex items-center gap-2">
-          <div className="badge badge-info gap-2 p-3 bg-blue-50 text-blue-700 border-blue-200">
-            <Info className="w-4 h-4" />
+        <div className="mt-4 space-y-3">
+          <ImportCsvPetunjuk />
+          <div className="badge badge-info gap-2 border-blue-200 bg-blue-50 p-3 text-blue-700">
+            <Info className="h-4 w-4" />
             <span
               className="cursor-pointer hover:underline"
               onClick={() => navigate("/artikel_documentation")}
@@ -858,11 +907,12 @@ export default function PurchaseOrdersCreate() {
       {/* Upload CSV Modal */}
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-2xl w-96 overflow-hidden">
+          <div className="max-h-[90vh] w-full max-w-lg overflow-hidden overflow-y-auto rounded-2xl bg-white shadow-2xl">
             <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
               <h2 className="text-lg font-semibold text-white">Upload CSV</h2>
             </div>
-            <div className="p-6">
+            <div className="space-y-4 p-6">
+              <ImportCsvPetunjuk compact />
               <form onSubmit={handleSubmitImportPO} className="space-y-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-700">

@@ -1,14 +1,10 @@
 import fs from "fs";
 import path from "path";
-import csv from "csv-parser";
 import mongoose from "mongoose";
 import DaftartDiskon from "../models/DaftarDiskon.model.js";
 import { findInventoryBySku } from "../utils/validatePoSkus.js";
 import { resolveSkuFromReq } from "../utils/resolveSku.js";
-import {
-  csvCell,
-  detectCsvSeparatorFromFile,
-} from "../utils/csvDelimiter.js";
+import { csvCell, parseCsvFile } from "../utils/csvDelimiter.js";
 
 // parse daftar SKU dari cell "SKU1,SKU2"
 const parseSkuList = (raw) => {
@@ -175,32 +171,22 @@ export const registerMultiDiskon = async (req, res) => {
 
   const filePath =
     file.path || path.join(process.cwd(), "uploads", file.filename);
-  const rows = [];
-
-  const separator = detectCsvSeparatorFromFile(filePath);
+  let rows = [];
 
   try {
-    await new Promise((resolve, reject) => {
-      fs.createReadStream(filePath)
-        .pipe(csv({ separator }))
-        .on("data", (row) => {
-          const judulDiskon = csvCell(row, "Judul Diskon");
-          if (!judulDiskon) return;
-
-          rows.push({
-            judulDiskon,
-            description: csvCell(row, "Deskripsi"),
-            berlakuDari: csvCell(row, "Berlaku Dari"),
-            berlakuHingga: csvCell(row, "Berlaku Hingga"),
-            rpPotongan: csvCell(row, "Potongan Rp"),
-            percentPotongan: csvCell(row, "Potongan %"),
-            skuRaw: csvCell(row, "SKU Terkait"),
-            quantityTersedia: csvCell(row, "Kuota"),
-          });
-        })
-        .on("end", resolve)
-        .on("error", reject);
-    });
+    const parsed = await parseCsvFile(filePath, ["judul diskon"]);
+    rows = parsed.rows
+      .map((row) => ({
+        judulDiskon: csvCell(row, "Judul Diskon"),
+        description: csvCell(row, "Deskripsi"),
+        berlakuDari: csvCell(row, "Berlaku Dari"),
+        berlakuHingga: csvCell(row, "Berlaku Hingga"),
+        rpPotongan: csvCell(row, "Potongan Rp"),
+        percentPotongan: csvCell(row, "Potongan %"),
+        skuRaw: csvCell(row, "SKU Terkait"),
+        quantityTersedia: csvCell(row, "Kuota"),
+      }))
+      .filter((row) => row.judulDiskon);
   } catch {
     return res.status(400).json({ message: "Gagal membaca file CSV" });
   } finally {
