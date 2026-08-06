@@ -9,6 +9,12 @@ export default defineConfig({
   server: {
     host: "0.0.0.0",
     port: "5173",
+    watch: {
+      // The project is mounted from the Windows filesystem when Vite runs in WSL.
+      // Polling keeps HMR reliable when native filesystem events are not forwarded.
+      usePolling: true,
+      interval: 100,
+    },
   },
   resolve: {
     alias: {

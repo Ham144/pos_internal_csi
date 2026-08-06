@@ -100,7 +100,7 @@ const Profile = () => {
             {/* Username Field */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                <User className="w-4 h-4 text-blue-500" />
+                <User className="w-4 h-4 text-blue-950" />
                 Username
                 <div
                   className="tooltip tooltip-bottom"
@@ -116,7 +116,7 @@ const Profile = () => {
                   name="username"
                   value={formData.username}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200 bg-gray-50 text-gray-800"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-950 transition-all duration-200 bg-gray-50 text-gray-800"
                   required
                 />
               </div>
@@ -129,7 +129,7 @@ const Profile = () => {
             {/* Password Field */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                <Lock className="w-4 h-4 text-blue-500" />
+                <Lock className="w-4 h-4 text-blue-950" />
                 Password
               </label>
               <div className="relative">
@@ -139,7 +139,7 @@ const Profile = () => {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-12 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200 bg-gray-50 text-gray-800"
+                  className="w-full pl-10 pr-12 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-950 transition-all duration-200 bg-gray-50 text-gray-800"
                   placeholder="Biarkan kosong jika tidak ingin mengubah"
                 />
                 <button
@@ -163,7 +163,7 @@ const Profile = () => {
             {/* Email Field */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                <Mail className="w-4 h-4 text-blue-500" />
+                <Mail className="w-4 h-4 text-blue-950" />
                 Email
               </label>
               <div className="relative">
@@ -173,7 +173,7 @@ const Profile = () => {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200 bg-gray-50 text-gray-800"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-950 transition-all duration-200 bg-gray-50 text-gray-800"
                   placeholder="user@example.com"
                   required
                 />
@@ -183,7 +183,7 @@ const Profile = () => {
             {/* Telephone Field */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                <Phone className="w-4 h-4 text-blue-500" />
+                <Phone className="w-4 h-4 text-blue-950" />
                 Telephone
               </label>
               <div className="relative">
@@ -193,7 +193,7 @@ const Profile = () => {
                   name="telepon"
                   value={formData.telepon}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200 bg-gray-50 text-gray-800"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-950 transition-all duration-200 bg-gray-50 text-gray-800"
                   placeholder="08123456789"
                   required
                 />
@@ -212,7 +212,7 @@ const Profile = () => {
               </button>
               <button
                 type="submit"
-                className="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-200 font-medium flex items-center gap-2 shadow-lg shadow-blue-500/25"
+                className="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-200 font-medium flex items-center gap-2 shadow-lg shadow-blue-950/25"
               >
                 <Save className="w-4 h-4" />
                 Simpan Perubahan

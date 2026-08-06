@@ -46,7 +46,7 @@ export default function GeneratedVoucherList() {
       ) : (
         <div className="overflow-x-auto rounded-lg border border-gray-200">
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gradient-to-r from-blue-600 to-blue-500">
+            <thead className="bg-gradient-to-r from-blue-600 to-blue-950">
               <tr className="text-sm text-center">
                 <th className="py-3 px-4  font-medium text-white text-xs uppercase tracking-wider">
                   Generation Date

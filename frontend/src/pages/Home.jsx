@@ -167,18 +167,18 @@ const Home = () => {
     <>
       <Helmet>
         <title>
-          Catur POS - Sistem Manajemen Point of Sale PT. Catur Sukses
+          Internal POS CSI - Sistem Manajemen Point of Sale PT. Catur Sukses
           Internasional
         </title>
         <meta
           name="description"
-          content="Catur POS adalah sistem manajemen point of sale internal PT Catur Sukses Internasional (CSI) yang terintegrasi dengan aplikasi mobile catur POS."
+          content="Internal POS CSI adalah sistem manajemen point of sale internal PT Catur Sukses Internasional (CSI) yang terintegrasi dengan aplikasi mobile Internal POS CSI."
         />
         <meta
           name="keywords"
-          content="Catur sukses internasional, catur sukses, Catur POS, Point of Sale, POS System, Retail Management, Inventory Management"
+          content="Catur sukses internasional, catur sukses, Internal POS CSI, Point of Sale, POS System, Retail Management, Inventory Management"
         />
-        <meta property="og:title" content="Catur POS" />
+        <meta property="og:title" content="Internal POS CSI" />
         <meta
           property="og:description"
           content="Sistem manajemen point of sale internal PT Catur Sukses Internasional (CSI)"
@@ -211,15 +211,15 @@ const Home = () => {
                 <div className="flex justify-center mb-6">
                   <div className="p-4 bg-white rounded-3xl backdrop-blur-sm border border-white/20">
                     <img
-                      src="/csi-logo2.png"
-                      alt="Catur POS"
+                      src="/internal-pos.png"
+                      alt="Internal POS CSI"
                       className="w-16 h-16 md:w-20 md:h-20"
                     />
                   </div>
                 </div>
 
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 tracking-tight">
-                  CATUR POS
+                  Internal POS CSI
                 </h1>
                 <p className="text-xl md:text-2xl text-blue-100 mb-8 max-w-3xl mx-auto">
                   Sistem Manajemen Point of Sale Terintegrasi
@@ -273,7 +273,7 @@ const Home = () => {
                             >
                               <div className="flex items-start gap-4">
                                 <div className="flex-shrink-0">
-                                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white shadow-md">
+                                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-950 to-blue-600 flex items-center justify-center text-white shadow-md">
                                     <FileText className="w-5 h-5" />
                                   </div>
                                 </div>
@@ -366,7 +366,7 @@ const Home = () => {
                                     navigateToPage(page.originalPath)
                                   }
                                 >
-                                  <span className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-white text-xs flex items-center justify-center font-medium">
+                                  <span className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-950 to-blue-600 text-white text-xs flex items-center justify-center font-medium">
                                     {index + 1}
                                   </span>
                                   <span className="text-sm truncate flex-1">
@@ -495,7 +495,7 @@ const Home = () => {
                   >
                     <div className="flex items-start gap-4">
                       <div className="flex-shrink-0">
-                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-lg shadow-md">
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-950 to-blue-600 flex items-center justify-center text-white font-bold text-lg shadow-md">
                           {index + 1}
                         </div>
                       </div>

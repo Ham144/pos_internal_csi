@@ -194,7 +194,7 @@ const Promo = () => {
     }
     if (!promoBaru?.syaratQuantity && !promoBaru?.syaratTotalRp) {
       return toast.error(
-        "syaratQuantity atau syaratTotalRp diperlukan salah satunya"
+        "syaratQuantity atau syaratTotalRp diperlukan salah satunya",
       );
     }
 
@@ -252,14 +252,14 @@ const Promo = () => {
       if (value === "active") {
         setFilteredPromoList(
           promoList?.data?.filter(
-            (promo) => new Date(promo.berlakuHingga) > new Date()
-          )
+            (promo) => new Date(promo.berlakuHingga) > new Date(),
+          ),
         );
       } else {
         setFilteredPromoList(
           promoList?.data?.filter(
-            (promo) => new Date(promo.berlakuHingga) < new Date()
-          )
+            (promo) => new Date(promo.berlakuHingga) < new Date(),
+          ),
         );
       }
     }
@@ -269,7 +269,7 @@ const Promo = () => {
     if (!Array.isArray(outletIds)) return "Semua Outlet";
 
     const matchedOutlets = allOutlets?.filter((outlet) =>
-      outletIds.includes(outlet._id)
+      outletIds.includes(outlet._id),
     );
 
     if (!matchedOutlets?.length) return "Semua Outlet";
@@ -553,7 +553,7 @@ const Promo = () => {
                       <span className="inline-flex items-center justify-center bg-blue-100 text-blue-800 rounded-full px-3 py-1 text-sm font-medium">
                         {outletExtractor(
                           promo?.authorizedOutlets,
-                          outletList?.data || []
+                          outletList?.data || [],
                         )}
                       </span>
                     </td>
@@ -568,7 +568,7 @@ const Promo = () => {
                                   day: "2-digit",
                                   month: "short",
                                   year: "numeric",
-                                }
+                                },
                               )
                             : "Not set"}
                         </span>
@@ -587,7 +587,7 @@ const Promo = () => {
                                   day: "2-digit",
                                   month: "short",
                                   year: "numeric",
-                                }
+                                },
                               )
                             : "Not set"}
                         </span>
@@ -710,7 +710,7 @@ const Promo = () => {
                   <input
                     type="text"
                     id="judulPromo"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-950 focus:border-blue-950"
                     value={
                       editingPromo
                         ? selectedPromo?.judulPromo
@@ -747,7 +747,7 @@ const Promo = () => {
                             promoBaru?.skuList?.length
                           ) {
                             const yes = confirm(
-                              "Mengganti mode dari particular ke simple_total akan menghapus sku terhubung karena hal itu tidak diperlukan, konfirmasi?"
+                              "Mengganti mode dari particular ke simple_total akan menghapus sku terhubung karena hal itu tidak diperlukan, konfirmasi?",
                             );
                             if (yes) {
                               setSelectedPromo((pre) => ({
@@ -777,7 +777,7 @@ const Promo = () => {
                         className={`w-full py-4 px-5 rounded-xl border-2 font-semibold transition-all duration-300 cursor-pointer ${
                           selectedPromo?.mode === "simple_total" ||
                           promoBaru?.mode === "simple_total"
-                            ? "bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-lg border-blue-700 transform scale-[1.02]"
+                            ? "bg-gradient-to-r from-blue-600 to-blue-950 text-white shadow-lg border-blue-700 transform scale-[1.02]"
                             : "bg-white text-gray-700 border-gray-300 hover:border-blue-400 hover:shadow-md"
                         }`}
                       >
@@ -809,7 +809,7 @@ const Promo = () => {
                         className={`w-full py-4 px-5 rounded-xl border-2 font-semibold transition-all duration-300 cursor-pointer ${
                           selectedPromo?.mode === "particular" ||
                           promoBaru?.mode === "particular"
-                            ? "bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-lg border-blue-700 transform scale-[1.02]"
+                            ? "bg-gradient-to-r from-blue-600 to-blue-950 text-white shadow-lg border-blue-700 transform scale-[1.02]"
                             : "bg-white text-gray-700 border-gray-300 hover:border-blue-400 hover:shadow-md"
                         }`}
                       >
@@ -822,7 +822,7 @@ const Promo = () => {
                     </div>
                   </div>
 
-                  <div className="bg-blue-50 border-l-4 border-blue-500 rounded-r-lg p-4 transition-all duration-300">
+                  <div className="bg-blue-50 border-l-4 border-blue-950 rounded-r-lg p-4 transition-all duration-300">
                     {selectedPromo?.mode === "simple_total" ||
                     promoBaru?.mode === "simple_total" ? (
                       <p className="text-gray-700">
@@ -888,7 +888,7 @@ const Promo = () => {
                           promoBaru?.mode === "simple_total"
                         ) {
                           toast.error(
-                            "Tidak Boleh menambahkan sku dalam mode ini"
+                            "Tidak Boleh menambahkan sku dalam mode ini",
                           );
                           return;
                         }
@@ -924,7 +924,7 @@ const Promo = () => {
                       value={outletExtractor(
                         selectedPromo?.authorizedOutlets ||
                           promoBaru?.authorizedOutlets,
-                        outletList?.data || []
+                        outletList?.data || [],
                       )}
                       readOnly
                     />
@@ -948,7 +948,7 @@ const Promo = () => {
                   <input
                     type="number"
                     id="quantityBerlaku"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-950 focus:border-blue-950"
                     value={
                       selectedPromo?._id
                         ? selectedPromo?.quantityBerlaku || 0
@@ -977,7 +977,7 @@ const Promo = () => {
                     <input
                       type="date"
                       id="berlakuDari"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-950 focus:border-blue-950"
                       value={
                         selectedPromo
                           ? selectedPromo?.berlakuDari
@@ -986,10 +986,10 @@ const Promo = () => {
                                 .split("T")[0]
                             : ""
                           : promoBaru?.berlakuDari
-                          ? new Date(promoBaru?.berlakuDari)
-                              .toISOString()
-                              .split("T")[0]
-                          : ""
+                            ? new Date(promoBaru?.berlakuDari)
+                                .toISOString()
+                                .split("T")[0]
+                            : ""
                       }
                       onChange={(e) =>
                         editingPromo
@@ -1016,7 +1016,7 @@ const Promo = () => {
                     <input
                       type="date"
                       id="berlakuHingga"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-950 focus:border-blue-950"
                       value={
                         selectedPromo
                           ? selectedPromo?.berlakuHingga
@@ -1025,10 +1025,10 @@ const Promo = () => {
                                 .split("T")[0]
                             : ""
                           : promoBaru?.berlakuHingga
-                          ? new Date(promoBaru?.berlakuHingga)
-                              .toISOString()
-                              .split("T")[0]
-                          : ""
+                            ? new Date(promoBaru?.berlakuHingga)
+                                .toISOString()
+                                .split("T")[0]
+                            : ""
                       }
                       min={
                         selectedPromo?.berlakuDari
@@ -1036,10 +1036,10 @@ const Promo = () => {
                               .toISOString()
                               .split("T")[0]
                           : promoBaru?.berlakuDari
-                          ? new Date(promoBaru?.berlakuDari)
-                              .toISOString()
-                              .split("T")[0]
-                          : ""
+                            ? new Date(promoBaru?.berlakuDari)
+                                .toISOString()
+                                .split("T")[0]
+                            : ""
                       }
                       onChange={(e) =>
                         editingPromo
@@ -1079,7 +1079,7 @@ const Promo = () => {
                       <input
                         type="number"
                         id="syaratQuantity"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-950 focus:border-blue-950"
                         min={1}
                         value={
                           (editingPromo && selectedPromo?.syaratQuantity) ||
@@ -1113,7 +1113,7 @@ const Promo = () => {
                       <input
                         type="number"
                         id="syaratTotalRp"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-950 focus:border-blue-950"
                         min={0}
                         value={
                           editingPromo
@@ -1136,15 +1136,15 @@ const Promo = () => {
                   )}
                   <select
                     id="syaratType"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-950 focus:border-blue-950"
                     value={
                       editingPromo
                         ? selectedPromo?.syaratQuantity
                           ? "quantity"
                           : "total"
                         : promoBaru?.syaratQuantity
-                        ? "quantity"
-                        : "total"
+                          ? "quantity"
+                          : "total"
                     }
                     onChange={(e) => {
                       const isQuantity = e.target.value === "quantity";
@@ -1185,7 +1185,7 @@ const Promo = () => {
                   <input
                     type="text"
                     id="skuBarangBonus"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-950 focus:border-blue-950"
                     value={
                       selectedPromo?.skuBarangBonus || promoBaru?.skuBarangBonus
                     }
@@ -1221,7 +1221,7 @@ const Promo = () => {
                   <input
                     type="number"
                     id="quantityBonus"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-950 focus:border-blue-950"
                     min={1}
                     value={
                       selectedPromo?.quantityBonus || promoBaru.quantityBonus
@@ -1294,14 +1294,14 @@ const Promo = () => {
                                     setSelectedPromo((prev) => ({
                                       ...prev,
                                       skuList: prev.skuList.filter(
-                                        (sku) => sku !== item.sku
+                                        (sku) => sku !== item.sku,
                                       ),
                                     }));
                                   } else {
                                     setPromoBaru((prev) => ({
                                       ...prev,
                                       skuList: prev.skuList.filter(
-                                        (sku) => sku !== item.sku
+                                        (sku) => sku !== item.sku,
                                       ),
                                     }));
                                   }
@@ -1533,14 +1533,14 @@ const Promo = () => {
                               setSelectedPromo((prev) => ({
                                 ...prev,
                                 skuList: prev.skuList.filter(
-                                  (sku) => sku !== item.sku
+                                  (sku) => sku !== item.sku,
                                 ),
                               }));
                             } else {
                               setPromoBaru((prev) => ({
                                 ...prev,
                                 skuList: prev.skuList.filter(
-                                  (sku) => sku !== item.sku
+                                  (sku) => sku !== item.sku,
                                 ),
                               }));
                             }

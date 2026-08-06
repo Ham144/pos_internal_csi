@@ -1,6 +1,8 @@
 import axios from "axios";
 import { BASE_URL } from "./constant";
 
+const adminConfigUrl = `${BASE_URL}/api/v1/admin/system-config`;
+
 // Verifikasi koneksi email saat ini
 export const verifyEmailConnection = async () => {
   try {
@@ -16,7 +18,7 @@ export const verifyEmailConnection = async () => {
   }
 };
 
-// Test koneksi Outlook dengan parameter dari .env
+// Test koneksi Outlook dengan konfigurasi aktif di server
 export const testOutlookConnection = async (to) => {
   try {
     const response = await axios.post(
@@ -61,10 +63,7 @@ export const runEmailKwitansiJob = async () => {
 // Mendapatkan konfigurasi email saat ini
 export const getCurrentEmailConfig = async () => {
   try {
-    const response = await axios.get(
-      `${BASE_URL}/api/v1/admin/current-email-config`,
-      { withCredentials: true }
-    );
+    const response = await axios.get(adminConfigUrl, { withCredentials: true });
     return response.data;
   } catch (error) {
     throw error;
@@ -74,11 +73,20 @@ export const getCurrentEmailConfig = async () => {
 // Menyimpan konfigurasi email
 export const saveEmailConfig = async (config) => {
   try {
-    const response = await axios.post(
-      `${BASE_URL}/api/v1/admin/save-email-config`,
-      config,
-      { withCredentials: true }
-    );
+    const response = await axios.put(adminConfigUrl, config, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const resetSystemConfig = async () => {
+  try {
+    const response = await axios.delete(adminConfigUrl, {
+      withCredentials: true,
+    });
     return response.data;
   } catch (error) {
     throw error;

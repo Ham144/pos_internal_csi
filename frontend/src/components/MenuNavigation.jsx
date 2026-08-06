@@ -27,8 +27,8 @@ const MenuNavigation = () => {
           <div className="navbar-start px-3">
             <div className="relative flex justify-center items-center ">
               <img
-                src="./csi-logo2.png"
-                alt="Catur Pos Logo"
+                src="./internal-pos.png"
+                alt="Internal POS CSI Logo"
                 width={50}
                 height={50}
                 className="rounded-2xl shadow-lg object-contain"

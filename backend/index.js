@@ -37,14 +37,7 @@ import stackTraceSkuRoutes from "./routes/stackTrace.route.js";
 
 let isProduction = process.env.NODE_ENV === "production";
 
-const corsOrigin = isProduction
-  ? [
-    process.env.FRONTEND ?? "https://www.mycsi.net"
-  ]
-  : [
-    "http://192.168.169.12:5173",
-    "http://localhost:8081",
-  ];
+const corsOrigin = [process.env.FRONTEND, "http://172.20.78.248:5173"];
 
 const app = express();
 
@@ -56,11 +49,11 @@ app.use(
   cors({
     origin: corsOrigin,
     credentials: true,
-  })
+  }),
 );
 
 app.get("/", async (req, res) => {
-  return res.send("CSI POS BACKEND : 200");
+  return res.send("Internal POS CSI BACKEND : 200");
 });
 
 //database
@@ -117,12 +110,12 @@ app.listen(port, () => {
     try {
       await initPengirimanVoucherCodeJob();
       console.log(
-        "✅ Cron job pengiriman voucher code berhasil diinisialisasi"
+        "✅ Cron job pengiriman voucher code berhasil diinisialisasi",
       );
     } catch (error) {
       console.error(
         "❌ Gagal menginisialisasi cron job pengiriman voucher code:",
-        error
+        error,
       );
     }
   })();
@@ -135,7 +128,7 @@ const initPengirimanVoucherCodeJob = async () => {
     const isEmailValid = await verifyEmailConnection();
     if (!isEmailValid) {
       console.warn(
-        "⚠️ Konfigurasi email tidak valid, pengiriman voucher code tidak akan berjalan"
+        "⚠️ Konfigurasi email tidak valid, pengiriman voucher code tidak akan berjalan",
       );
       return false;
     }
@@ -148,7 +141,7 @@ const initPengirimanVoucherCodeJob = async () => {
   } catch (error) {
     console.error(
       "❌ Error saat inisialisasi cron job pengiriman voucher code:",
-      error
+      error,
     );
     throw error;
   }

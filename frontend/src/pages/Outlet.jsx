@@ -493,7 +493,7 @@ const Outlet = () => {
                     </td>
                     <td className="px-4 py-4">
                       <div className="flex items-center gap-2">
-                        <Store className="w-4 h-4 text-blue-500" />
+                        <Store className="w-4 h-4 text-blue-950" />
                         <span className="font-medium text-gray-800">
                           {outlet.namaOutlet}
                         </span>
@@ -528,7 +528,7 @@ const Outlet = () => {
                             </span>
                           ))}
                         {outlet?.kasirList?.length > 2 && (
-                          <span className="text-xs text-blue-500 font-medium">
+                          <span className="text-xs text-blue-950 font-medium">
                             +{outlet.kasirList.length - 2}
                           </span>
                         )}
@@ -652,12 +652,12 @@ const Outlet = () => {
                   {/* Nama Outlet */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1.5 flex items-center gap-1">
-                      <Store className="w-4 h-4 text-blue-500" />
+                      <Store className="w-4 h-4 text-blue-950" />
                       Nama Outlet
                     </label>
                     <input
                       type="text"
-                      className="w-full border border-gray-200 px-4 py-2.5 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                      className="w-full border border-gray-200 px-4 py-2.5 rounded-xl focus:ring-2 focus:ring-blue-950 focus:border-transparent transition-all duration-200"
                       placeholder="Masukkan nama outlet"
                       value={selectedOutlet.namaOutlet}
                       onChange={(e) =>
@@ -672,12 +672,12 @@ const Outlet = () => {
                   {/* Deskripsi */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1.5 flex items-center gap-1">
-                      <FileText className="w-4 h-4 text-blue-500" />
+                      <FileText className="w-4 h-4 text-blue-950" />
                       Deskripsi
                     </label>
                     <input
                       type="text"
-                      className="w-full border border-gray-200 px-4 py-2.5 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                      className="w-full border border-gray-200 px-4 py-2.5 rounded-xl focus:ring-2 focus:ring-blue-950 focus:border-transparent transition-all duration-200"
                       placeholder="Masukkan deskripsi outlet"
                       value={selectedOutlet.description}
                       onChange={(e) =>
@@ -692,12 +692,12 @@ const Outlet = () => {
                   {/* Nama Perusahaan */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1.5 flex items-center gap-1">
-                      <Building2 className="w-4 h-4 text-blue-500" />
+                      <Building2 className="w-4 h-4 text-blue-950" />
                       Nama Perusahaan
                     </label>
                     <input
                       type="text"
-                      className="w-full border border-gray-200 px-4 py-2.5 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                      className="w-full border border-gray-200 px-4 py-2.5 rounded-xl focus:ring-2 focus:ring-blue-950 focus:border-transparent transition-all duration-200"
                       placeholder="Masukkan nama perusahaan"
                       value={selectedOutlet.namaPerusahaan}
                       onChange={(e) =>
@@ -712,12 +712,12 @@ const Outlet = () => {
                   {/* Alamat */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1.5 flex items-center gap-1">
-                      <MapPin className="w-4 h-4 text-blue-500" />
+                      <MapPin className="w-4 h-4 text-blue-950" />
                       Alamat
                     </label>
                     <input
                       type="text"
-                      className="w-full border border-gray-200 px-4 py-2.5 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                      className="w-full border border-gray-200 px-4 py-2.5 rounded-xl focus:ring-2 focus:ring-blue-950 focus:border-transparent transition-all duration-200"
                       placeholder="Masukkan alamat"
                       value={selectedOutlet.alamat}
                       onChange={(e) =>
@@ -732,12 +732,12 @@ const Outlet = () => {
                   {/* NPWP */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1.5 flex items-center gap-1">
-                      <CreditCard className="w-4 h-4 text-blue-500" />
+                      <CreditCard className="w-4 h-4 text-blue-950" />
                       NPWP
                     </label>
                     <input
                       type="text"
-                      className="w-full border border-gray-200 px-4 py-2.5 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                      className="w-full border border-gray-200 px-4 py-2.5 rounded-xl focus:ring-2 focus:ring-blue-950 focus:border-transparent transition-all duration-200"
                       placeholder="Masukkan NPWP"
                       value={selectedOutlet.npwp}
                       onChange={(e) =>
@@ -753,7 +753,7 @@ const Outlet = () => {
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1.5">
                       <div className="flex items-center gap-1">
-                        <Clock className="w-4 h-4 text-blue-500" />
+                        <Clock className="w-4 h-4 text-blue-950" />
                         Periode Settlement (hari)
                         <div
                           className="tooltip tooltip-left"
@@ -766,7 +766,7 @@ const Outlet = () => {
                     <input
                       type="number"
                       min="1"
-                      className="w-full border border-gray-200 px-4 py-2.5 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                      className="w-full border border-gray-200 px-4 py-2.5 rounded-xl focus:ring-2 focus:ring-blue-950 focus:border-transparent transition-all duration-200"
                       placeholder="Masukkan periode settlement"
                       value={selectedOutlet.periodeSettlement}
                       onChange={(e) =>
@@ -781,12 +781,12 @@ const Outlet = () => {
                   {/* Jam Settlement */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1.5 flex items-center gap-1">
-                      <Clock className="w-4 h-4 text-blue-500" />
+                      <Clock className="w-4 h-4 text-blue-950" />
                       Jam Settlement
                     </label>
                     <input
                       type="time"
-                      className="w-full border border-gray-200 px-4 py-2.5 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                      className="w-full border border-gray-200 px-4 py-2.5 rounded-xl focus:ring-2 focus:ring-blue-950 focus:border-transparent transition-all duration-200"
                       value={selectedOutlet.jamSettlement || "00:00"}
                       onChange={(e) =>
                         setSelectedOutlet((prev) => ({
@@ -801,7 +801,7 @@ const Outlet = () => {
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1.5">
                       <div className="flex items-center gap-1">
-                        <Tag className="w-4 h-4 text-blue-500" />
+                        <Tag className="w-4 h-4 text-blue-950" />
                         Brand Terhubung
                         <div
                           className="tooltip tooltip-bottom"
@@ -813,14 +813,14 @@ const Outlet = () => {
                     </label>
                     <button
                       type="button"
-                      className="w-full border border-gray-200 bg-gray-50 px-4 py-2.5 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all duration-200 flex items-center justify-between text-gray-700"
+                      className="w-full border border-gray-200 bg-gray-50 px-4 py-2.5 rounded-xl hover:border-blue-950 hover:bg-blue-50 transition-all duration-200 flex items-center justify-between text-gray-700"
                       onClick={(e) => {
                         e.stopPropagation();
                         document.getElementById("modalBrandPick").showModal();
                       }}
                     >
                       <span className="flex items-center gap-2">
-                        <Package className="w-4 h-4 text-blue-500" />
+                        <Package className="w-4 h-4 text-blue-950" />
                         Tambah Brand
                       </span>
                       <ChevronRight className="w-4 h-4 text-gray-400" />
@@ -830,14 +830,14 @@ const Outlet = () => {
                   {/* Kasir List */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1.5 flex items-center gap-1">
-                      <Users className="w-4 h-4 text-blue-500" />
+                      <Users className="w-4 h-4 text-blue-950" />
                       Kasir List
                     </label>
                     <div
                       onClick={() =>
                         document.getElementById("pickKasir").showModal()
                       }
-                      className="w-full border border-gray-200 bg-gray-50 px-4 py-3 rounded-xl cursor-pointer hover:border-blue-500 transition-all duration-200"
+                      className="w-full border border-gray-200 bg-gray-50 px-4 py-3 rounded-xl cursor-pointer hover:border-blue-950 transition-all duration-200"
                     >
                       {selectedOutlet?.kasirList?.length === 0 ? (
                         <span className="text-gray-400 text-sm">
@@ -890,7 +890,7 @@ const Outlet = () => {
                   {/* SPG List */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1.5 flex items-center gap-1">
-                      <Users className="w-4 h-4 text-blue-500" />
+                      <Users className="w-4 h-4 text-blue-950" />
                       SPG List
                     </label>
                     <div
@@ -898,7 +898,7 @@ const Outlet = () => {
                         setSelectedSpgIds(selectedOutlet?.spgList || []);
                         document.getElementById("modalSpgPick").showModal();
                       }}
-                      className="w-full border border-gray-200 bg-gray-50 px-4 py-3 rounded-xl cursor-pointer hover:border-blue-500 transition-all duration-200"
+                      className="w-full border border-gray-200 bg-gray-50 px-4 py-3 rounded-xl cursor-pointer hover:border-blue-950 transition-all duration-200"
                     >
                       {!selectedOutlet?.spgList?.length ? (
                         <span className="text-gray-400 text-sm">
@@ -951,7 +951,7 @@ const Outlet = () => {
                   {/* SKU tampil gambar di mobile */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1.5 flex items-center gap-1">
-                      <ImageIcon className="w-4 h-4 text-blue-500" />
+                      <ImageIcon className="w-4 h-4 text-blue-950" />
                       SKU Tampil Gambar (favorites)
                       <div
                         className="tooltip tooltip-bottom"
@@ -966,7 +966,7 @@ const Outlet = () => {
                           .getElementById("modalFavoritedInventoryPick")
                           .showModal()
                       }
-                      className="w-full border border-gray-200 bg-gray-50 px-4 py-3 rounded-xl cursor-pointer hover:border-blue-500 transition-all duration-200"
+                      className="w-full border border-gray-200 bg-gray-50 px-4 py-3 rounded-xl cursor-pointer hover:border-blue-950 transition-all duration-200"
                     >
                       {!selectedFavoritedSkus?.length ? (
                         <span className="text-gray-400 text-sm">
@@ -1012,7 +1012,7 @@ const Outlet = () => {
                   {/* Logo */}
                   <div>
                     <div className="flex items-center gap-2 mb-2">
-                      <ImageIcon className="w-4 h-4 text-blue-500" />
+                      <ImageIcon className="w-4 h-4 text-blue-950" />
                       <span className="text-sm font-medium text-gray-700">
                         Logo Outlet
                       </span>

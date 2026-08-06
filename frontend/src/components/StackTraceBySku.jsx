@@ -76,7 +76,7 @@ const StackTraceBySku = ({ skuToTrace }) => {
       case "decrease":
         return <ArrowDown className="w-4 h-4 text-red-500" />;
       case "spawn":
-        return <PlusCircle className="w-4 h-4 text-blue-500" />;
+        return <PlusCircle className="w-4 h-4 text-blue-950" />;
       default:
         return <Info className="w-4 h-4 text-gray-500" />;
     }
@@ -138,14 +138,14 @@ const StackTraceBySku = ({ skuToTrace }) => {
                 {/* Dari Tanggal */}
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-700 flex items-center gap-1">
-                    <Calendar className="w-4 h-4 text-blue-500" />
+                    <Calendar className="w-4 h-4 text-blue-950" />
                     Dari Tanggal
                   </label>
                   <div className="relative">
                     <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-400" />
                     <input
                       type="date"
-                      className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200"
+                      className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-950 transition-all duration-200"
                       value={from}
                       onChange={(e) => setFrom(e.target.value)}
                     />
@@ -155,14 +155,14 @@ const StackTraceBySku = ({ skuToTrace }) => {
                 {/* Sampai Tanggal */}
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-700 flex items-center gap-1">
-                    <Calendar className="w-4 h-4 text-blue-500" />
+                    <Calendar className="w-4 h-4 text-blue-950" />
                     Sampai Tanggal
                   </label>
                   <div className="relative">
                     <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-400" />
                     <input
                       type="date"
-                      className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200"
+                      className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-950 transition-all duration-200"
                       value={to}
                       onChange={(e) => setTo(e.target.value)}
                     />
@@ -172,14 +172,14 @@ const StackTraceBySku = ({ skuToTrace }) => {
                 {/* Limit */}
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-700 flex items-center gap-1">
-                    <Filter className="w-4 h-4 text-blue-500" />
+                    <Filter className="w-4 h-4 text-blue-950" />
                     Limit
                   </label>
                   <input
                     type="number"
                     min={1}
                     max={500}
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-950 transition-all duration-200"
                     value={limit}
                     onChange={(e) => setLimit(Number(e.target.value))}
                   />
@@ -189,7 +189,7 @@ const StackTraceBySku = ({ skuToTrace }) => {
                 <div className="flex items-end gap-2 lg:col-span-2">
                   <button
                     type="submit"
-                    className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 text-white py-2.5 rounded-xl font-medium hover:from-blue-700 hover:to-blue-800 transition-all duration-200 flex items-center justify-center gap-2 shadow-lg shadow-blue-500/25"
+                    className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 text-white py-2.5 rounded-xl font-medium hover:from-blue-700 hover:to-blue-800 transition-all duration-200 flex items-center justify-center gap-2 shadow-lg shadow-blue-950/25"
                   >
                     <Filter className="w-5 h-5" />
                     Terapkan Filter
@@ -292,7 +292,7 @@ const StackTraceBySku = ({ skuToTrace }) => {
                               );
                             case "spawn":
                               return (
-                                <PackagePlus className="w-4 h-4 text-blue-500" />
+                                <PackagePlus className="w-4 h-4 text-blue-950" />
                               );
                             default:
                               return (
@@ -334,7 +334,7 @@ const StackTraceBySku = ({ skuToTrace }) => {
                             <td className="px-6 py-4 whitespace-nowrap">
                               <div className="flex flex-col">
                                 <div className="flex gap-2">
-                                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white shadow-sm group-hover:scale-110 transition-transform">
+                                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-950 to-blue-600 flex items-center justify-center text-white shadow-sm group-hover:scale-110 transition-transform">
                                     <Package className="w-4 h-4" />
                                   </div>
                                   <span className="font-medium text-blue-700">

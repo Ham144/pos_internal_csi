@@ -247,7 +247,7 @@ const AllAccounts = () => {
       <div className="bg-white rounded-2xl shadow-xl border border-blue-100 mb-6 p-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg shadow-blue-500/25">
+            <div className="p-3 bg-gradient-to-br from-blue-950 to-blue-600 rounded-xl shadow-lg shadow-blue-950/25">
               <Shield className="w-8 h-8 text-white" />
             </div>
             <div>
@@ -262,7 +262,7 @@ const AllAccounts = () => {
 
           {/* Stats Cards */}
           <div className="flex gap-3">
-            <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl px-4 py-2 text-white shadow-lg">
+            <div className="bg-gradient-to-br from-blue-950 to-blue-600 rounded-xl px-4 py-2 text-white shadow-lg">
               <p className="text-xs text-blue-100">Total Akun</p>
               <p className="text-xl font-bold">{filteredAccounts.length}</p>
             </div>
@@ -302,7 +302,7 @@ const AllAccounts = () => {
                       setSelectedUser(null);
                       document.getElementById("newAccount").showModal();
                     }}
-                    className="btn bg-gradient-to-r from-blue-600 to-blue-700 text-white border-0 hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-500/25"
+                    className="btn bg-gradient-to-r from-blue-600 to-blue-700 text-white border-0 hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-950/25"
                   >
                     <UserPlus className="w-5 h-5 mr-2" />
                     Initialize New Account
@@ -314,7 +314,7 @@ const AllAccounts = () => {
                     <select
                       value={selectedRole}
                       onChange={(e) => setSelectedRole(e.target.value)}
-                      className="pl-10 pr-8 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200 appearance-none bg-white"
+                      className="pl-10 pr-8 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-950 transition-all duration-200 appearance-none bg-white"
                     >
                       <option value="all">Semua Role</option>
                       {uniqueRoles.map((role) => (
@@ -337,7 +337,7 @@ const AllAccounts = () => {
                   </button>
 
                   {/* Total Badge */}
-                  <div className="badge badge-lg bg-gradient-to-r from-blue-500 to-blue-600 text-white border-0 px-4 py-3">
+                  <div className="badge badge-lg bg-gradient-to-r from-blue-950 to-blue-600 text-white border-0 px-4 py-3">
                     <Filter className="w-4 h-4 mr-2" />
                     Total: {filteredAccounts.length}
                   </div>
@@ -401,7 +401,7 @@ const AllAccounts = () => {
                     >
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white shadow-sm group-hover:scale-110 transition-transform">
+                          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-950 to-blue-600 flex items-center justify-center text-white shadow-sm group-hover:scale-110 transition-transform">
                             <Shield className="w-4 h-4" />
                           </div>
                           <span className="font-medium text-gray-800">
@@ -566,7 +566,7 @@ const AllAccounts = () => {
                   {/* Username (Disabled) */}
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                      <Shield className="w-4 h-4 text-blue-500" />
+                      <Shield className="w-4 h-4 text-blue-950" />
                       Username
                       <div
                         className="tooltip tooltip-bottom"
@@ -586,7 +586,7 @@ const AllAccounts = () => {
                   {/* Kode Kasir */}
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                      <Key className="w-4 h-4 text-blue-500" />
+                      <Key className="w-4 h-4 text-blue-950" />
                       Kode Kasir
                       <span className="badge badge-info text-xs">
                         Max 3 karakter
@@ -595,7 +595,7 @@ const AllAccounts = () => {
                     <input
                       type="text"
                       maxLength={3}
-                      className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200 uppercase"
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-950 transition-all duration-200 uppercase"
                       value={selectedUser.kodeKasir || ""}
                       onChange={(e) =>
                         setSelectedUser((prev) => ({
@@ -614,13 +614,13 @@ const AllAccounts = () => {
                   {/* Password */}
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                      <Lock className="w-4 h-4 text-blue-500" />
+                      <Lock className="w-4 h-4 text-blue-950" />
                       Password
                     </label>
                     <div className="relative">
                       <input
                         type={showPassword ? "text" : "password"}
-                        className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200"
+                        className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-950 transition-all duration-200"
                         value={selectedUser.password || ""}
                         onChange={(e) =>
                           setSelectedUser((prev) => ({
@@ -647,12 +647,12 @@ const AllAccounts = () => {
                   {/* Email */}
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                      <Mail className="w-4 h-4 text-blue-500" />
+                      <Mail className="w-4 h-4 text-blue-950" />
                       Email
                     </label>
                     <input
                       type="email"
-                      className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200"
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-950 transition-all duration-200"
                       value={selectedUser.email || ""}
                       onChange={(e) =>
                         setSelectedUser((prev) => ({
@@ -667,12 +667,12 @@ const AllAccounts = () => {
                   {/* Telepon */}
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                      <Phone className="w-4 h-4 text-blue-500" />
+                      <Phone className="w-4 h-4 text-blue-950" />
                       Telepon
                     </label>
                     <input
                       type="text"
-                      className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200"
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-950 transition-all duration-200"
                       value={selectedUser.telepon || ""}
                       onChange={(e) =>
                         setSelectedUser((prev) => ({
@@ -687,12 +687,12 @@ const AllAccounts = () => {
                   {/* Target Harga */}
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                      <Target className="w-4 h-4 text-blue-500" />
+                      <Target className="w-4 h-4 text-blue-950" />
                       Target Harga Penjualan
                     </label>
                     <input
                       type="number"
-                      className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200"
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-950 transition-all duration-200"
                       value={selectedUser.targetHargaPenjualan || ""}
                       onChange={(e) =>
                         setSelectedUser((prev) => ({
@@ -707,12 +707,12 @@ const AllAccounts = () => {
                   {/* Target Quantity */}
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                      <Target className="w-4 h-4 text-blue-500" />
+                      <Target className="w-4 h-4 text-blue-950" />
                       Target Quantity Penjualan
                     </label>
                     <input
                       type="number"
-                      className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200"
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-950 transition-all duration-200"
                       value={selectedUser.targetQuantityPenjualan || ""}
                       onChange={(e) =>
                         setSelectedUser((prev) => ({
@@ -728,11 +728,11 @@ const AllAccounts = () => {
                   {/* Outlet */}
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                      <Store className="w-4 h-4 text-blue-500" />
+                      <Store className="w-4 h-4 text-blue-950" />
                       Outlet
                     </label>
                     <select
-                      className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200 appearance-none bg-white"
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-950 transition-all duration-200 appearance-none bg-white"
                       value={selectedUser.outlet || ""}
                       onChange={(e) => {
                         const newOutletId = e.target.value;
@@ -763,12 +763,12 @@ const AllAccounts = () => {
                     <>
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                          <Shield className="w-4 h-4 text-blue-500" />
+                          <Shield className="w-4 h-4 text-blue-950" />
                           Role Name
                         </label>
                         <input
                           type="text"
-                          className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200 uppercase"
+                          className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-950 transition-all duration-200 uppercase"
                           value={selectedUser.roleName?.toUpperCase() || ""}
                           onChange={(e) =>
                             setSelectedUser((prev) => ({
@@ -784,7 +784,7 @@ const AllAccounts = () => {
                       <div className="space-y-4 pt-2">
                         <div className="bg-gradient-to-r from-blue-50 to-white rounded-xl p-4 border border-blue-100">
                           <h3 className="text-sm font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                            <Lock className="w-4 h-4 text-blue-500" />
+                            <Lock className="w-4 h-4 text-blue-950" />
                             Blocked Access By Page
                           </h3>
                           <div className="space-y-2 max-h-48 overflow-y-auto">

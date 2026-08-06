@@ -638,7 +638,7 @@ const Diskon = () => {
                     type="text"
                     name="judulDiskon"
                     placeholder="Contoh: Diskon 11.11"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-950 focus:border-blue-950"
                     value={
                       iseditingDiskon
                         ? selectedDiskon?.judulDiskon
@@ -666,7 +666,7 @@ const Diskon = () => {
                   <textarea
                     name="description"
                     placeholder="Penjelasan atau Deskripsi Ketentuan untuk diskon untuk keterangan pada penerima"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 h-24"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-950 focus:border-blue-950 h-24"
                     value={
                       iseditingDiskon
                         ? selectedDiskon?.description
@@ -695,7 +695,7 @@ const Diskon = () => {
                     <input
                       type="date"
                       name="berlakuDari"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-950 focus:border-blue-950"
                       value={
                         iseditingDiskon
                           ? (selectedDiskon?.berlakuDari &&
@@ -725,7 +725,7 @@ const Diskon = () => {
                     <input
                       type="date"
                       name="berlakuHingga"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-950 focus:border-blue-950"
                       value={
                         iseditingDiskon
                           ? selectedDiskon?.berlakuHingga &&
@@ -756,7 +756,7 @@ const Diskon = () => {
                   </label>
                   <div className="flex gap-2 items-center">
                     <select
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-950 focus:border-blue-950"
                       value={
                         iseditingDiskon
                           ? selectedDiskon?.RpPotonganHarga?.$numberDecimal
@@ -859,7 +859,7 @@ const Diskon = () => {
                         }}
                         name="RpPotonganHarga"
                         placeholder="Contoh: 10,000"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-950 focus:border-blue-950"
                       />
                     </div>
                   ) : (
@@ -909,7 +909,7 @@ const Diskon = () => {
                         }}
                         name="percentPotonganHarga"
                         placeholder="Contoh: 8"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-950 focus:border-blue-950"
                       />
                       <span className="text-xs text-gray-500 mt-1">
                         Masukkan nilai 1-99
@@ -927,7 +927,7 @@ const Diskon = () => {
                     type="text"
                     name="skuTanpaSyarat"
                     placeholder="Klik untuk memilih produk"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-950 focus:border-blue-950"
                     onClick={() => {
                       document.getElementById("pickdiskon").showModal();
                       iseditingDiskon
@@ -1004,7 +1004,7 @@ const Diskon = () => {
                     inputMode="numeric"
                     name="quantityTersedia"
                     placeholder="Contoh: 10"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-950 focus:border-blue-950"
                   />
                 </div>
               </form>

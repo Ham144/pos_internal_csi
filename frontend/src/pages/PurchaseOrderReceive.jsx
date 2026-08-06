@@ -97,7 +97,7 @@ const PurchaseOrderReceive = () => {
     onError: (error) => {
       console.log("Error dari onError:", error); // Debugging
       toast.error(error?.response?.data?.message || "Gagal mengupdate item");
-    },  
+    },
   });
   const handlePickItem = (item) => {
     document.getElementById("editItemModal").showModal();
@@ -133,7 +133,7 @@ const PurchaseOrderReceive = () => {
                             ${
                               currentForm === "Erp"
                                 ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                                : "bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-500/25"
+                                : "bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-950/25"
                             }`}
             >
               <StepBack className="w-5 h-5" />
@@ -168,7 +168,7 @@ const PurchaseOrderReceive = () => {
                               (currentForm === "Erp" && !Erp) ||
                               (currentForm === "barcode" && !barcode)
                                 ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                                : "bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-500/25"
+                                : "bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-950/25"
                             }`}
             >
               {currentForm === "Erp" ? "Cari PO" : "Scan Barcode"}
@@ -191,7 +191,7 @@ const PurchaseOrderReceive = () => {
                     htmlFor="Erp"
                     className="text-sm font-medium text-gray-700 flex items-center gap-2"
                   >
-                    <Package className="w-4 h-4 text-blue-500" />
+                    <Package className="w-4 h-4 text-blue-950" />
                     Purchase Code (ERP)
                   </label>
                   <div className="relative">
@@ -202,7 +202,7 @@ const PurchaseOrderReceive = () => {
                       value={Erp}
                       onChange={(e) => setErp(e.target.value)}
                       placeholder="Masukkan kode Purchase Order"
-                      className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200"
+                      className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-950 transition-all duration-200"
                       autoFocus
                     />
                   </div>
@@ -213,7 +213,7 @@ const PurchaseOrderReceive = () => {
                     htmlFor="plat"
                     className="text-sm font-medium text-gray-700 flex items-center gap-2"
                   >
-                    <Truck className="w-4 h-4 text-blue-500" />
+                    <Truck className="w-4 h-4 text-blue-950" />
                     Plat Kendaraan (Opsional)
                   </label>
                   <div className="relative">
@@ -224,7 +224,7 @@ const PurchaseOrderReceive = () => {
                       value={plat}
                       onChange={(e) => setPlat(e.target.value)}
                       placeholder="Contoh: B 1234 XYZ"
-                      className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200"
+                      className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-950 transition-all duration-200"
                     />
                   </div>
                 </div>
@@ -249,7 +249,7 @@ const PurchaseOrderReceive = () => {
                   htmlFor="barcodeScanner"
                   className="text-sm font-medium text-gray-700 flex items-center gap-2"
                 >
-                  <Barcode className="w-4 h-4 text-blue-500" />
+                  <Barcode className="w-4 h-4 text-blue-950" />
                   Scan Barcode Item
                   <span className="badge badge-warning gap-1 ml-2">
                     <AlertCircle className="w-3 h-3" />
@@ -264,7 +264,7 @@ const PurchaseOrderReceive = () => {
                     onChange={(e) => setBarcode(e.target.value)}
                     type="text"
                     placeholder="Arahkan scanner barcode ke sini"
-                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-950 transition-all duration-200"
                     autoFocus
                   />
                 </div>
@@ -339,7 +339,7 @@ const PurchaseOrderReceive = () => {
                                 <div className="flex items-center gap-2">
                                   <div
                                     className={`w-8 h-8 rounded-lg flex items-center justify-center
-                                                                    ${isComplete ? "bg-green-100" : "bg-gradient-to-br from-blue-500 to-blue-600 text-white"}`}
+                                                                    ${isComplete ? "bg-green-100" : "bg-gradient-to-br from-blue-950 to-blue-600 text-white"}`}
                                   >
                                     {isComplete ? (
                                       <CheckCircle className="w-4 h-4 text-green-600" />
@@ -426,7 +426,7 @@ const PurchaseOrderReceive = () => {
                   </div>
                   <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transition-all duration-300"
+                      className="h-full bg-gradient-to-r from-blue-950 to-blue-600 rounded-full transition-all duration-300"
                       style={{
                         width: `${(searchResult.items.filter((i) => i.request === i.received).length / searchResult.items.length) * 100}%`,
                       }}

@@ -165,7 +165,7 @@ const ReportBubble = () => {
                   name="title"
                   value={formData.title}
                   onChange={handleChange}
-                  className="input input-bordered w-full border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 bg-white/50 backdrop-blur-sm"
+                  className="input input-bordered w-full border-gray-200 focus:border-blue-950 focus:ring-2 focus:ring-blue-200 transition-all duration-200 bg-white/50 backdrop-blur-sm"
                   placeholder="Contoh: Error saat mencetak invoice"
                 />
                 <label className="label">
@@ -188,7 +188,7 @@ const ReportBubble = () => {
                   name="description"
                   value={formData.description}
                   onChange={handleChange}
-                  className="textarea textarea-bordered w-full border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 bg-white/50 backdrop-blur-sm min-h-[120px]"
+                  className="textarea textarea-bordered w-full border-gray-200 focus:border-blue-950 focus:ring-2 focus:ring-blue-200 transition-all duration-200 bg-white/50 backdrop-blur-sm min-h-[120px]"
                   placeholder="Jelaskan secara detail masalah yang Anda alami... 
 • saat melakukan apa?
 • URL nya?
@@ -201,7 +201,7 @@ const ReportBubble = () => {
               <div className="form-control">
                 <label className="label">
                   <span className="label-text font-medium text-gray-700 flex items-center gap-2">
-                    <File className="w-4 h-4 text-blue-500" />
+                    <File className="w-4 h-4 text-blue-950" />
                     Lampiran Gambar
                   </span>
                 </label>
@@ -236,7 +236,7 @@ const ReportBubble = () => {
                       <p className="text-xs text-gray-500 mt-1 text-center">
                         Format: JPG, PNG, GIF, WEBP • Maks. 5MB
                       </p>
-                      <p className="text-xs text-blue-500 mt-2">
+                      <p className="text-xs text-blue-950 mt-2">
                         💡 Screenshot akan membantu kami lebih cepat memahami
                         masalah
                       </p>
@@ -317,7 +317,7 @@ const ReportBubble = () => {
               </button>
               <button
                 type="submit"
-                className="btn bg-gradient-to-r from-blue-600 to-blue-700 text-white border-0 hover:from-blue-700 hover:to-blue-800 gap-2 shadow-lg shadow-blue-500/25"
+                className="btn bg-gradient-to-r from-blue-600 to-blue-700 text-white border-0 hover:from-blue-700 hover:to-blue-800 gap-2 shadow-lg shadow-blue-950/25"
                 disabled={isLoading}
               >
                 {isLoading ? (

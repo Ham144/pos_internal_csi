@@ -74,7 +74,7 @@ const BrandList = () => {
           <input
             type="text"
             placeholder="Search brands..."
-            className="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-950"
             onChange={(e) => setSearch(e.target.value)}
             value={search}
           />
@@ -204,7 +204,7 @@ const BrandList = () => {
                 <div className="pt-4 flex justify-end">
                   <button
                     onClick={() => handleEditClick(selectedSku)}
-                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
+                    className="bg-blue-950 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
                   >
                     Edit in Item Library
                   </button>

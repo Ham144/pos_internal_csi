@@ -107,8 +107,8 @@ export default function Login({ className, ...props }) {
     >
       {/* Background Pattern */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-400 rounded-full opacity-20 blur-3xl"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-300 rounded-full opacity-20 blur-3xl"></div>
+        <div className="absolute -top-40 -right-40 w-80 h-80  rounded-full opacity-20 blur-3xl"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 rounded-full opacity-20 blur-3xl"></div>
       </div>
 
       {/* Login Card */}
@@ -125,8 +125,8 @@ export default function Login({ className, ...props }) {
               <div className="relative group">
                 <div className="absolute inset-0 bg-blue-400 rounded-2xl blur-xl opacity-50 group-hover:opacity-75 transition-opacity"></div>
                 <img
-                  src="/csi-logo2.png"
-                  alt="Catur Pos Logo"
+                  src="/internal-pos.png"
+                  alt="Internal POS CSI Logo"
                   width={120}
                   height={120}
                   className="relative rounded-2xl bg-white p-2 shadow-xl transform transition-all duration-300 group-hover:scale-110 group-hover:-translate-y-1"
@@ -167,11 +167,11 @@ export default function Login({ className, ...props }) {
                   htmlFor="username"
                   className="text-sm font-medium text-gray-700 flex items-center gap-2"
                 >
-                  <User className="w-4 h-4 text-blue-500" />
+                  <User className="w-4 h-4 text-blue-950" />
                   Username
                 </Label>
                 <div className="relative group">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 " />
                   <Input
                     id="username"
                     value={username}
@@ -180,7 +180,7 @@ export default function Login({ className, ...props }) {
                     placeholder="Masukkan username Anda"
                     required
                     disabled={isPending || isVerifying}
-                    className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200 bg-white/50 backdrop-blur-sm"
+                    className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-950 transition-all duration-200"
                   />
                 </div>
               </div>
@@ -191,11 +191,11 @@ export default function Login({ className, ...props }) {
                   htmlFor="password"
                   className="text-sm font-medium text-gray-700 flex items-center gap-2"
                 >
-                  <Lock className="w-4 h-4 text-blue-500" />
+                  <Lock className="w-4 h-4 text-blue-950" />
                   Password
                 </Label>
                 <div className="relative group">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-blue-950 transition-colors" />
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
@@ -204,7 +204,7 @@ export default function Login({ className, ...props }) {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     disabled={isPending || isVerifying}
-                    className="w-full pl-10 pr-12 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200 bg-white/50 backdrop-blur-sm"
+                    className="w-full pl-10 pr-12 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-950 transition-all duration-200 "
                   />
                   <button
                     type="button"
@@ -224,7 +224,7 @@ export default function Login({ className, ...props }) {
               <Button
                 type="submit"
                 disabled={isPending || isVerifying}
-                className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg shadow-blue-500/25 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg shadow-blue-950/25 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {isVerifying ? (
                   <>
@@ -250,7 +250,7 @@ export default function Login({ className, ...props }) {
         {/* Footer */}
         <div className="px-8 py-4 border-t border-gray-100 bg-gray-50/50">
           <p className="text-xs text-center text-gray-500">
-            © 2024 Catur Pos. All rights reserved.
+            © 2024 Internal POS CSI. All rights reserved.
           </p>
         </div>
       </Card>

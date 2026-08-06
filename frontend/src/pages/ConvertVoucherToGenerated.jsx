@@ -37,7 +37,7 @@ export default function ConvertVoucherToGenerated() {
     onError: (e) => {
       setError(e?.response?.data?.message);
       toast.error(
-        e?.response?.data?.message || "Gagal konversi, terjadi kesalahan"
+        e?.response?.data?.message || "Gagal konversi, terjadi kesalahan",
       );
     },
   });
@@ -114,7 +114,7 @@ export default function ConvertVoucherToGenerated() {
                 value={formData.email} // Menggunakan formData.email
                 type="email"
                 placeholder="Masukkan email Anda"
-                className="input input-bordered w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="input input-bordered w-full focus:outline-none focus:ring-2 focus:ring-blue-950"
                 required // Menjadikan field ini wajib diisi
               />
             </div>

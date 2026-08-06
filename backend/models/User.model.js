@@ -12,13 +12,6 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    email: {
-      type: String,
-      required: true,
-    },
-    telepon: {
-      type: String,
-    },
     otp: {
       type: Number,
     },
@@ -51,9 +44,10 @@ const userSchema = new mongoose.Schema(
     },
     kodeKasir: {
       type: String,
+      unique: true,
     }, //3 huruf random dari usernamenya exp: HM1 krn username yafizham
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const UserRefrensi = new mongoose.model("UserRefrensi", userSchema);

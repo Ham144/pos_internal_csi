@@ -1,8 +1,10 @@
-const DEV_URL = "http://192.168.169.12:3000";
-const PROD_URL = import.meta.env.VITE_PROD_URL ?? "https://pos.mycsi.net";
+const PROD_URL = "https://internal-pos.mycsi.net";
+const DEV_URL = "http://172.20.78.248:5173";
 
-export const NODE_ENV = "production";
-// export let NODE_ENV = "development";
+export const NODE_ENV = window.location.hostname.endsWith("pos.mycsi.net")
+  ? "production"
+  : "development";
+
 export const buildNumber = "1000";
 
 if (import.meta.env.VITE_DEMO) {
@@ -153,7 +155,7 @@ export const mockBackend = [
   },
   {
     originalPath: "/api/v1/auth/loginMobile",
-    description: "API untuk login ke App mobile Catur POS",
+    description: "API untuk login ke App mobile Internal POS CSI",
   },
   {
     originalPath: "/api/v1/auth/getUserById/:id",

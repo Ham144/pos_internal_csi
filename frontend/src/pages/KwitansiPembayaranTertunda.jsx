@@ -156,7 +156,7 @@ const KwitansiPembayaranTertunda = () => {
                     </span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <Mail className="w-4 h-4 text-blue-500" />
+                    <Mail className="w-4 h-4 text-blue-950" />
                     <span>
                       Memiliki email pelanggan (
                       <code className="bg-gray-100 px-1 rounded">customer</code>
@@ -201,7 +201,7 @@ const KwitansiPembayaranTertunda = () => {
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     placeholder="Kode Invoice atau Kasir..."
-                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-950 transition-all duration-200"
                   />
                   <button
                     type="submit"
@@ -218,7 +218,7 @@ const KwitansiPembayaranTertunda = () => {
                   Tampilkan
                 </label>
                 <select
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200 appearance-none bg-white"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-950 transition-all duration-200 appearance-none bg-white"
                   value={limit}
                   onChange={(e) => setLimit(Number(e.target.value))}
                 >
@@ -328,7 +328,7 @@ const KwitansiPembayaranTertunda = () => {
                           </td>
                           <td className="px-6 py-4">
                             <div className="flex items-center gap-2">
-                              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white shadow-sm">
+                              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-950 to-blue-600 flex items-center justify-center text-white shadow-sm">
                                 <FileText className="w-4 h-4" />
                               </div>
                               <span className="font-medium text-blue-700">
@@ -355,7 +355,7 @@ const KwitansiPembayaranTertunda = () => {
                             {invoice.customer ? (
                               <div>
                                 <div className="flex items-center gap-1">
-                                  <Mail className="w-4 h-4 text-blue-500" />
+                                  <Mail className="w-4 h-4 text-blue-950" />
                                   <span className="text-sm font-medium text-gray-800">
                                     {invoice.customer}
                                   </span>

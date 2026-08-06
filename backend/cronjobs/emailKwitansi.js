@@ -1,31 +1,15 @@
 // Import yang diperlukan
 import cron from "node-cron";
-import nodemailer from "nodemailer";
 import Outlet from "../models/Outlet.model.js";
 import Invoice from "../models/invoice.model.js";
 import formatCurrency from "../utils/formatCurrency.js";
-
-// Konfigurasi transporter email
-// Gunakan konfigurasi SMTP email Anda
-const transporter = nodemailer.createTransport({
-  service: process.env.EMAIL_SERVICE || undefined,
-  host: process.env.EMAIL_HOST,
-  port: Number(process.env.EMAIL_PORT) || 587,
-  secure: process.env.EMAIL_SECURE === "true",
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-  tls: {
-    // Mematikan verifikasi sertifikat jika terjadi masalah TLS
-    rejectUnauthorized: false,
-    ciphers: "SSLv3",
-  },
-  debug: true, // Aktifkan debugging untuk melihat detail koneksi
-});
+import {
+  createCurrentSmtpTransporter,
+  getEffectiveSystemConfig,
+} from "../utils/systemConfig.js";
 
 // Fungsi untuk mengirim email bukti pembayaran
-const sendKwitansiEmail = async (invoice) => {
+const sendKwitansiEmail = async (invoice, transporter, senderEmail) => {
   try {
     // Dapatkan informasi outlet dari kode invoice
     const kodeOutlet = invoice.kodeInvoice.slice(0, 2);
@@ -94,7 +78,7 @@ const sendKwitansiEmail = async (invoice) => {
 
     // Buat konten email dengan HTML
     const mailOptions = {
-      from: `"${outletDB.namaOutlet}" <${process.env.EMAIL_USER}>`,
+      from: `"${outletDB.namaOutlet}" <${senderEmail}>`,
       to: invoice.customer,
       subject: `Bukti Pembayaran - ${outletDB.namaOutlet} - ${invoice.kodeInvoice}`,
       html: `
@@ -167,6 +151,8 @@ const sendKwitansiEmail = async (invoice) => {
 const processUnsentInvoices = async () => {
   try {
     console.log("Memulai pengiriman bukti pembayaran melalui email...");
+    const transporter = await createCurrentSmtpTransporter();
+    const smtpConfig = await getEffectiveSystemConfig();
 
     // Ambil semua invoice yang sudah dibayar tapi belum dikirim email kwitansi
     const invoices = await Invoice.find({
@@ -192,7 +178,11 @@ const processUnsentInvoices = async () => {
       );
 
       // Kirim email kwitansi
-      const sent = await sendKwitansiEmail(invoice);
+      const sent = await sendKwitansiEmail(
+        invoice,
+        transporter,
+        smtpConfig.EMAIL_USER
+      );
 
       // Update status isPrintedKwitansi jika berhasil
       if (sent) {
@@ -231,6 +221,7 @@ const emailJob = cron.schedule(
 export const verifyEmailConnection = async () => {
   try {
     console.log("Verifikasi koneksi email...");
+    const transporter = await createCurrentSmtpTransporter();
     const verification = await transporter.verify();
     if (verification) {
       console.log("✅ Koneksi email berhasil terverifikasi!");
@@ -241,12 +232,7 @@ export const verifyEmailConnection = async () => {
     }
   } catch (error) {
     console.error("❌ Error saat verifikasi koneksi email:", error.message);
-    console.error("Detail error:", {
-      host: process.env.EMAIL_HOST,
-      port: process.env.EMAIL_PORT,
-      secure: process.env.EMAIL_SECURE,
-      error: error.stack,
-    });
+    console.error("Detail error:", { error: error.stack });
     return false;
   }
 };

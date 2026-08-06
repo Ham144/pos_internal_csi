@@ -200,7 +200,7 @@ const ModalNewAccount = () => {
               </form>
               <button
                 type="submit"
-                className="px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-200 font-medium flex items-center gap-2 shadow-lg shadow-blue-500/25"
+                className="px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-200 font-medium flex items-center gap-2 shadow-lg shadow-blue-950/25"
               >
                 <Save className="w-5 h-5" />
                 Create Account
@@ -209,7 +209,7 @@ const ModalNewAccount = () => {
             {/* Username */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                <User className="w-4 h-4 text-blue-500" />
+                <User className="w-4 h-4 text-blue-950" />
                 Username
                 <span className="text-red-500">*</span>
               </label>
@@ -221,7 +221,7 @@ const ModalNewAccount = () => {
                   value={newAccount.username}
                   onChange={handleChange}
                   required
-                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-950 transition-all duration-200"
                   placeholder="Masukkan username"
                 />
               </div>
@@ -230,7 +230,7 @@ const ModalNewAccount = () => {
             {/* Password */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                <Lock className="w-4 h-4 text-blue-500" />
+                <Lock className="w-4 h-4 text-blue-950" />
                 Password
                 <span className="text-red-500">*</span>
               </label>
@@ -242,7 +242,7 @@ const ModalNewAccount = () => {
                   value={newAccount.password}
                   onChange={handleChange}
                   required
-                  className="w-full pl-10 pr-12 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200"
+                  className="w-full pl-10 pr-12 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-950 transition-all duration-200"
                   placeholder="Masukkan password"
                 />
                 <button
@@ -262,7 +262,7 @@ const ModalNewAccount = () => {
             {/* Email */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                <Mail className="w-4 h-4 text-blue-500" />
+                <Mail className="w-4 h-4 text-blue-950" />
                 Email
                 <span className="text-red-500">*</span>
               </label>
@@ -274,7 +274,7 @@ const ModalNewAccount = () => {
                   value={newAccount.email}
                   onChange={handleChange}
                   required
-                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-950 transition-all duration-200"
                   placeholder="user@example.com"
                 />
               </div>
@@ -283,7 +283,7 @@ const ModalNewAccount = () => {
             {/* Telepon */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                <Phone className="w-4 h-4 text-blue-500" />
+                <Phone className="w-4 h-4 text-blue-950" />
                 Telepon
                 <span className="badge badge-soft badge-info text-xs">
                   Opsional
@@ -296,7 +296,7 @@ const ModalNewAccount = () => {
                   name="telepon"
                   value={newAccount.telepon}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-950 transition-all duration-200"
                   placeholder="08123456789"
                 />
               </div>
@@ -305,7 +305,7 @@ const ModalNewAccount = () => {
             {/* Target Harga */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                <Target className="w-4 h-4 text-blue-500" />
+                <Target className="w-4 h-4 text-blue-950" />
                 Target Harga Penjualan
                 <span className="badge badge-soft badge-info text-xs">
                   Opsional
@@ -319,7 +319,7 @@ const ModalNewAccount = () => {
                   value={newAccount.targetHargaPenjualan}
                   onChange={handleChange}
                   min={0}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-950 transition-all duration-200"
                   placeholder="Masukkan target harga"
                 />
               </div>
@@ -329,7 +329,7 @@ const ModalNewAccount = () => {
             {/* Target Quantity */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                <Target className="w-4 h-4 text-blue-500" />
+                <Target className="w-4 h-4 text-blue-950" />
                 Target Quantity Penjualan
                 <span className="badge badge-soft badge-info text-xs">
                   Opsional
@@ -343,7 +343,7 @@ const ModalNewAccount = () => {
                   value={newAccount.targetQuantityPenjualan}
                   onChange={handleChange}
                   min={0}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-950 transition-all duration-200"
                   placeholder="Masukkan target quantity"
                 />
               </div>
@@ -353,7 +353,7 @@ const ModalNewAccount = () => {
             {/* Outlet */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                <Store className="w-4 h-4 text-blue-500" />
+                <Store className="w-4 h-4 text-blue-950" />
                 Outlet
                 <span className="badge badge-soft badge-info text-xs">
                   Opsional
@@ -370,7 +370,7 @@ const ModalNewAccount = () => {
                       outletId: e.target.value,
                     }))
                   }
-                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200 appearance-none bg-white"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-950 transition-all duration-200 appearance-none bg-white"
                 >
                   <option value="">Pilih Outlet</option>
                   {outletList?.data?.map((outlet) => (
@@ -386,7 +386,7 @@ const ModalNewAccount = () => {
             {/* Role Name */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                <Shield className="w-4 h-4 text-blue-500" />
+                <Shield className="w-4 h-4 text-blue-950" />
                 Role Name
                 <span className="text-red-500">*</span>
                 <span className="badge badge-soft badge-info text-xs">
@@ -401,7 +401,7 @@ const ModalNewAccount = () => {
                   value={newAccount.roleName}
                   onChange={handleChange}
                   required
-                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-950 transition-all duration-200"
                   placeholder="ADMIN / MANAGER / KASIR / SPG"
                 />
               </div>
@@ -410,7 +410,7 @@ const ModalNewAccount = () => {
             {/* Kode Kasir */}
             <div className="space-y-2 md:col-span-2">
               <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                <Key className="w-4 h-4 text-blue-500" />
+                <Key className="w-4 h-4 text-blue-950" />
                 Kode Kasir
                 <span className="badge badge-soft badge-warning text-xs">
                   Max 3 karakter
@@ -428,12 +428,12 @@ const ModalNewAccount = () => {
                     value={newAccount.kodeKasir}
                     onChange={handleChange}
                     maxLength={3}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200 uppercase"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-950 transition-all duration-200 uppercase"
                     placeholder="ADM"
                   />
                 </div>
                 <div className="flex items-center text-sm text-gray-500 bg-gray-50 px-4 rounded-xl border border-gray-200">
-                  <Info className="w-4 h-4 mr-2 text-blue-500" />
+                  <Info className="w-4 h-4 mr-2 text-blue-950" />
                   Akan dibuat otomatis jika tidak diisi
                 </div>
               </div>

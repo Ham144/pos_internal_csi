@@ -2,9 +2,12 @@ import { Router } from "express";
 import { runManualEmailJob } from "../cronjobs/index.js";
 import { verifyEmailConnection } from "../cronjobs/emailKwitansi.js";
 import nodemailer from "nodemailer";
-import fs from "fs";
-import path from "path";
-import dotenv from "dotenv";
+import {
+  createCurrentSmtpTransporter,
+  deleteSystemConfig,
+  getPublicSystemConfig,
+  saveSystemConfig,
+} from "../utils/systemConfig.js";
 
 const router = Router();
 
@@ -19,7 +22,7 @@ router.post("/run-email-kwitansi-job", async (req, res) => {
       return res.status(500).json({
         success: false,
         message:
-          "Konfigurasi email tidak valid. Periksa pengaturan SMTP di .env",
+          "Konfigurasi email tidak valid. Periksa pengaturan SMTP di database",
       });
     }
 
@@ -56,7 +59,7 @@ router.get("/verify-email-connection", async (req, res) => {
       success: isValid,
       message: isValid
         ? "Koneksi email berhasil terverifikasi"
-        : "Koneksi email gagal terverifikasi. Periksa pengaturan SMTP di .env",
+        : "Koneksi email gagal terverifikasi. Periksa pengaturan SMTP di database",
     });
   } catch (error) {
     return res.status(500).json({
@@ -133,7 +136,7 @@ router.post("/test-email-connection", async (req, res) => {
   }
 });
 
-// Route untuk testing koneksi Outlook365 (menggunakan kredensial dari .env)
+// Route untuk testing koneksi Outlook365 (menggunakan kredensial dari database)
 router.post("/test-outlook-connection", async (req, res) => {
   const { to } = req.body;
 
@@ -145,31 +148,11 @@ router.post("/test-outlook-connection", async (req, res) => {
   }
 
   try {
-    // Buat transporter untuk Outlook365
-    const outlookTransporter = nodemailer.createTransport({
-      service: process.env.EMAIL_SERVICE,
-      host: process.env.EMAIL_HOST,
-      port: Number(process.env.EMAIL_PORT),
-      secure: process.env.EMAIL_SECURE === "true",
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
-      tls: {
-        rejectUnauthorized: false,
-        ciphers: "SSLv3",
-      },
-      debug: true,
-    });
+    // Buat transporter dari konfigurasi yang tersimpan di database
+    const outlookTransporter = await createCurrentSmtpTransporter();
 
     console.log("Verifikasi koneksi Outlook365...");
-    console.log({
-      service: process.env.EMAIL_SERVICE,
-      host: process.env.EMAIL_HOST,
-      port: process.env.EMAIL_PORT,
-      secure: process.env.EMAIL_SECURE === "true",
-      user: process.env.EMAIL_USER,
-    });
+    console.log("Konfigurasi SMTP diambil dari database");
 
     // Verifikasi koneksi
     const isConnected = await outlookTransporter.verify();
@@ -183,25 +166,26 @@ router.post("/test-outlook-connection", async (req, res) => {
     }
 
     // Kirim email test
+    const currentConfig = await getPublicSystemConfig();
     const info = await outlookTransporter.sendMail({
-      from: `"Test CATUR POS" <${process.env.EMAIL_USER}>`,
+      from: `"Test Internal POS CSI" <${currentConfig.user}>`,
       to,
-      subject: "Test Email dari CATUR POS",
+      subject: "Test Email dari Internal POS CSI",
       text: "Ini adalah email test menggunakan Outlook",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px;">
-          <h1>Test Email CATUR POS</h1>
-          <p>Jika Anda menerima email ini, berarti konfigurasi SMTP Outlook365 di server CATUR POS Anda berhasil!</p>
+          <h1>Test Email Internal POS CSI</h1>
+          <p>Jika Anda menerima email ini, berarti konfigurasi SMTP Outlook365 di server Internal POS CSI Anda berhasil!</p>
           <p>Detail konfigurasi:</p>
           <ul>
-            <li>Host: ${process.env.EMAIL_HOST}</li>
-            <li>Port: ${process.env.EMAIL_PORT}</li>
-            <li>Service: ${process.env.EMAIL_SERVICE}</li>
-            <li>User: ${process.env.EMAIL_USER}</li>
+            <li>Host: ${currentConfig.host}</li>
+            <li>Port: ${currentConfig.port}</li>
+            <li>Service: ${currentConfig.service || "-"}</li>
+            <li>User: ${currentConfig.user}</li>
           </ul>
           <p style="color: #777; font-size: 12px; margin-top: 30px; text-align: center;">
             Email ini dikirim secara otomatis melalui sistem POS. ${new Date().toLocaleString(
-              "id-ID"
+              "id-ID",
             )}
           </p>
         </div>
@@ -214,7 +198,7 @@ router.post("/test-outlook-connection", async (req, res) => {
       details: {
         messageId: info.messageId,
         to: to,
-        from: process.env.EMAIL_USER,
+        from: currentConfig.user,
       },
     });
   } catch (error) {
@@ -228,63 +212,39 @@ router.post("/test-outlook-connection", async (req, res) => {
   }
 });
 
-// Route untuk menyimpan konfigurasi email ke file .env
+// Route untuk menyimpan konfigurasi email ke database
 router.post("/save-email-config", async (req, res) => {
-  const { host, port, secure, service, user, pass } = req.body;
+  const { host, port, secure, service, user, pass, passDownloadApk } = req.body;
 
-  if (!host || !port || !user || !pass) {
+  if (!host || !port || !user) {
     return res.status(400).json({
       success: false,
-      message: "Semua parameter (host, port, user, pass) diperlukan",
+      message: "Parameter (host, port, user) diperlukan",
     });
   }
 
   try {
-    // Baca file .env
-    const envPath = path.resolve(process.cwd(), ".env");
-    const envContent = fs.readFileSync(envPath, "utf-8");
-
-    // Ambil semua variabel yang ada dari file .env
-    const envConfig = dotenv.parse(envContent);
-
-    // Update konfigurasi email
-    envConfig.EMAIL_HOST = host;
-    envConfig.EMAIL_PORT = port;
-    envConfig.EMAIL_SECURE = secure ? "true" : "false";
-    envConfig.EMAIL_USER = user;
-    envConfig.EMAIL_PASS = pass;
-
-    if (service) {
-      envConfig.EMAIL_SERVICE = service;
-    }
-
-    // Format ulang file .env
-    const newEnvContent = Object.entries(envConfig)
-      .map(([key, val]) => `${key}="${val}"`)
-      .join("\n");
-
-    // Simpan perubahan ke file .env
-    fs.writeFileSync(envPath, newEnvContent);
-
-    // Perbarui variabel lingkungan yang sedang berjalan
-    process.env.EMAIL_HOST = host;
-    process.env.EMAIL_PORT = port;
-    process.env.EMAIL_SECURE = secure ? "true" : "false";
-    process.env.EMAIL_USER = user;
-    process.env.EMAIL_PASS = pass;
-    if (service) {
-      process.env.EMAIL_SERVICE = service;
-    }
+    const savedConfig = await saveSystemConfig({
+      EMAIL_HOST: host,
+      EMAIL_PORT: port,
+      EMAIL_SECURE: secure,
+      EMAIL_USER: user,
+      EMAIL_PASS: pass,
+      EMAIL_SERVICE: service,
+      PASS_DOWNLOAD_APK: passDownloadApk,
+    });
 
     return res.status(200).json({
       success: true,
-      message: "Konfigurasi email berhasil disimpan",
+      message: "Konfigurasi berhasil disimpan ke database",
       config: {
-        host,
-        port,
-        secure,
-        service: service || undefined,
-        user,
+        host: savedConfig.EMAIL_HOST,
+        port: String(savedConfig.EMAIL_PORT),
+        secure: savedConfig.EMAIL_SECURE,
+        service: savedConfig.EMAIL_SERVICE || undefined,
+        user: savedConfig.EMAIL_USER,
+        hasEmailPass: Boolean(savedConfig.EMAIL_PASS),
+        hasDownloadApkPass: Boolean(savedConfig.PASS_DOWNLOAD_APK),
       },
     });
   } catch (error) {
@@ -300,13 +260,7 @@ router.post("/save-email-config", async (req, res) => {
 // Route untuk mendapatkan konfigurasi email saat ini (tanpa password)
 router.get("/current-email-config", async (req, res) => {
   try {
-    const config = {
-      host: process.env.EMAIL_HOST,
-      port: process.env.EMAIL_PORT,
-      secure: process.env.EMAIL_SECURE === "true",
-      service: process.env.EMAIL_SERVICE,
-      user: process.env.EMAIL_USER,
-    };
+    const config = await getPublicSystemConfig();
 
     return res.status(200).json({
       success: true,
@@ -317,6 +271,86 @@ router.get("/current-email-config", async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Terjadi kesalahan saat mengambil konfigurasi email",
+      error: error.message,
+    });
+  }
+});
+
+router.get("/system-config", async (req, res) => {
+  try {
+    const config = await getPublicSystemConfig();
+    return res.status(200).json({
+      success: true,
+      config,
+    });
+  } catch (error) {
+    console.error("Error saat mengambil konfigurasi sistem:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Terjadi kesalahan saat mengambil konfigurasi sistem",
+      error: error.message,
+    });
+  }
+});
+
+router.put("/system-config", async (req, res) => {
+  const { host, port, secure, service, user, pass, passDownloadApk } = req.body;
+
+  if (!host || !port || !user) {
+    return res.status(400).json({
+      success: false,
+      message: "Parameter (host, port, user) diperlukan",
+    });
+  }
+
+  try {
+    const savedConfig = await saveSystemConfig({
+      EMAIL_HOST: host,
+      EMAIL_PORT: port,
+      EMAIL_SECURE: secure,
+      EMAIL_USER: user,
+      EMAIL_PASS: pass,
+      EMAIL_SERVICE: service,
+      PASS_DOWNLOAD_APK: passDownloadApk,
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Konfigurasi sistem berhasil diperbarui",
+      config: {
+        host: savedConfig.EMAIL_HOST,
+        port: String(savedConfig.EMAIL_PORT),
+        secure: savedConfig.EMAIL_SECURE,
+        service: savedConfig.EMAIL_SERVICE || undefined,
+        user: savedConfig.EMAIL_USER,
+        hasEmailPass: Boolean(savedConfig.EMAIL_PASS),
+        hasDownloadApkPass: Boolean(savedConfig.PASS_DOWNLOAD_APK),
+      },
+    });
+  } catch (error) {
+    console.error("Error saat memperbarui konfigurasi sistem:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Terjadi kesalahan saat memperbarui konfigurasi sistem",
+      error: error.message,
+    });
+  }
+});
+
+router.delete("/system-config", async (req, res) => {
+  try {
+    const config = await deleteSystemConfig();
+    return res.status(200).json({
+      success: true,
+      message:
+        "Konfigurasi sistem berhasil dihapus dan kembali ke default server",
+      config,
+    });
+  } catch (error) {
+    console.error("Error saat menghapus konfigurasi sistem:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Terjadi kesalahan saat menghapus konfigurasi sistem",
       error: error.message,
     });
   }

@@ -19,7 +19,9 @@ const formatPoError = (data) => {
   if (!data) return "Terjadi kesalahan";
   const parts = [];
   if (data.duplicateInFile?.length) {
-    parts.push(`Kode PO duplikat dalam file: ${data.duplicateInFile.join(", ")}`);
+    parts.push(
+      `Kode PO duplikat dalam file: ${data.duplicateInFile.join(", ")}`,
+    );
   }
   if (data.duplicateErp?.length) {
     parts.push(`Kode PO sudah terdaftar: ${data.duplicateErp.join(", ")}`);
@@ -421,7 +423,7 @@ export default function PurchaseOrdersCreate() {
       <div className="bg-white rounded-2xl shadow-xl border border-blue-100 mb-6 p-4">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg shadow-blue-500/25">
+            <div className="p-3 bg-gradient-to-br from-blue-950 to-blue-600 rounded-xl shadow-lg shadow-blue-950/25">
               <PackageIcon className="w-6 h-6 text-white" />
             </div>
             <div>
@@ -436,7 +438,7 @@ export default function PurchaseOrdersCreate() {
 
           <div className="flex flex-wrap items-center gap-3">
             {/* Total Data Badge */}
-            <div className="badge badge-lg bg-gradient-to-r from-blue-500 to-blue-600 text-white border-0 px-4 py-3">
+            <div className="badge badge-lg bg-gradient-to-r from-blue-950 to-blue-600 text-white border-0 px-4 py-3">
               <FileText className="w-4 h-4 mr-2" />
               Total: {purchaseOrderList?.data?.length || 0}
             </div>
@@ -456,7 +458,7 @@ export default function PurchaseOrdersCreate() {
                 setSelectedOrder(null);
                 setNewOrder({ Erp: "", plat: "" });
               }}
-              className="btn bg-gradient-to-r from-blue-600 to-blue-700 text-white border-0 hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-500/25"
+              className="btn bg-gradient-to-r from-blue-600 to-blue-700 text-white border-0 hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-950/25"
             >
               <PlusCircle className="w-5 h-5 mr-2" />
               Buat PO Baru
@@ -559,7 +561,7 @@ export default function PurchaseOrdersCreate() {
                       >
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white shadow-sm group-hover:scale-110 transition-transform">
+                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-950 to-blue-600 flex items-center justify-center text-white shadow-sm group-hover:scale-110 transition-transform">
                               <PackageIcon className="w-4 h-4" />
                             </div>
                             <span className="font-medium text-blue-700">
@@ -578,7 +580,7 @@ export default function PurchaseOrdersCreate() {
                         <td className="px-6 py-4">
                           <div className="relative w-full h-2 bg-gray-200 rounded-full overflow-hidden">
                             <div
-                              className="absolute left-0 top-0 h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transition-all duration-500"
+                              className="absolute left-0 top-0 h-full bg-gradient-to-r from-blue-950 to-blue-600 rounded-full transition-all duration-500"
                               style={{ width: `${statusPercentage(order)}%` }}
                             ></div>
                           </div>
@@ -674,7 +676,7 @@ export default function PurchaseOrdersCreate() {
                 {/* ERP Field */}
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                    <PackageIcon className="w-4 h-4 text-blue-500" />
+                    <PackageIcon className="w-4 h-4 text-blue-950" />
                     Purchase Code (ERP)
                   </label>
                   <input
@@ -688,7 +690,7 @@ export default function PurchaseOrdersCreate() {
                           })
                         : setNewOrder({ ...newOrder, Erp: e.target.value })
                     }
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-950 transition-all duration-200"
                     placeholder="Masukkan kode ERP"
                     required
                   />
@@ -697,7 +699,7 @@ export default function PurchaseOrdersCreate() {
                 {/* Plat Field */}
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                    <Truck className="w-4 h-4 text-blue-500" />
+                    <Truck className="w-4 h-4 text-blue-950" />
                     Plat (Opsional)
                   </label>
                   <input
@@ -711,7 +713,7 @@ export default function PurchaseOrdersCreate() {
                           })
                         : setNewOrder({ ...newOrder, plat: e.target.value })
                     }
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-950 transition-all duration-200"
                     placeholder="Contoh: B 1234 XYZ"
                   />
                 </div>
@@ -719,7 +721,7 @@ export default function PurchaseOrdersCreate() {
                 {/* Items Section */}
                 <div className="space-y-4">
                   <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                    <Barcode className="w-4 h-4 text-blue-500" />
+                    <Barcode className="w-4 h-4 text-blue-950" />
                     Daftar Item
                   </label>
 

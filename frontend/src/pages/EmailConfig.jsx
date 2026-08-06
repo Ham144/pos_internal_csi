@@ -7,6 +7,7 @@ import {
   runEmailKwitansiJob,
   getCurrentEmailConfig,
   saveEmailConfig,
+  resetSystemConfig,
 } from "../api/adminApi";
 import toast from "react-hot-toast";
 
@@ -37,6 +38,7 @@ const EmailConfig = () => {
     service: "Outlook365",
     user: "",
     pass: "",
+    passDownloadApk: "",
     to: "",
   });
 
@@ -75,6 +77,7 @@ const EmailConfig = () => {
           secure: data.config.secure || false,
           service: data.config.service || "Outlook365",
           user: data.config.user || "",
+          passDownloadApk: "",
           // Password tidak diisi dari server untuk alasan keamanan
         }));
       }
@@ -141,20 +144,15 @@ const EmailConfig = () => {
   // Mutation untuk menyimpan konfigurasi email
   const saveConfig = async () => {
     // Validasi form
-    if (
-      !customConfig.host ||
-      !customConfig.port ||
-      !customConfig.user ||
-      !customConfig.pass
-    ) {
-      toast.error("Semua field konfigurasi harus diisi");
+    if (!customConfig.host || !customConfig.port || !customConfig.user) {
+      toast.error("Host, port, dan user wajib diisi");
       return;
     }
 
     setIsSaving(true);
     try {
       const configToSave = { ...customConfig };
-      delete configToSave.to; // Hapus field to karena tidak perlu disimpan di .env
+      delete configToSave.to; // Field ini hanya dipakai untuk uji kirim email
 
       const result = await saveEmailConfig(configToSave);
       toast.success("Konfigurasi email berhasil disimpan!");
@@ -171,6 +169,25 @@ const EmailConfig = () => {
       throw error;
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const resetConfig = async () => {
+    if (
+      !window.confirm("Hapus konfigurasi DB dan kembali ke default server?")
+    ) {
+      return;
+    }
+
+    try {
+      await resetSystemConfig();
+      toast.success("Konfigurasi berhasil direset ke default server");
+      refetchStatus();
+      refetchConfig();
+    } catch (error) {
+      toast.error(
+        error?.response?.data?.message || "Gagal mereset konfigurasi",
+      );
     }
   };
 
@@ -321,6 +338,36 @@ const EmailConfig = () => {
                     {currentConfig.config.user}
                   </span>
                 </div>
+                <div className="flex items-center gap-2">
+                  <Lock className="w-4 h-4 text-blue-600" />
+                  <span className="text-gray-600">SMTP Password:</span>
+                  <span
+                    className={`px-2 py-1 rounded text-xs font-medium ${
+                      currentConfig.config.hasEmailPass
+                        ? "bg-green-100 text-green-700"
+                        : "bg-gray-100 text-gray-600"
+                    }`}
+                  >
+                    {currentConfig.config.hasEmailPass
+                      ? "Tersimpan"
+                      : "Belum diatur"}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Send className="w-4 h-4 text-blue-600" />
+                  <span className="text-gray-600">APK Password:</span>
+                  <span
+                    className={`px-2 py-1 rounded text-xs font-medium ${
+                      currentConfig.config.hasDownloadApkPass
+                        ? "bg-green-100 text-green-700"
+                        : "bg-gray-100 text-gray-600"
+                    }`}
+                  >
+                    {currentConfig.config.hasDownloadApkPass
+                      ? "Tersimpan"
+                      : "Belum diatur"}
+                  </span>
+                </div>
               </div>
             </div>
           )}
@@ -348,7 +395,7 @@ const EmailConfig = () => {
               value={testEmail}
               onChange={(e) => setTestEmail(e.target.value)}
               placeholder="contoh@email.com"
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-950 focus:border-transparent transition-all"
               required
             />
           </div>
@@ -398,7 +445,7 @@ const EmailConfig = () => {
                 value={customConfig.host}
                 onChange={handleCustomConfigChange}
                 placeholder="smtp.example.com"
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-950 focus:border-transparent transition-all"
               />
             </div>
 
@@ -412,7 +459,7 @@ const EmailConfig = () => {
                 value={customConfig.port}
                 onChange={handleCustomConfigChange}
                 placeholder="587"
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-950 focus:border-transparent transition-all"
               />
             </div>
 
@@ -426,21 +473,35 @@ const EmailConfig = () => {
                 value={customConfig.user}
                 onChange={handleCustomConfigChange}
                 placeholder="your@email.com"
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-950 focus:border-transparent transition-all"
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Password
+                SMTP Password
               </label>
               <input
                 type="password"
                 name="pass"
                 value={customConfig.pass}
                 onChange={handleCustomConfigChange}
-                placeholder="••••••••"
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                placeholder="Kosongkan jika tidak diubah"
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-950 focus:border-transparent transition-all"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                PASS_DOWNLOAD_APK
+              </label>
+              <input
+                type="password"
+                name="passDownloadApk"
+                value={customConfig.passDownloadApk}
+                onChange={handleCustomConfigChange}
+                placeholder="Kosongkan jika tidak diubah"
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-950 focus:border-transparent transition-all"
               />
             </div>
 
@@ -452,7 +513,7 @@ const EmailConfig = () => {
                 name="service"
                 value={customConfig.service}
                 onChange={handleCustomConfigChange}
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white"
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-950 focus:border-transparent transition-all bg-white"
               >
                 <option value="">Tidak Ada</option>
                 <option value="Outlook365">Outlook365</option>
@@ -469,7 +530,7 @@ const EmailConfig = () => {
                   name="secure"
                   checked={customConfig.secure}
                   onChange={handleCustomConfigChange}
-                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-950"
                 />
                 <span className="text-sm text-gray-700">
                   Gunakan SSL (port 465)
@@ -499,6 +560,15 @@ const EmailConfig = () => {
               )}
             </button>
 
+            <button
+              onClick={resetConfig}
+              className="w-full border border-red-200 text-red-600 px-4 py-3 rounded-lg font-medium hover:bg-red-50 transition-all flex items-center justify-center gap-2"
+              type="button"
+            >
+              <AlertCircle className="w-4 h-4" />
+              <span>Reset ke Default Server</span>
+            </button>
+
             <div className="relative my-2">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-200"></div>
@@ -520,7 +590,7 @@ const EmailConfig = () => {
                 value={customConfig.to}
                 onChange={handleCustomConfigChange}
                 placeholder="test@example.com"
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-950 focus:border-transparent transition-all"
               />
             </div>
 

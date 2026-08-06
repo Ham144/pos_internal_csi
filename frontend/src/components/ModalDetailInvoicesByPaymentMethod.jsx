@@ -182,7 +182,7 @@ export default function ModalDetailInvoicesByPaymentMethod({
             <div className="space-y-4">
               {/* Info Summary Cards */}
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-4 text-white shadow-lg">
+                <div className="bg-gradient-to-br from-blue-950 to-blue-600 rounded-xl p-4 text-white shadow-lg">
                   <p className="text-blue-100 text-sm">Total Transaksi</p>
                   <p className="text-2xl font-bold">
                     {invoiceData.pagination?.total || 0}
@@ -272,7 +272,7 @@ export default function ModalDetailInvoicesByPaymentMethod({
                             </td>
                             <td>
                               <div className="flex items-center gap-2">
-                                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white shadow-sm">
+                                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-950 to-blue-600 flex items-center justify-center text-white shadow-sm">
                                   <CreditCard className="w-4 h-4" />
                                 </div>
                                 <span className="font-medium text-blue-900">
@@ -391,7 +391,7 @@ export default function ModalDetailInvoicesByPaymentMethod({
                                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                                     {/* Items Purchased */}
                                     <div className="bg-white rounded-xl shadow-sm border border-blue-100 overflow-hidden">
-                                      <div className="bg-gradient-to-r from-blue-500 to-blue-600 px-4 py-2">
+                                      <div className="bg-gradient-to-r from-blue-950 to-blue-600 px-4 py-2">
                                         <h3 className="text-sm font-semibold text-white flex items-center gap-2">
                                           <ShoppingCart className="w-4 h-4" />
                                           Item Pembelian

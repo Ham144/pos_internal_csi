@@ -63,7 +63,7 @@ export default function ModalDetailInvoice({ showDetail }) {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Left Card - Info Umum */}
             <div className="bg-white rounded-xl shadow-lg border border-blue-100 overflow-hidden">
-              <div className="bg-gradient-to-r from-blue-500 to-blue-600 px-4 py-2">
+              <div className="bg-gradient-to-r from-blue-950 to-blue-600 px-4 py-2">
                 <h4 className="text-sm font-semibold text-white flex items-center gap-2">
                   <Info className="w-4 h-4" />
                   Informasi Umum
@@ -261,7 +261,7 @@ export default function ModalDetailInvoice({ showDetail }) {
 
           {/* Items Table */}
           <div className="bg-white rounded-xl shadow-lg border border-blue-100 overflow-hidden">
-            <div className="bg-gradient-to-r from-blue-500 to-blue-600 px-4 py-2">
+            <div className="bg-gradient-to-r from-blue-950 to-blue-600 px-4 py-2">
               <h4 className="text-sm font-semibold text-white flex items-center gap-2">
                 <ShoppingCart className="w-4 h-4" />
                 Item Pembelian

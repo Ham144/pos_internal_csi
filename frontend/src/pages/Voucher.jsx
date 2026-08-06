@@ -276,7 +276,7 @@ const Voucher = () => {
                       className="alert alert-warning  cursor-pointer "
                       onClick={() => {
                         navigate(
-                          "/artikel_documentation?search=penjelasan%20sistem%20voucher"
+                          "/artikel_documentation?search=penjelasan%20sistem%20voucher",
                         );
                       }}
                     >
@@ -390,7 +390,7 @@ const Voucher = () => {
                               <td className="px-4 py-3 whitespace-nowrap">
                                 {voucher.tipeSyarat === "totalRp"
                                   ? `Min. belanja ${Number(
-                                      voucher.minimalPembelianTotalRp
+                                      voucher.minimalPembelianTotalRp,
                                     ).toLocaleString("id-ID", {
                                       style: "currency",
                                       currency: "IDR",
@@ -400,7 +400,7 @@ const Voucher = () => {
                               </td>
                               <td className="px-4 py-3 whitespace-nowrap">
                                 {new Date(
-                                  voucher.berlakuDari
+                                  voucher.berlakuDari,
                                 ).toLocaleDateString("id-ID", {
                                   day: "2-digit",
                                   month: "short",
@@ -416,7 +416,7 @@ const Voucher = () => {
                                   }`}
                                 >
                                   {new Date(
-                                    voucher.berlakuHingga
+                                    voucher.berlakuHingga,
                                   ).toLocaleDateString("id-ID", {
                                     day: "2-digit",
                                     month: "short",
@@ -482,7 +482,7 @@ const Voucher = () => {
                               onClick={() => {
                                 if (
                                   window.confirm(
-                                    "Apakah Anda yakin ingin menghapus voucher ini?"
+                                    "Apakah Anda yakin ingin menghapus voucher ini?",
                                   )
                                 ) {
                                   handleDeleteVoucher(selectedVoucher?._id);
@@ -532,7 +532,7 @@ const Voucher = () => {
                                     judulVoucher: e.target.value,
                                   }));
                             }}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-950 focus:border-blue-950"
                             defaultValue={selectedVoucher?.judulVoucher || ""}
                           />
                         </div>
@@ -559,7 +559,7 @@ const Voucher = () => {
                                     potongan: e.target.value,
                                   }))
                             }
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-950 focus:border-blue-950"
                           />
                         </div>
 
@@ -583,7 +583,7 @@ const Voucher = () => {
                                     tipeSyarat: e.target.value,
                                   }))
                             }
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-950 focus:border-blue-950"
                           >
                             <option value={"quantity"}>Quantity</option>
                             <option value={"totalRp"}>Total Harga</option>
@@ -615,7 +615,7 @@ const Voucher = () => {
                                       minimalPembelianQuantity: e.target.value,
                                     }));
                               }}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-950 focus:border-blue-950"
                             />
                           </div>
                         ) : (
@@ -641,7 +641,7 @@ const Voucher = () => {
                                       minimalPembelianTotalRp: e.target.value,
                                     }));
                               }}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-950 focus:border-blue-950"
                             />
                           </div>
                         )}
@@ -653,7 +653,7 @@ const Voucher = () => {
                             </label>
                             <input
                               type="date"
-                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-950 focus:border-blue-950"
                               defaultValue={selectedVoucher?.validFrom || ""}
                               value={
                                 selectedVoucher
@@ -679,7 +679,7 @@ const Voucher = () => {
                             </label>
                             <input
                               type="date"
-                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-950 focus:border-blue-950"
                               defaultValue={selectedVoucher?.validTo || ""}
                               value={
                                 selectedVoucher
@@ -708,7 +708,7 @@ const Voucher = () => {
                           <input
                             type="number"
                             min={1}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-950 focus:border-blue-950"
                             defaultValue={selectedVoucher?.maxUsage || ""}
                             value={
                               selectedVoucher
@@ -737,7 +737,7 @@ const Voucher = () => {
                             type="text"
                             name="skuList"
                             placeholder="Klik untuk memilih produk"
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-950 focus:border-blue-950"
                             onClick={() => {
                               const pickVoucherModal =
                                 document.getElementById("pickvoucher");
@@ -752,7 +752,7 @@ const Voucher = () => {
                                     ]);
                               } else {
                                 toast.error(
-                                  "Modal pilih voucher tidak ditemukan"
+                                  "Modal pilih voucher tidak ditemukan",
                                 );
                               }
                             }}
@@ -783,7 +783,7 @@ const Voucher = () => {
                                     >
                                       {badge}
                                     </span>
-                                  )
+                                  ),
                                 )
                               : voucherList.skuList &&
                                 voucherList?.skuList?.map((badge, index) => (
@@ -846,8 +846,8 @@ const Voucher = () => {
                                         onClick={() =>
                                           setTempSkuTerhubung((prev) =>
                                             prev?.filter(
-                                              (sku) => sku !== item.sku
-                                            )
+                                              (sku) => sku !== item.sku,
+                                            ),
                                           )
                                         }
                                         className="btn btn-sm bg-green-500 text-white"
@@ -963,19 +963,19 @@ const Voucher = () => {
                                     .writeText(text)
                                     .then(() => {
                                       toast.success(
-                                        "Kode voucher berhasil disalin!"
+                                        "Kode voucher berhasil disalin!",
                                       );
                                     })
                                     .catch((error) => {
                                       console.error("Copy failed", error);
                                       toast.error(
-                                        "Gagal menyalin kode voucher"
+                                        "Gagal menyalin kode voucher",
                                       );
                                     });
                                 } else {
                                   console.error("Clipboard API not supported");
                                   toast.error(
-                                    "Fitur salin tidak didukung pada browser ini"
+                                    "Fitur salin tidak didukung pada browser ini",
                                   );
                                 }
                               }}
@@ -1036,10 +1036,10 @@ const Voucher = () => {
                                           style: "currency",
                                           currency: "IDR",
                                           minimumFractionDigits: 0,
-                                        }
+                                        },
                                       ).format(
                                         selectedVoucher?.minimalPembelianTotalRp ||
-                                          0
+                                          0,
                                       )}`
                                     : `Min. ${
                                         selectedVoucher?.minimalPembelianQuantity ||
@@ -1078,7 +1078,7 @@ const Voucher = () => {
                                 <span className="font-medium">
                                   {selectedVoucher?.berlakuDari
                                     ? new Date(
-                                        selectedVoucher.berlakuDari
+                                        selectedVoucher.berlakuDari,
                                       ).toLocaleDateString("id-ID", {
                                         day: "2-digit",
                                         month: "short",
@@ -1101,7 +1101,7 @@ const Voucher = () => {
                                 >
                                   {selectedVoucher?.berlakuHingga
                                     ? new Date(
-                                        selectedVoucher.berlakuHingga
+                                        selectedVoucher.berlakuHingga,
                                       ).toLocaleDateString("id-ID", {
                                         day: "2-digit",
                                         month: "short",

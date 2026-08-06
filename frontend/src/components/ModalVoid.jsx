@@ -101,7 +101,7 @@ const ModalVoid = ({
                     <tr>
                       <td className="font-medium text-sm">invoice.isVoid</td>
                       <td className="text-center">
-                        <span className="badge bg-blue-500 text-white gap-1 text-xs">
+                        <span className="badge bg-blue-950 text-white gap-1 text-xs">
                           <span style={{ fontSize: "0.8em" }}>🔄</span> true
                         </span>
                       </td>
@@ -132,7 +132,7 @@ const ModalVoid = ({
                         spg[spg].skuTerjual
                       </td>
                       <td className="text-center">
-                        <span className="badge bg-blue-500 text-white gap-1 text-xs">
+                        <span className="badge bg-blue-950 text-white gap-1 text-xs">
                           <span style={{ fontSize: "0.8em" }}>🔄</span> Update
                         </span>
                       </td>
@@ -176,7 +176,7 @@ const ModalVoid = ({
                         userInfo.skuTerjual
                       </td>
                       <td className="text-center">
-                        <span className="badge bg-blue-500 text-white gap-1 text-xs">
+                        <span className="badge bg-blue-950 text-white gap-1 text-xs">
                           <span style={{ fontSize: "0.8em" }}>🔄</span> Update
                         </span>
                       </td>

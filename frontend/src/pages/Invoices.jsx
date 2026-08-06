@@ -537,7 +537,7 @@ const Invoices = () => {
       )}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="bg-white rounded-xl shadow-sm border border-blue-100 overflow-hidden">
-          <div className="bg-gradient-to-r from-blue-500 to-blue-600 px-4 py-2">
+          <div className="bg-gradient-to-r from-blue-950 to-blue-600 px-4 py-2">
             <h3 className="text-sm font-semibold text-white flex items-center gap-2">
               <ShoppingCart className="w-4 h-4" />
               Item Pembelian
@@ -710,14 +710,14 @@ const Invoices = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
         <div className="space-y-2">
           <label className="text-sm font-medium text-gray-700 flex items-center gap-1">
-            <Calendar className="w-4 h-4 text-blue-500" />
+            <Calendar className="w-4 h-4 text-blue-950" />
             Tanggal Mulai
           </label>
           <div className="relative">
             <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-400" />
             <input
               type="date"
-              className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200"
+              className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-950 transition-all duration-200"
               value={dateRange.startDate}
               onChange={(e) =>
                 setDateRange({ ...dateRange, startDate: e.target.value })
@@ -727,14 +727,14 @@ const Invoices = () => {
         </div>
         <div className="space-y-2">
           <label className="text-sm font-medium text-gray-700 flex items-center gap-1">
-            <Calendar className="w-4 h-4 text-blue-500" />
+            <Calendar className="w-4 h-4 text-blue-950" />
             Tanggal Akhir
           </label>
           <div className="relative">
             <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-400" />
             <input
               type="date"
-              className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200"
+              className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-950 transition-all duration-200"
               value={dateRange.endDate}
               onChange={(e) =>
                 setDateRange({ ...dateRange, endDate: e.target.value })
@@ -744,13 +744,13 @@ const Invoices = () => {
         </div>
         <div className="space-y-2">
           <label className="text-sm font-medium text-gray-700 flex items-center gap-1">
-            <Building2 className="w-4 h-4 text-blue-500" />
+            <Building2 className="w-4 h-4 text-blue-950" />
             Outlet
           </label>
           <div className="relative">
             <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-400" />
             <select
-              className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200 appearance-none bg-white"
+              className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-950 transition-all duration-200 appearance-none bg-white"
               value={outlet}
               onChange={(e) => setOutlet(e.target.value)}
             >
@@ -775,11 +775,11 @@ const Invoices = () => {
         </div>
         <div className="space-y-2">
           <label className="text-sm font-medium text-gray-700 flex items-center gap-1">
-            <Filter className="w-4 h-4 text-blue-500" />
+            <Filter className="w-4 h-4 text-blue-950" />
             Jumlah Data
           </label>
           <select
-            className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200 appearance-none bg-white"
+            className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-950 transition-all duration-200 appearance-none bg-white"
             value={limit}
             onChange={(e) => setLimit(e.target.value)}
           >
@@ -794,13 +794,13 @@ const Invoices = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         <div className="space-y-2">
           <label className="text-sm font-medium text-gray-700 flex items-center gap-1">
-            <Users className="w-4 h-4 text-blue-500" />
+            <Users className="w-4 h-4 text-blue-950" />
             SPG
           </label>
           <div className="relative">
             <Users className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-400" />
             <select
-              className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200 appearance-none bg-white"
+              className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-950 transition-all duration-200 appearance-none bg-white"
               value={spg}
               onChange={(e) => setSpg(e.target.value)}
             >
@@ -815,13 +815,13 @@ const Invoices = () => {
         </div>
         <div className="space-y-2">
           <label className="text-sm font-medium text-gray-700 flex items-center gap-1">
-            <UserCircle className="w-4 h-4 text-blue-500" />
+            <UserCircle className="w-4 h-4 text-blue-950" />
             Kasir
           </label>
           <div className="relative">
             <UserCircle className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-400" />
             <select
-              className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200 appearance-none bg-white"
+              className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-950 transition-all duration-200 appearance-none bg-white"
               value={kasir?.username}
               onChange={(e) => setKasir(e.target.value)}
             >
@@ -838,7 +838,7 @@ const Invoices = () => {
       <button
         onClick={exportToCSV}
         disabled={!invoiceData?.data?.length}
-        className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 rounded-xl font-medium hover:from-blue-700 hover:to-blue-800 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-blue-500/25"
+        className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 rounded-xl font-medium hover:from-blue-700 hover:to-blue-800 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-blue-950/25"
       >
         <Download className="w-5 h-5" />
         Export ke CSV
@@ -847,7 +847,7 @@ const Invoices = () => {
   );
 
   const statusTabActiveClass = {
-    all: "bg-blue-500 text-white shadow-lg shadow-blue-500/25",
+    all: "bg-blue-950 text-white shadow-lg shadow-blue-950/25",
     complete: "bg-green-500 text-white shadow-lg shadow-green-500/25",
     void: "bg-red-500 text-white shadow-lg shadow-red-500/25",
     pending: "bg-yellow-500 text-white shadow-lg shadow-yellow-500/25",
@@ -897,7 +897,7 @@ const Invoices = () => {
 
         {/* Filter Section */}
         <div className="bg-white rounded-2xl shadow-xl border border-blue-100 mb-4 md:mb-8 overflow-hidden">
-          <div className="hidden md:block bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-3">
+          <div className="hidden md:block bg-gradient-to-r from-blue-950 to-blue-600 px-6 py-3">
             <h2 className="text-lg font-semibold text-white flex items-center gap-2">
               <Filter className="w-5 h-5" />
               Filter Transaksi
@@ -906,7 +906,7 @@ const Invoices = () => {
 
           <button
             type="button"
-            className="md:hidden w-full flex items-center justify-between gap-2 bg-gradient-to-r from-blue-500 to-blue-600 px-4 py-3 text-white"
+            className="md:hidden w-full flex items-center justify-between gap-2 bg-gradient-to-r from-blue-950 to-blue-600 px-4 py-3 text-white"
             onClick={() => setMobileFilterOpen((prev) => !prev)}
           >
             <span className="font-semibold flex items-center gap-2">
@@ -1149,7 +1149,7 @@ const Invoices = () => {
                           </td>
                           <td className="px-4 py-3">
                             <div className="flex items-center gap-2">
-                              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white shadow-sm">
+                              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-950 to-blue-600 flex items-center justify-center text-white shadow-sm">
                                 <CreditCard className="w-4 h-4" />
                               </div>
                               <span className="font-medium text-blue-900">

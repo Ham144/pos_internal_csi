@@ -32,8 +32,8 @@ export default function Customer_list() {
       <div role="alert" className="alert alert-info text-white">
         <Info />
         <span>
-          Customer list dibuat di app mobile Catur POS, hanya bisa menghapus dan
-          mengedit disini
+          Customer list dibuat di app mobile Internal POS CSI, hanya bisa
+          menghapus dan mengedit disini
         </span>
       </div>
       <div className="flex flex-col justify-items-center">
@@ -44,7 +44,7 @@ export default function Customer_list() {
         </div>
         <div class="overflow-x-auto shadow-lg rounded-lg">
           <table class="table w-full">
-            <thead class="bg-gradient-to-r from-blue-500 to-blue-700 text-white">
+            <thead class="bg-gradient-to-r from-blue-950 to-blue-700 text-white">
               <tr>
                 <th class="p-4 text-left text-sm font-semibold uppercase tracking-wider rounded-tl-lg">
                   Nama

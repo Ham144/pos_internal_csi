@@ -54,7 +54,7 @@ const DashboardPreview = () => {
                     minimumFractionDigits: 0,
                     maximumFractionDigits: 0,
                   }).format(
-                    simpleOverview?.penjualanHariIni[0]?.totalSales || 0
+                    simpleOverview?.penjualanHariIni[0]?.totalSales || 0,
                   )
                 ) : (
                   <span className="badge badge-warning">Perlu Login</span>
@@ -120,7 +120,7 @@ const DashboardPreview = () => {
               viewBox="0 0 24 24"
               strokeWidth={1.5}
               stroke="currentColor"
-              className="w-5 h-5 mr-2 text-blue-500"
+              className="w-5 h-5 mr-2 text-blue-950"
             >
               <path
                 strokeLinecap="round"

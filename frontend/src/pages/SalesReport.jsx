@@ -284,13 +284,11 @@ const SalesReport = () => {
             if (header === "kodeInvoice") {
               row[idx] = i === 0 ? invoice.kodeInvoice || "" : "";
             } else if (header === "tanggalBayar") {
-              row[idx] =
-                i === 0 ? formatCsvDate(invoice.tanggalBayar) : "";
+              row[idx] = i === 0 ? formatCsvDate(invoice.tanggalBayar) : "";
             } else if (header === "salesPerson") {
               row[idx] = i === 0 ? invoice.salesPerson || "" : "";
             } else if (header === "spg") {
-              row[idx] =
-                i === 0 ? spgObj?.name || invoice.spg || "" : "";
+              row[idx] = i === 0 ? spgObj?.name || invoice.spg || "" : "";
             } else if (header === "sku") {
               row[idx] = item?.sku || "";
             } else if (header === "description") {
@@ -302,8 +300,7 @@ const SalesReport = () => {
             } else if (header === "totalRp") {
               row[idx] = csvAngka(item?.totalRp);
             } else if (header === "paymentMethod") {
-              row[idx] =
-                i === 0 ? labelMetodeBayar(invoice.paymentMethod) : "";
+              row[idx] = i === 0 ? labelMetodeBayar(invoice.paymentMethod) : "";
             } else if (header === "nomorTransaksi") {
               row[idx] = i === 0 ? invoice.nomorTransaksi || "" : "";
             } else if (header === "diskon") {
@@ -348,7 +345,7 @@ const SalesReport = () => {
       const link = document.createElement("a");
       link.href = url;
       const date = formatCsvDate(new Date());
-      link.download = `Statement catur POS - filter:: ${selectedOutletObj?.namaOutlet} : ${date} - ${dateRange.startDate}: ${dateRange.endDate}.csv`;
+      link.download = `Statement Internal POS CSI - filter:: ${selectedOutletObj?.namaOutlet} : ${date} - ${dateRange.startDate}: ${dateRange.endDate}.csv`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -588,14 +585,14 @@ const SalesReport = () => {
       <div className="container mx-auto px-4 py-8">
         {/* Header Section */}
         <div className="flex items-center gap-3 mb-8">
-          <div className="p-3 bg-gradient-to-br from-blue-500/20 to-blue-500/5 rounded-2xl">
-            <TrendingUp className="w-8 h-8 text-blue-500" />
+          <div className="p-3 bg-gradient-to-br from-blue-950/20 to-blue-950/5 rounded-2xl">
+            <TrendingUp className="w-8 h-8 text-blue-950" />
           </div>
           <div>
             <h1 className="lg:text-4xl  font-bold bg-gradient-to-r from-blue-800 to-blue-600 bg-clip-text text-transparent">
               Dashboard & Laporan
             </h1>
-            <p className="text-blue-500 lg:text-lg text-xs mt-1">
+            <p className="text-blue-950 lg:text-lg text-xs mt-1">
               Analisis lengkap performa bisnis Anda
             </p>
           </div>
@@ -616,7 +613,7 @@ const SalesReport = () => {
                   onClick={() => setMainTab(tab.id)}
                   className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all duration-200 ${
                     mainTab === tab.id
-                      ? "bg-blue-500 text-white shadow-lg shadow-blue-500/25 scale-105"
+                      ? "bg-blue-950 text-white shadow-lg shadow-blue-950/25 scale-105"
                       : "text-blue-600 hover:bg-blue-100"
                   }`}
                 >
@@ -808,7 +805,7 @@ const SalesReport = () => {
                 <p className="text-2xl font-bold text-blue-800">
                   {formatCurrency(salesData?.summary?.totalSales || 0)}
                 </p>
-                <p className="text-sm text-blue-500 mt-2">
+                <p className="text-sm text-blue-950 mt-2">
                   {salesData?.summary?.totalTransactions || 0} transaksi
                 </p>
               </div>
@@ -942,19 +939,19 @@ const SalesReport = () => {
                     <table className="w-full">
                       <thead className="bg-blue-50 rounded-xl">
                         <tr>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-blue-500">
+                          <th className="px-4 py-3 text-left text-xs font-medium text-blue-950">
                             Rank
                           </th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-blue-500">
+                          <th className="px-4 py-3 text-left text-xs font-medium text-blue-950">
                             Metode
                           </th>
-                          <th className="px-4 py-3 text-right text-xs font-medium text-blue-500">
+                          <th className="px-4 py-3 text-right text-xs font-medium text-blue-950">
                             Total
                           </th>
-                          <th className="px-4 py-3 text-right text-xs font-medium text-blue-500">
+                          <th className="px-4 py-3 text-right text-xs font-medium text-blue-950">
                             Invoice
                           </th>
-                          <th className="px-4 py-3 text-right text-xs font-medium text-blue-500">
+                          <th className="px-4 py-3 text-right text-xs font-medium text-blue-950">
                             Items
                           </th>
                         </tr>
@@ -1069,19 +1066,19 @@ const SalesReport = () => {
                   <table className="w-full">
                     <thead className="bg-blue-50 rounded-xl">
                       <tr>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-blue-500">
+                        <th className="px-4 py-3 text-left text-xs font-medium text-blue-950">
                           Rank
                         </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-blue-500">
+                        <th className="px-4 py-3 text-left text-xs font-medium text-blue-950">
                           SKU
                         </th>
-                        <th className="px-4 py-3 text-right text-xs font-medium text-blue-500">
+                        <th className="px-4 py-3 text-right text-xs font-medium text-blue-950">
                           Quantity
                         </th>
-                        <th className="px-4 py-3 text-right text-xs font-medium text-blue-500">
+                        <th className="px-4 py-3 text-right text-xs font-medium text-blue-950">
                           Total Penjualan
                         </th>
-                        <th className="px-4 py-3 text-right text-xs font-medium text-blue-500">
+                        <th className="px-4 py-3 text-right text-xs font-medium text-blue-950">
                           Invoice
                         </th>
                       </tr>
@@ -1124,19 +1121,19 @@ const SalesReport = () => {
                   <table className="w-full">
                     <thead className="bg-blue-50 sticky top-0">
                       <tr>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-blue-500">
+                        <th className="px-4 py-3 text-left text-xs font-medium text-blue-950">
                           Rank
                         </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-blue-500">
+                        <th className="px-4 py-3 text-left text-xs font-medium text-blue-950">
                           Kasir
                         </th>
-                        <th className="px-4 py-3 text-right text-xs font-medium text-blue-500">
+                        <th className="px-4 py-3 text-right text-xs font-medium text-blue-950">
                           Total
                         </th>
-                        <th className="px-4 py-3 text-right text-xs font-medium text-blue-500">
+                        <th className="px-4 py-3 text-right text-xs font-medium text-blue-950">
                           Invoice
                         </th>
-                        <th className="px-4 py-3 text-right text-xs font-medium text-blue-500">
+                        <th className="px-4 py-3 text-right text-xs font-medium text-blue-950">
                           %
                         </th>
                       </tr>
@@ -1150,7 +1147,7 @@ const SalesReport = () => {
                               <p className="font-medium">
                                 {kasir.kasir.username}
                               </p>
-                              <p className="text-xs text-blue-500">
+                              <p className="text-xs text-blue-950">
                                 {kasir.kasir.roleName}
                               </p>
                             </div>
@@ -1172,7 +1169,7 @@ const SalesReport = () => {
                                     idx === 0
                                       ? "bg-green-500"
                                       : idx === 1
-                                        ? "bg-blue-500"
+                                        ? "bg-blue-950"
                                         : "bg-orange-500"
                                   }`}
                                   style={{ width: `${kasir.percentage}%` }}
@@ -1238,19 +1235,19 @@ const SalesReport = () => {
                   <table className="w-full">
                     <thead className="bg-blue-50 sticky top-0">
                       <tr>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-blue-500">
+                        <th className="px-4 py-3 text-left text-xs font-medium text-blue-950">
                           Rank
                         </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-blue-500">
+                        <th className="px-4 py-3 text-left text-xs font-medium text-blue-950">
                           SPG
                         </th>
-                        <th className="px-4 py-3 text-right text-xs font-medium text-blue-500">
+                        <th className="px-4 py-3 text-right text-xs font-medium text-blue-950">
                           Total
                         </th>
-                        <th className="px-4 py-3 text-right text-xs font-medium text-blue-500">
+                        <th className="px-4 py-3 text-right text-xs font-medium text-blue-950">
                           Invoice
                         </th>
-                        <th className="px-4 py-3 text-right text-xs font-medium text-blue-500">
+                        <th className="px-4 py-3 text-right text-xs font-medium text-blue-950">
                           %
                         </th>
                       </tr>
@@ -1383,16 +1380,16 @@ const SalesReport = () => {
                 <table className="w-full">
                   <thead className="bg-blue-50">
                     <tr>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-blue-500">
+                      <th className="px-4 py-3 text-left text-xs font-medium text-blue-950">
                         SKU
                       </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-blue-500">
+                      <th className="px-4 py-3 text-left text-xs font-medium text-blue-950">
                         Deskripsi
                       </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-blue-500">
+                      <th className="px-4 py-3 text-left text-xs font-medium text-blue-950">
                         Stok
                       </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-blue-500">
+                      <th className="px-4 py-3 text-left text-xs font-medium text-blue-950">
                         Harga
                       </th>
                     </tr>
@@ -1529,19 +1526,19 @@ const SalesReport = () => {
                 <table className="w-full">
                   <thead className="bg-blue-50">
                     <tr>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-blue-500">
+                      <th className="px-4 py-3 text-left text-xs font-medium text-blue-950">
                         ERP
                       </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-blue-500">
+                      <th className="px-4 py-3 text-left text-xs font-medium text-blue-950">
                         Plat
                       </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-blue-500">
+                      <th className="px-4 py-3 text-left text-xs font-medium text-blue-950">
                         Tanggal
                       </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-blue-500">
+                      <th className="px-4 py-3 text-left text-xs font-medium text-blue-950">
                         Items
                       </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-blue-500">
+                      <th className="px-4 py-3 text-left text-xs font-medium text-blue-950">
                         Progress
                       </th>
                     </tr>

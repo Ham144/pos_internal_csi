@@ -238,7 +238,7 @@ const Artikel_Documentation = () => {
                   Category
                 </label>
                 <select
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white"
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-950 focus:border-transparent transition-all bg-white"
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
                 >
@@ -284,7 +284,7 @@ const Artikel_Documentation = () => {
                   </div>
                   <input
                     type="text"
-                    className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-950 focus:border-transparent transition-all"
                     placeholder="Cari dokumen..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}

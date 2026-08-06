@@ -90,7 +90,7 @@ const FilterInventories = ({ onChange }) => {
         setIsDebouncing(false);
       }, 500); // 500ms debounce delay
     },
-    [onChange, setFilter]
+    [onChange, setFilter],
   );
 
   const handleChange = (e) => {
@@ -187,7 +187,7 @@ const FilterInventories = ({ onChange }) => {
             onSubmit={handleSubmit}
             onChange={handleChange}
             placeholder="Cari SKU atau description"
-            className="flex-1 relative px-4 py-2 border border-gray-300  text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex-1 relative px-4 py-2 border border-gray-300  text-sm focus:outline-none focus:ring-2 focus:ring-blue-950"
           />
           {/* Efek shimmer hanya ditampilkan saat debouncing */}
           {isDebouncing && (
@@ -357,7 +357,7 @@ const FilterInventories = ({ onChange }) => {
                           setFilter((prev) => ({
                             ...prev,
                             brandIds: prev.brandIds.filter(
-                              (id) => id !== brand._id
+                              (id) => id !== brand._id,
                             ),
                           }));
                         }}

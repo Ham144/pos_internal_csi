@@ -386,7 +386,7 @@ const SumberThirdParty = () => {
                     <input
                       type="text"
                       name="baseEndpoint"
-                      className={`w-full pl-4 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
+                      className={`w-full pl-4 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-950 focus:border-transparent transition-all duration-200 ${
                         errors.baseEndpoint
                           ? "border-red-300 bg-red-50"
                           : "border-gray-200"
@@ -423,7 +423,7 @@ const SumberThirdParty = () => {
                     <input
                       type="text"
                       name="getTokenEndpoint"
-                      className={`w-full pl-4 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
+                      className={`w-full pl-4 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-950 focus:border-transparent transition-all duration-200 ${
                         errors.getTokenEndpoint
                           ? "border-red-300 bg-red-50"
                           : "border-gray-200"
@@ -460,7 +460,7 @@ const SumberThirdParty = () => {
                     <input
                       type="text"
                       name="getProductsEndpoint"
-                      className={`w-full pl-4 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
+                      className={`w-full pl-4 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-950 focus:border-transparent transition-all duration-200 ${
                         errors.getProductsEndpoint
                           ? "border-red-300 bg-red-50"
                           : "border-gray-200"
@@ -496,7 +496,7 @@ const SumberThirdParty = () => {
                   <input
                     type="text"
                     name="stringQueries"
-                    className="w-full pl-4 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    className="w-full pl-4 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-950 focus:border-transparent transition-all duration-200"
                     placeholder="per_page=100&sort=date"
                     value={formData.stringQueries}
                     onChange={handleChange}
@@ -522,7 +522,7 @@ const SumberThirdParty = () => {
                     <input
                       type="text"
                       name="start_date"
-                      className="w-full pl-4 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                      className="w-full pl-4 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-950 focus:border-transparent transition-all duration-200"
                       placeholder="YYYY-MM-DD"
                       value={formData.start_date}
                       onChange={handleChange}
@@ -543,7 +543,7 @@ const SumberThirdParty = () => {
                     <input
                       type="text"
                       name="end_date"
-                      className="w-full pl-4 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                      className="w-full pl-4 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-950 focus:border-transparent transition-all duration-200"
                       placeholder="YYYY-MM-DD"
                       value={formData.end_date}
                       onChange={handleChange}
@@ -565,7 +565,7 @@ const SumberThirdParty = () => {
                   </label>
                   <select
                     name="cronInterval"
-                    className="w-full pl-4 pr-10 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 appearance-none bg-white"
+                    className="w-full pl-4 pr-10 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-950 focus:border-transparent transition-all duration-200 appearance-none bg-white"
                     value={formData.cronInterval}
                     onChange={handleChange}
                   >
@@ -713,7 +713,7 @@ const SumberThirdParty = () => {
               {/* Info Text */}
               <div className="bg-gray-50 rounded-xl p-6">
                 <div className="flex items-start gap-3">
-                  <ExternalLink className="w-5 h-5 text-blue-500 mt-0.5" />
+                  <ExternalLink className="w-5 h-5 text-blue-950 mt-0.5" />
                   <div>
                     <p className="text-gray-700 leading-relaxed">
                       Klik tombol{" "}

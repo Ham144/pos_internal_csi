@@ -424,7 +424,7 @@ const PaymentMethod = () => {
                     value={formData.method}
                     onChange={handleInputChange}
                     placeholder="Contoh: QRIS, Bank Transfer, Cash"
-                    className="w-full border border-gray-200 px-4 py-3 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    className="w-full border border-gray-200 px-4 py-3 rounded-xl focus:ring-2 focus:ring-blue-950 focus:border-transparent transition-all duration-200"
                     required
                   />
                   <p className="text-xs text-gray-500">
@@ -446,7 +446,7 @@ const PaymentMethod = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1">
                     <label className="block text-sm font-medium text-gray-700 flex items-center gap-1">
-                      <Percent className="w-4 h-4 text-blue-500" />
+                      <Percent className="w-4 h-4 text-blue-950" />
                       Diskon (%)
                     </label>
                     <input
@@ -457,7 +457,7 @@ const PaymentMethod = () => {
                       min="0"
                       max="100"
                       placeholder="0 - 100"
-                      className="w-full border border-gray-200 px-4 py-3 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                      className="w-full border border-gray-200 px-4 py-3 rounded-xl focus:ring-2 focus:ring-blue-950 focus:border-transparent transition-all duration-200"
                     />
                   </div>
 
@@ -473,7 +473,7 @@ const PaymentMethod = () => {
                       onChange={handleInputChange}
                       min="0"
                       placeholder="Contoh: 5000"
-                      className="w-full border border-gray-200 px-4 py-3 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                      className="w-full border border-gray-200 px-4 py-3 rounded-xl focus:ring-2 focus:ring-blue-950 focus:border-transparent transition-all duration-200"
                     />
                   </div>
                 </div>
@@ -482,7 +482,7 @@ const PaymentMethod = () => {
                   <label className="flex items-center justify-between cursor-pointer">
                     <div className="flex items-start gap-3">
                       <div className="mt-0.5">
-                        <Info className="w-4 h-4 text-blue-500" />
+                        <Info className="w-4 h-4 text-blue-950" />
                       </div>
                       <div>
                         <span className="block font-medium text-gray-700">

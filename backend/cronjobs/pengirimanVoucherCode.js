@@ -1,32 +1,20 @@
 // Import yang diperlukan
 import cron from "node-cron";
-import nodemailer from "nodemailer";
 import Outlet from "../models/Outlet.model.js";
 import Invoice from "../models/invoice.model.js";
 import formatCurrency from "../utils/formatCurrency.js";
 import GeneratedVoucher from "../models/GeneratedVoucher.model.js";
 import DaftarVoucher from "../models/DaftarVoucher.model.js";
+import {
+  createCurrentSmtpTransporter,
+  getEffectiveSystemConfig,
+} from "../utils/systemConfig.js";
 
-// Konfigurasi transporter email
-// Gunakan konfigurasi SMTP email Anda
-const transporter = nodemailer.createTransport({
-  service: process.env.EMAIL_SERVICE || undefined,
-  host: process.env.EMAIL_HOST,
-  port: Number(process.env.EMAIL_PORT) || 587,
-  secure: process.env.EMAIL_SECURE === "true",
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-  tls: {
-    // Mematikan verifikasi sertifikat jika terjadi masalah TLS
-    rejectUnauthorized: false,
-    ciphers: "SSLv3",
-  },
-  debug: true, // Aktifkan debugging untuk melihat detail koneksi
-});
-
-const kirimEmailVoucherCode = async (generatedVoucher) => {
+const kirimEmailVoucherCode = async (
+  generatedVoucher,
+  transporter,
+  senderEmail
+) => {
   //cari refrensi voucher
   const voucherDB = await DaftarVoucher.findById(generatedVoucher.voucherId);
   if (!voucherDB) {
@@ -49,17 +37,28 @@ const kirimEmailVoucherCode = async (generatedVoucher) => {
   const email = generatedVoucher.pemilik.email;
   const subject = `Anda memiliki voucher ${voucherDB.judulVoucher} atas pembelian baru baru ini`;
   const text = `Belanjamu baru baru ini mendapatkan voucher ${voucherDB.judulVoucher}, ini kode voucher mu "${generatedVoucher.privateVoucherCode}" jangan publikasi kode ini, dan beri tahu kekasir kode voucher ini saat transaksi untuk dapat potongan harga, voucher ini hanya berlaku di outlet berikut ${certainOutlet}`;
-  await transporter.sendMail({ from: email, to: email, subject, text });
+  await transporter.sendMail({
+    from: `"CSI POS" <${senderEmail}>`,
+    to: email,
+    subject,
+    text,
+  });
 };
 
 // Fungsi untuk mengumpulkan generatedVoucher yang belum dikirim
 const kumpulkanGeneratedVoucherBelumDikirim = async () => {
   const generatedVoucher = await GeneratedVoucher.find({ isSend: false });
+  const transporter = await createCurrentSmtpTransporter();
+  const smtpConfig = await getEffectiveSystemConfig();
 
   //looping generatedVoucher
   for (const privateVoucher of generatedVoucher) {
     //kirim email
-    await kirimEmailVoucherCode(privateVoucher);
+    await kirimEmailVoucherCode(
+      privateVoucher,
+      transporter,
+      smtpConfig.EMAIL_USER
+    );
     privateVoucher.isSend = true;
     await privateVoucher.save();
   }
@@ -83,6 +82,7 @@ const pengirimanVoucherCodeJob = cron.schedule(
 export const verifyEmailConnection = async () => {
   try {
     console.log("Verifikasi koneksi email...");
+    const transporter = await createCurrentSmtpTransporter();
     const verification = await transporter.verify();
     if (verification) {
       console.log("✅ Koneksi email berhasil terverifikasi!");
@@ -93,12 +93,7 @@ export const verifyEmailConnection = async () => {
     }
   } catch (error) {
     console.error("❌ Error saat verifikasi koneksi email:", error.message);
-    console.error("Detail error:", {
-      host: process.env.EMAIL_HOST,
-      port: process.env.EMAIL_PORT,
-      secure: process.env.EMAIL_SECURE,
-      error: error.stack,
-    });
+    console.error("Detail error:", { error: error.stack });
     return false;
   }
 };

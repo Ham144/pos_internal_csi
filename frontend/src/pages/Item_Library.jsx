@@ -19,7 +19,10 @@ const formatInventoryImportError = (data) => {
   );
   if (missing.length) {
     parts.push(
-      `SKU tidak terdaftar: ${missing.map((d) => d.sku).filter(Boolean).join(", ")}`,
+      `SKU tidak terdaftar: ${missing
+        .map((d) => d.sku)
+        .filter(Boolean)
+        .join(", ")}`,
     );
   }
   const detailList = (data.details || data.errors || []).filter(
@@ -782,7 +785,7 @@ const ItemLibrary = () => {
                   </div>
                 </div>
               </div>
-              <div className="badge badge-lg bg-gradient-to-r from-blue-500 to-blue-600 text-white border-0 px-4 py-3">
+              <div className="badge badge-lg bg-gradient-to-r from-blue-950 to-blue-600 text-white border-0 px-4 py-3">
                 <Package className="w-4 h-4 mr-2" />
                 Total: {totalItems} Item
               </div>
@@ -793,7 +796,7 @@ const ItemLibrary = () => {
                   setNewSingleInventory(null);
                   setTimeout(() => setNewSingleInventory({}), 400);
                 }}
-                className="btn bg-gradient-to-r from-blue-600 to-blue-700 text-white border-0 hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-500/25"
+                className="btn bg-gradient-to-r from-blue-600 to-blue-700 text-white border-0 hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-950/25"
               >
                 <Plus className="w-5 h-5" />
                 Tambah Item
@@ -1165,7 +1168,7 @@ const ItemLibrary = () => {
                     }
                   }
                 }}
-                className="flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-500/25"
+                className="flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-950/25"
               >
                 <Save className="w-5 h-5" />
                 {newSingleInventory ? "Register" : "Update"}
@@ -1184,7 +1187,7 @@ const ItemLibrary = () => {
                     name="sku"
                     value={handleShowValue().sku}
                     onChange={handleOnChange}
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-950 transition-all duration-200"
                     placeholder="Masukkan SKU"
                   />
                 </div>
@@ -1199,7 +1202,7 @@ const ItemLibrary = () => {
                   name="description"
                   value={handleShowValue().description}
                   onChange={handleOnChange}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200"
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-950 transition-all duration-200"
                   placeholder="Masukkan deskripsi"
                 />
               </div>
@@ -1213,7 +1216,7 @@ const ItemLibrary = () => {
                   name="quantity"
                   value={handleShowValue().quantity}
                   onChange={handleOnChange}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200"
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-950 transition-all duration-200"
                   placeholder="0"
                 />
               </div>
@@ -1227,7 +1230,7 @@ const ItemLibrary = () => {
                   name="barcodeItem"
                   value={handleShowValue().barcodeItem}
                   onChange={handleOnChange}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200"
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-950 transition-all duration-200"
                   placeholder="Masukkan barcode"
                 />
               </div>
@@ -1240,7 +1243,7 @@ const ItemLibrary = () => {
                   name="brand"
                   value={handleShowValue().brand}
                   onChange={handleOnChange}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200 appearance-none bg-white"
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-950 transition-all duration-200 appearance-none bg-white"
                 >
                   <option value={handleShowValue().brand}>
                     {handleShowValue().brand || "Pilih Brand"}
@@ -1264,7 +1267,7 @@ const ItemLibrary = () => {
                     parseRpHargaDasar(handleShowValue()?.RpHargaDasar) ?? ""
                   }
                   onChange={handleOnChange}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200"
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-950 transition-all duration-200"
                   placeholder="0"
                 />
               </div>
