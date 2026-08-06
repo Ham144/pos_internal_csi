@@ -77,7 +77,6 @@ app.get("/api/v1/ping", async (_, res) => {
 app.use(authenticate);
 app.use(authorize);
 //routes
-app.use("/api/v1/payment", paymentRoute);
 app.use("/api/v1/inventories", inventoryRoutes);
 app.use("/api/v1/unlistedLibraries", unlistedLibrarySourceRoute);
 app.use("/api/v1/diskon", diskonRoutes);
@@ -96,7 +95,7 @@ app.use("/api/v1/spg", spgRoutes);
 app.use("/api/v1/kasir", kasirRoutes);
 app.use("/api/v1/auth", auhtRoutes);
 app.use("/api/v1/inventoryStat", inventoryStatRoute);
-app.use("/api/v1/paymentMethod", paymentMethodRoutes);
+app.use("/api/v1/payment", paymentMethodRoutes);
 app.use("/api/v1/dashboard", salesReportRoutes);
 app.use("/api/v1/admin", adminRoutes);
 app.use("/api/v1/stackTraceSku", stackTraceSkuRoutes);

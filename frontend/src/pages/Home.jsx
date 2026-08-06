@@ -195,7 +195,7 @@ const Home = () => {
         {/* Main Content */}
         <div className="min-h-screen bg-gradient-to-br from-blue-50/30 via-white to-gray-50">
           {/* Hero Section */}
-          <div className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800">
+          <div className="relative overflow-hidden bg-gradient-to-br from-blue-950 via-blue-700 to-blue-900">
             {/* Decorative Elements */}
             <div className="absolute inset-0 overflow-hidden">
               <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-400 rounded-full opacity-20 blur-3xl"></div>

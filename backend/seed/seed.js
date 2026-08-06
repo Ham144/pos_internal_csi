@@ -10,7 +10,7 @@ import PaymentMethod from "../models/PaymentMethod.model.js";
 import SystemConfig from "../models/SystemConfig.model.js";
 
 const SUPERADMIN_USERNAME = "superadmin";
-const SUPERADMIN_PASSWORD = process.env.SEED_SUPERADMIN_PASSWORD || "caturPOSv1";
+const SUPERADMIN_PASSWORD = process.env.SEED_SUPERADMIN_PASSWORD;
 const RESET_SUPERADMIN_PASSWORD = process.argv.includes(
   "--reset-superadmin-password",
 );
@@ -85,10 +85,6 @@ const seedInventory = async () => {
           RpHargaDasar: mongoose.Types.Decimal128.fromString(
             product.RpHargaDasar,
           ),
-          barcodeItem: product.barcodeItem,
-          description: product.description,
-          brand: product.brand,
-          isDisabled: false,
           terjual: 0,
         },
         $set: {
@@ -196,7 +192,8 @@ const seedSystemConfigFromEnv = async () => {
   const config = {};
 
   if (process.env.EMAIL_HOST) config.EMAIL_HOST = process.env.EMAIL_HOST;
-  if (process.env.EMAIL_PORT) config.EMAIL_PORT = Number(process.env.EMAIL_PORT);
+  if (process.env.EMAIL_PORT)
+    config.EMAIL_PORT = Number(process.env.EMAIL_PORT);
   if (process.env.EMAIL_SECURE) {
     config.EMAIL_SECURE = ["true", "1"].includes(
       process.env.EMAIL_SECURE.toLowerCase(),
@@ -245,7 +242,9 @@ const seed = async () => {
 
   if (RESET_SUPERADMIN_PASSWORD) {
     console.log("- Password superadmin di-reset sesuai konfigurasi seed.");
-  } else if (superadmin.createdAt?.getTime() === superadmin.updatedAt?.getTime()) {
+  } else if (
+    superadmin.createdAt?.getTime() === superadmin.updatedAt?.getTime()
+  ) {
     console.log(
       "- Password default superadmin hanya dicetak di dokumentasi seed, bukan di log.",
     );

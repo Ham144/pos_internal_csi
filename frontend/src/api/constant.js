@@ -1,15 +1,13 @@
+export const APP_NAME = "Internal POS CSI";
+
 const PROD_URL = "https://internal-pos.mycsi.net";
-const DEV_URL = "http://172.20.78.248:5173";
+const DEV_URL = "http://172.20.78.248:3003";
 
 export const NODE_ENV = window.location.hostname.endsWith("pos.mycsi.net")
   ? "production"
   : "development";
 
 export const buildNumber = "1000";
-
-if (import.meta.env.VITE_DEMO) {
-  NODE_ENV = "production";
-}
 
 export const BASE_URL = NODE_ENV == "production" ? PROD_URL : DEV_URL;
 

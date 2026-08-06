@@ -1,3 +1,4 @@
+export const APP_NAME = "Internal POS CSI";
 const environment = "production";
 // const environment = "development"
 export const BASE_URL =

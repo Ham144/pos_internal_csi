@@ -1,8 +1,80 @@
 import { Router } from "express";
 import PaymentMethod from "../models/PaymentMethod.model.js";
 import Invoice from "../models/invoice.model.js";
+import { createPaymentToken } from "../utils/midtrans.js";
 
 const router = Router();
+
+router.post("/request-token", async (req, res) => {
+  const { kodeInvoice } = req.body;
+
+  try {
+    const invoice = await Invoice.findOne({
+      kodeInvoice,
+    });
+
+    if (!invoice) {
+      return res.status(404).json({
+        message: "Bill Tidak Terdaftar",
+      });
+    }
+
+    if (invoice.done) {
+      return res.status(402).json({
+        message: "Bill telah selesai",
+      });
+    }
+
+    if (!invoice.currentBill?.length) {
+      return res.status(400).json({
+        message: "Bill tidak memiliki barang didalam",
+      });
+    }
+    if (invoice.total == 0 || invoice.total < 0) {
+      return res.status(400).json({
+        message: "Bill tidak memiliki total yang valid",
+      });
+    }
+
+    if (invoice.isPrintedCustomerBilling) {
+      return res.status(400).json({
+        message: "Bill untuk customer perlu di print dulu",
+      });
+    }
+
+    if (invoice.isVoid) {
+      return res.status(403).json({
+        message: "tidak bisa melakukan pembayaran, Bill telah di batalkan",
+      });
+    }
+
+    if (invoice.requestingVoid) {
+      return res.status(403).json({
+        message:
+          "Bill telah diminta untuk dibatalkan, cancel pembatalan terlebih dahulu",
+      });
+    }
+
+    const token = await createPaymentToken({
+      orderId: String(kodeInvoice),
+      grossAmount: Number(invoice.total),
+      customerDetails: {
+        email: String(invoice.customer),
+      },
+    });
+    return res.json({
+      message: "Berhasil generate token pembayaran",
+      data: token,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: error?.message || "Gagal generate token payment gateway",
+    });
+  }
+});
+
+// old payment offline fallback
 
 router.get("/getAllPaymentMethod", async (req, res) => {
   try {
@@ -150,5 +222,6 @@ router.get("/getInvoicesByPaymentMethod/:id", async (req, res) => {
     });
   }
 });
+
 
 export default router;

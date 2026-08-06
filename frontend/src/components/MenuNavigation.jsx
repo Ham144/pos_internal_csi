@@ -21,7 +21,7 @@ const MenuNavigation = () => {
 
   //menu navigation responsive sudah perfect
   return (
-    <div className="fixed xl:w-[70vw] xl:left-[22vw] top-3 max-md:left-2 max-md:right-2 z-40">
+    <div className="fixed  xl:w-[70vw] xl:left-[22vw] top-3 max-md:left-2 max-md:right-2 z-40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-2">
         <div className="navbar bg-white backdrop-blur-sm rounded-xl shadow-md">
           <div className="navbar-start px-3">

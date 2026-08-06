@@ -32,7 +32,7 @@ export default function Layout() {
         </View>
         <Image
           style={{ width: 200, height: 200, resizeMode: "contain" }}
-          source={require("../assets/csi.png")}
+          source={require("../assets/internal-pos.png")}
         />
       </View>
     );
