@@ -1,0 +1,68 @@
+{
+  "expo": {
+    "platforms": [
+      "android"
+    ],
+    "userInterfaceStyle": "light",
+    "orientation": "landscape",
+    "icon": "./src/assets/csi.png",
+    "scheme": "ham",
+    "splash": {
+      "image": "./src/assets/csi.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "android": {
+      "jsEngine": "hermes",
+      "adaptiveIcon": {
+        "foregroundImage": "./src/assets/csi.png",
+        "backgroundColor": "#ffffff"
+      },
+      "permissions": [
+        "android.permission.INTERNET",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.INTERNET",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.READ_EXTERNAL_STORAGE"
+      ],
+      "runtimeVersion": "1.0.0",
+      "package": "com.mastermind144.pos.csi"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-font",
+        {}
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true
+          }
+        }
+      ]
+    ],
+    "name": "csi Pos",
+    "slug": "catur-pos",
+    "newArchEnabled": true,
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "d5e79543-be39-433f-9800-4ca73dc6cb6a"
+      }
+    },
+    "updates": {
+      "url": "https://u.expo.dev/d5e79543-be39-433f-9800-4ca73dc6cb6a",
+      "checkAutomatically": "ON_LOAD", 
+      "requestHeaders": {
+        "expo-channel-name": "production"
+      }
+    },
+    "runtimeVersion": "1.0.0",
+    "ios": {}
+  }
+}
