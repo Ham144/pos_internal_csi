@@ -1,0 +1,262 @@
+import "dotenv/config";
+import bcrypt from "bcryptjs";
+import mongoose from "mongoose";
+
+import User from "../models/User.model.js";
+import Outlet from "../models/Outlet.model.js";
+import Brand from "../models/brand.model.js";
+import Inventory from "../models/InventoryRefrensi.model.js";
+import PaymentMethod from "../models/PaymentMethod.model.js";
+import SystemConfig from "../models/SystemConfig.model.js";
+
+const SUPERADMIN_USERNAME = "superadmin";
+const SUPERADMIN_PASSWORD = process.env.SEED_SUPERADMIN_PASSWORD || "caturPOSv1";
+const RESET_SUPERADMIN_PASSWORD = process.argv.includes(
+  "--reset-superadmin-password",
+);
+
+const sampleProducts = [
+  {
+    sku: "DEMO-001",
+    barcodeItem: "899000000001",
+    description: "Produk Demo Satu",
+    brand: "CSI Demo",
+    RpHargaDasar: "10000",
+    quantity: 100,
+  },
+  {
+    sku: "DEMO-002",
+    barcodeItem: "899000000002",
+    description: "Produk Demo Dua",
+    brand: "CSI Demo",
+    RpHargaDasar: "15000",
+    quantity: 100,
+  },
+  {
+    sku: "DEMO-003",
+    barcodeItem: "899000000003",
+    description: "Produk Demo Tiga",
+    brand: "CSI Elektronik",
+    RpHargaDasar: "25000",
+    quantity: 50,
+  },
+  {
+    sku: "DEMO-004",
+    barcodeItem: "899000000004",
+    description: "Produk Demo Empat",
+    brand: "CSI Elektronik",
+    RpHargaDasar: "50000",
+    quantity: 25,
+  },
+];
+
+const seedBrands = async () => {
+  const productsByBrand = sampleProducts.reduce((result, product) => {
+    result[product.brand] ??= [];
+    result[product.brand].push(product.sku);
+    return result;
+  }, {});
+
+  const brands = {};
+  for (const [name, skuList] of Object.entries(productsByBrand)) {
+    const brand = await Brand.findOneAndUpdate(
+      { name },
+      {
+        $set: { name },
+        $addToSet: { skuList: { $each: skuList } },
+      },
+      { new: true, upsert: true, setDefaultsOnInsert: true },
+    );
+    brands[name] = brand;
+  }
+
+  return brands;
+};
+
+const seedInventory = async () => {
+  for (const product of sampleProducts) {
+    await Inventory.findOneAndUpdate(
+      { sku: product.sku },
+      {
+        $setOnInsert: {
+          _id: product.sku,
+          sku: product.sku,
+          quantity: product.quantity,
+          RpHargaDasar: mongoose.Types.Decimal128.fromString(
+            product.RpHargaDasar,
+          ),
+          barcodeItem: product.barcodeItem,
+          description: product.description,
+          brand: product.brand,
+          isDisabled: false,
+          terjual: 0,
+        },
+        $set: {
+          barcodeItem: product.barcodeItem,
+          description: product.description,
+          brand: product.brand,
+          isDisabled: false,
+        },
+      },
+      { new: true, upsert: true, setDefaultsOnInsert: true },
+    );
+  }
+};
+
+const seedSuperadmin = async () => {
+  const passwordHash = bcrypt.hashSync(SUPERADMIN_PASSWORD, 10);
+  const existingUser = await User.findOne({ username: SUPERADMIN_USERNAME });
+
+  if (existingUser) {
+    const updates = {
+      roleName: "SUPER ADMIN",
+      blockedAccess: [],
+      isDisabled: false,
+    };
+
+    if (RESET_SUPERADMIN_PASSWORD) {
+      updates.password = passwordHash;
+    }
+
+    await User.updateOne({ _id: existingUser._id }, { $set: updates });
+    return User.findById(existingUser._id);
+  }
+
+  const availableCodes = ["SUP", "SA1", "SA2", "SA3"];
+  let kodeKasir = null;
+  for (const candidate of availableCodes) {
+    if (!(await User.exists({ kodeKasir: candidate }))) {
+      kodeKasir = candidate;
+      break;
+    }
+  }
+
+  if (!kodeKasir) {
+    throw new Error(
+      "Tidak dapat menentukan kodeKasir unik untuk akun superadmin.",
+    );
+  }
+
+  return User.create({
+    username: SUPERADMIN_USERNAME,
+    password: passwordHash,
+    roleName: "SUPER ADMIN",
+    blockedAccess: [],
+    kodeKasir,
+    isDisabled: false,
+  });
+};
+
+const seedOutlet = async (brands, superadmin) => {
+  const brandIds = Object.values(brands).map((brand) => brand._id);
+  const favoriteSkus = sampleProducts.map((product) => product.sku);
+
+  const outlet = await Outlet.findOneAndUpdate(
+    { kodeOutlet: "01" },
+    {
+      $setOnInsert: {
+        kodeOutlet: "01",
+        namaOutlet: "Outlet Default",
+        description: "Outlet default hasil seed POS",
+        namaPerusahaan: "CSI",
+        periodeSettlement: 1,
+        jamSettlement: "00:00",
+        jumlahInvoice: 0,
+        pendapatan: 0,
+      },
+      $addToSet: {
+        kasirList: superadmin._id,
+        brandIds: { $each: brandIds },
+        favoritedInventoryIds: { $each: favoriteSkus },
+      },
+    },
+    { new: true, upsert: true, setDefaultsOnInsert: true },
+  );
+
+  return outlet;
+};
+
+const seedPaymentMethods = async () => {
+  const paymentMethods = [
+    { method: "Tunai", discount: 0, additional_fee: 0, status: true },
+    { method: "Transfer", discount: 0, additional_fee: 0, status: true },
+    { method: "QRIS", discount: 0, additional_fee: 0, status: true },
+  ];
+
+  for (const paymentMethod of paymentMethods) {
+    await PaymentMethod.findOneAndUpdate(
+      { method: paymentMethod.method },
+      { $setOnInsert: paymentMethod },
+      { new: true, upsert: true, setDefaultsOnInsert: true },
+    );
+  }
+};
+
+const seedSystemConfigFromEnv = async () => {
+  const config = {};
+
+  if (process.env.EMAIL_HOST) config.EMAIL_HOST = process.env.EMAIL_HOST;
+  if (process.env.EMAIL_PORT) config.EMAIL_PORT = Number(process.env.EMAIL_PORT);
+  if (process.env.EMAIL_SECURE) {
+    config.EMAIL_SECURE = ["true", "1"].includes(
+      process.env.EMAIL_SECURE.toLowerCase(),
+    );
+  }
+  if (process.env.EMAIL_USER) config.EMAIL_USER = process.env.EMAIL_USER;
+  if (process.env.EMAIL_PASS) config.EMAIL_PASS = process.env.EMAIL_PASS;
+  if (process.env.EMAIL_SERVICE) {
+    config.EMAIL_SERVICE = process.env.EMAIL_SERVICE;
+  }
+  if (process.env.PASS_DOWNLOAD_APK) {
+    config.PASS_DOWNLOAD_APK = process.env.PASS_DOWNLOAD_APK;
+  }
+
+  if (Object.keys(config).length === 0) return null;
+
+  return SystemConfig.findOneAndUpdate(
+    { _id: "global" },
+    { $setOnInsert: config },
+    { new: true, upsert: true, setDefaultsOnInsert: true },
+  );
+};
+
+const seed = async () => {
+  if (!process.env.MONGO_URI) {
+    throw new Error("MONGO_URI belum diatur di file .env");
+  }
+
+  await mongoose.connect(process.env.MONGO_URI);
+
+  const brands = await seedBrands();
+  await seedInventory();
+  const superadmin = await seedSuperadmin();
+  const outlet = await seedOutlet(brands, superadmin);
+  await seedPaymentMethods();
+  const systemConfig = await seedSystemConfigFromEnv();
+
+  console.log("Seed berhasil dijalankan.");
+  console.log(`- Superadmin: ${superadmin.username}`);
+  console.log(`- Outlet: ${outlet.namaOutlet} (${outlet.kodeOutlet})`);
+  console.log(`- SKU contoh: ${sampleProducts.length}`);
+  console.log("- Metode pembayaran: Tunai, Transfer, QRIS");
+  console.log(
+    `- Konfigurasi sistem dari .env: ${systemConfig ? "disimpan" : "dilewati"}`,
+  );
+
+  if (RESET_SUPERADMIN_PASSWORD) {
+    console.log("- Password superadmin di-reset sesuai konfigurasi seed.");
+  } else if (superadmin.createdAt?.getTime() === superadmin.updatedAt?.getTime()) {
+    console.log(
+      "- Password default superadmin hanya dicetak di dokumentasi seed, bukan di log.",
+    );
+  }
+};
+
+try {
+  await seed();
+} catch (error) {
+  console.error("Seed gagal:", error.message);
+  process.exitCode = 1;
+} finally {
+  await mongoose.disconnect();
+}
