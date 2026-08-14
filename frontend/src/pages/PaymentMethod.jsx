@@ -42,6 +42,7 @@ const PaymentMethod = () => {
     method: "",
     discount: "",
     additional_fee: "",
+    gatewayProvider: null,
     status: true,
   });
 
@@ -68,6 +69,7 @@ const PaymentMethod = () => {
         method: "",
         discount: "",
         additional_fee: "",
+        gatewayProvider: null,
         status: true,
       });
       queryClient.invalidateQueries({ queryKey: ["paymentMethods"] });
@@ -115,7 +117,12 @@ const PaymentMethod = () => {
     const { name, value, type, checked } = e.target;
     setFormData({
       ...formData,
-      [name]: type === "checkbox" ? checked : value,
+      [name]:
+        type === "checkbox"
+          ? checked
+          : name === "gatewayProvider"
+          ? value || null
+          : value,
     });
   };
 
@@ -174,7 +181,7 @@ const PaymentMethod = () => {
                   Metode Pembayaran
                 </h1>
                 <p className="text-gray-500 mt-1 flex items-center gap-1">
-                  Atur kategori pembayaran yang akan berguna untuk perhitungan
+                  Atur kategori pembayaran yang akan berguna untuk 
                   dashboard sales report
                   <div
                     className="tooltip tooltip-right"
@@ -241,6 +248,9 @@ const PaymentMethod = () => {
                       Biaya Tambahan
                     </th>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-white">
+                      Integrasi
+                    </th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-white">
                       Status
                     </th>
                     <th className="px-6 py-4 text-center text-sm font-semibold text-white">
@@ -298,6 +308,15 @@ const PaymentMethod = () => {
                           </div>
                         ) : (
                           <span className="text-gray-400 text-sm">-</span>
+                        )}
+                      </td>
+                      <td className="px-6 py-4">
+                        {method.gatewayProvider === "midtrans" ? (
+                          <span className="bg-sky-100 text-sky-700 px-3 py-1 rounded-lg text-sm font-medium">
+                            Midtrans
+                          </span>
+                        ) : (
+                          <span className="text-gray-400 text-sm">Manual</span>
                         )}
                       </td>
                       <td className="px-6 py-4">
@@ -403,6 +422,7 @@ const PaymentMethod = () => {
                         method: "",
                         discount: "",
                         additional_fee: "",
+                        gatewayProvider: null,
                         status: true,
                       });
                     }}
@@ -478,6 +498,24 @@ const PaymentMethod = () => {
                   </div>
                 </div>
 
+                <div className="space-y-1">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Integrasi Pembayaran
+                  </label>
+                  <select
+                    name="gatewayProvider"
+                    value={formData.gatewayProvider || ""}
+                    onChange={handleInputChange}
+                    className="w-full border border-gray-200 px-4 py-3 rounded-xl focus:ring-2 focus:ring-blue-950 focus:border-transparent transition-all duration-200"
+                  >
+                    <option value="">Manual / tanpa gateway</option>
+                    <option value="midtrans">Midtrans</option>
+                  </select>
+                  <p className="text-xs text-gray-500">
+                    Pilih Midtrans hanya untuk metode yang harus diverifikasi oleh payment gateway sebelum kuitansi dicetak.
+                  </p>
+                </div>
+
                 <div className="bg-blue-50 rounded-xl p-4">
                   <label className="flex items-center justify-between cursor-pointer">
                     <div className="flex items-start gap-3">
@@ -527,6 +565,7 @@ const PaymentMethod = () => {
                         method: "",
                         discount: "",
                         additional_fee: "",
+                        gatewayProvider: null,
                         status: true,
                       });
                     }}

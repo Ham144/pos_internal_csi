@@ -28,7 +28,7 @@ router.post("/run-email-kwitansi-job", async (req, res) => {
 
     // Jalankan job
     const result = await runManualEmailJob();
-
+    
     if (result === false) {
       return res.status(500).json({
         success: false,
@@ -191,7 +191,7 @@ router.post("/test-outlook-connection", async (req, res) => {
         </div>
       `,
     });
-
+    
     return res.status(200).json({
       success: true,
       message: "Koneksi Outlook berhasil dan email test telah dikirim",
@@ -233,7 +233,7 @@ router.post("/save-email-config", async (req, res) => {
       EMAIL_SERVICE: service,
       PASS_DOWNLOAD_APK: passDownloadApk,
     });
-
+    
     return res.status(200).json({
       success: true,
       message: "Konfigurasi berhasil disimpan ke database",

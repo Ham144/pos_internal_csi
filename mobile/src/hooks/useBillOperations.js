@@ -1,10 +1,12 @@
 import { useState } from "react";
-import { Platform, ToastAndroid, Alert } from "react-native";
+import { Platform, ToastAndroid, Alert, Linking } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   printCetakBillCustomer,
   printCetakKwitansi,
   printCetakHelper,
+  createMidtransPayment,
+  getMidtransPaymentStatus,
 } from "../api";
 import excactTimeString from "../utils/excactTimeString";
 import { useLoading, useOutlet, useSyncSetting } from "../store";
@@ -62,6 +64,73 @@ export const useBillOperations = ({
   const { handleSinkronisasi } = useOnlineSync();
   const { autoSyncSetelahKwitansiPertama } = useSyncSetting();
 
+  const isMidtransPaymentMethod = async () => {
+    const paymentMethodsRaw = await AsyncStorage.getItem("paymentMethod");
+    const paymentMethods = paymentMethodsRaw ? JSON.parse(paymentMethodsRaw) : [];
+    return paymentMethods.some(
+      (method) =>
+        method.method === paymentMethod &&
+        method.status === true &&
+        method.gatewayProvider === "midtrans",
+    );
+  };
+
+  const waitForMidtransSettlement = async () => {
+    const maxAttempts = 60;
+    for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+      const status = await getMidtransPaymentStatus(_id);
+      if (status?.paid) return status;
+      if (status?.status === "failed") {
+        throw new Error("Pembayaran Midtrans gagal, dibatalkan, atau kedaluwarsa");
+      }
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+    }
+    return null;
+  };
+
+  const startMidtransPayment = async () => {
+    setLoadingPrinting(true);
+    try {
+      // The server must own the invoice before it can calculate a gateway amount.
+      const syncResult = await handleSinkronisasi();
+      if (!syncResult) {
+        throw new Error("Bill belum berhasil disinkronkan ke server");
+      }
+
+      const transaction = await createMidtransPayment(_id);
+      if (!transaction?.redirectUrl) {
+        throw new Error("URL pembayaran Midtrans tidak tersedia");
+      }
+
+      const canOpenPaymentPage = await Linking.canOpenURL(transaction.redirectUrl);
+      if (!canOpenPaymentPage) {
+        throw new Error("Perangkat tidak dapat membuka halaman pembayaran Midtrans");
+      }
+      await Linking.openURL(transaction.redirectUrl);
+
+      const status = await waitForMidtransSettlement();
+      if (!status) {
+        Alert.alert(
+          "Menunggu pembayaran",
+          "Pembayaran belum dikonfirmasi. Jangan cetak kuitansi. Setelah pembayaran selesai, tekan tombol Bayar lagi untuk memeriksa status.",
+        );
+        return;
+      }
+
+      await handleCetaKuitansi_offlineBayar({
+        paymentReference: status.transactionId || status.orderId,
+      });
+    } catch (error) {
+      console.error("Midtrans payment error:", error);
+      Alert.alert(
+        "Pembayaran belum selesai",
+        error?.response?.data?.message || error?.message || "Gagal memulai pembayaran Midtrans",
+      );
+    } finally {
+      setLoadingPrinting(false);
+    }
+  };
+
   // Fungsi untuk memeriksa bill yang tersimpan
   const checkSavedBills = async () => {
     try {
@@ -95,6 +164,7 @@ export const useBillOperations = ({
     isPrintedKwitansi,
     done,
     tanggalBayar,
+    nomorTransaksi: nomorTransaksiOverride,
   }) => {
     try {
       // Ambil bills yang sudah ada
@@ -165,7 +235,7 @@ export const useBillOperations = ({
         catatans,
         createdAt: new Date().toISOString(),
         tanggalBayar: tanggalBayar || new Date().toISOString(),
-        nomorTransaksi: nomorTransaksi,
+        nomorTransaksi: nomorTransaksiOverride || nomorTransaksi,
         implementedVoucher: implementedVoucher,
       };
 
@@ -492,8 +562,13 @@ export const useBillOperations = ({
   };
 
   //cetak kwitansi, setelah cetak kwitansi maka langsung sync
-  const handleCetaKuitansi_offlineBayar = async () => {
+  const handleCetaKuitansi_offlineBayar = async ({ paymentReference } = {}) => {
     try {
+      if (!done && !paymentReference && (await isMidtransPaymentMethod())) {
+        await startMidtransPayment();
+        return;
+      }
+
       if (isOnline) {
         const multiConfig = JSON.parse(
           await AsyncStorage.getItem("printerConfigs")
@@ -531,7 +606,7 @@ export const useBillOperations = ({
             alamat: customerAddress || "",
           },
           paymentMethod,
-          nomorTransaksi, // Tambahkan nomor transaksi ke bill
+          nomorTransaksi: paymentReference || nomorTransaksi,
           tanggalBayar: tanggalBayar,
         };
 
@@ -629,6 +704,7 @@ export const useBillOperations = ({
               isPrintedKwitansi: true,
               done: true,
               tanggalBayar: tanggalBayar || new Date().toISOString(),
+              nomorTransaksi: paymentReference || nomorTransaksi,
             });
 
             if (isTotallySuccessful) {
@@ -656,7 +732,6 @@ export const useBillOperations = ({
             }
           }
         } catch (error) {
-          console.error("Error cetak kwitansi:", error);
 
           // Jika sudah done (sudah dibayar), kita tidak perlu melakukan update lagi
           if (done) {

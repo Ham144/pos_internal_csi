@@ -1,4 +1,6 @@
 import React from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { NavigationIndependentTree } from "@react-navigation/core";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import PointOfSaleNavigator from "@/navigations/PointOfSaleNavigator.jsx";
 import AktivitasScreen from "@/screens/AktivitasScreen.jsx";
@@ -10,33 +12,37 @@ const Drawer = createDrawerNavigator();
 
 const DrawerNavigator = () => {
   return (
-    <Drawer.Navigator>
-      <Drawer.Screen
-        name="Point of Sale"
-        component={PointOfSaleNavigator}
-        options={{ headerShown: false }}
-      />
-      <Drawer.Screen
-        name="Aktivitas"
-        component={AktivitasScreen}
-        options={{ headerShown: false }}
-      />
-      <Drawer.Screen
-        name="Inventori"
-        component={InventoriScreen}
-        options={{ headerShown: false }}
-      />
-      <Drawer.Screen
-        name="Ringkasan"
-        component={SummaryScreen}
-        options={{ headerShown: false }}
-      />
-      <Drawer.Screen
-        name="Pengaturan"
-        component={PengaturanScreen}
-        options={{ headerShown: false }}
-      />
-    </Drawer.Navigator>
+    <NavigationIndependentTree>
+      <NavigationContainer>
+        <Drawer.Navigator>
+          <Drawer.Screen
+            name="Point of Sale"
+            component={PointOfSaleNavigator}
+            options={{ headerShown: false }}
+          />
+          <Drawer.Screen
+            name="Aktivitas"
+            component={AktivitasScreen}
+            options={{ headerShown: false }}
+          />
+          <Drawer.Screen
+            name="Inventori"
+            component={InventoriScreen}
+            options={{ headerShown: false }}
+          />
+          <Drawer.Screen
+            name="Ringkasan"
+            component={SummaryScreen}
+            options={{ headerShown: false }}
+          />
+          <Drawer.Screen
+            name="Pengaturan"
+            component={PengaturanScreen}
+            options={{ headerShown: false }}
+          />
+        </Drawer.Navigator>
+      </NavigationContainer>
+    </NavigationIndependentTree>
   );
 };
 

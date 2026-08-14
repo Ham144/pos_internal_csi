@@ -1,7 +1,7 @@
 export const APP_NAME = "Internal POS CSI";
 
 const PROD_URL = "https://internal-pos.mycsi.net";
-const DEV_URL = "http://172.20.78.248:3003";
+const DEV_URL = "http://192.168.21.193:3003";
 
 export const NODE_ENV = window.location.hostname.endsWith("pos.mycsi.net")
   ? "production"

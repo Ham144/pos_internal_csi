@@ -8,6 +8,7 @@ import Brand from "../models/brand.model.js";
 import Inventory from "../models/InventoryRefrensi.model.js";
 import PaymentMethod from "../models/PaymentMethod.model.js";
 import SystemConfig from "../models/SystemConfig.model.js";
+import SpgRefrensi from "../models/SpgRefrensi.model.js";
 
 const SUPERADMIN_USERNAME = "superadmin";
 const SUPERADMIN_PASSWORD = process.env.SEED_SUPERADMIN_PASSWORD;
@@ -172,13 +173,32 @@ const seedOutlet = async (brands, superadmin) => {
   return outlet;
 };
 
+const seedSpg = async () => {
+  const spgs = [{ name: "luna" }, { name: "Tera" }, { name: "Sol" }];
+  let registered = [];
+  for (const s of spgs) {
+    const registerd = await SpgRefrensi.findOneAndUpdate(
+      {
+        name: s.name,
+      },
+      {
+        upsert: true,
+        new: true,
+        setDefaultsOnInsert: true,
+      },
+    ).
+    registered.push(registerd);
+  }
+  return registered;
+};
+
 const seedPaymentMethods = async () => {
   const paymentMethods = [
     { method: "Tunai", discount: 0, additional_fee: 0, status: true },
     { method: "Transfer", discount: 0, additional_fee: 0, status: true },
     { method: "QRIS", discount: 0, additional_fee: 0, status: true },
   ];
-
+  
   for (const paymentMethod of paymentMethods) {
     await PaymentMethod.findOneAndUpdate(
       { method: paymentMethod.method },
@@ -229,6 +249,12 @@ const seed = async () => {
   const superadmin = await seedSuperadmin();
   const outlet = await seedOutlet(brands, superadmin);
   await seedPaymentMethods();
+  const SPGs = await seedSpg();
+  outlet.spgList = SPGs.map((e) => e._id);
+  if (outlet.spgList?.length > 1) {
+    console.log("Spg Outlet berhasil di inisailiasi");
+  }
+
   const systemConfig = await seedSystemConfigFromEnv();
 
   console.log("Seed berhasil dijalankan.");

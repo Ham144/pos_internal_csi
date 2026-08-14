@@ -116,6 +116,27 @@ const invoiceSchema = new mongoose.Schema(
     tanggalBayar: Date, //terjadi kesalahan di mobile, ini dianggap last print bill bukan invoice
     paymentMethod: String, //payment method.method
     nomorTransaksi: String, //nomor transaksi dari mesin edisi
+    paymentGateway: {
+      provider: String,
+      orderId: String,
+      attempt: Number,
+      status: {
+        type: String,
+        default: "",
+      },
+      grossAmount: Number,
+      snapToken: String,
+      redirectUrl: String,
+      transactionId: String,
+      paymentType: String,
+      transactionStatus: String,
+      statusCode: String,
+      fraudStatus: String,
+      creatingAt: Date,
+      transactionTime: Date,
+      settlementTime: Date,
+      notificationAt: Date,
+    },
   },
   { timestamps: true }
 );

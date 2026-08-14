@@ -11,6 +11,12 @@ const paymentMethodSchema = new Schema({
     default: true,
   },
   additional_fee: Number,
+  // Set explicitly from the CMS for payment methods handled by a gateway.
+  gatewayProvider: {
+    type: String,
+    enum: ["midtrans", null],
+    default: null,
+  },
 });
 
 const PaymentMethod = model("PaymentMethod", paymentMethodSchema);

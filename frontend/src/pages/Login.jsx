@@ -5,9 +5,7 @@ import {
   LogIn,
   Eye,
   EyeOff,
-  Shield,
   CheckCircle,
-  ArrowRight,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -21,11 +19,10 @@ import { useLocation, useNavigate } from "react-router";
 import { useUserInfo } from "@/store";
 
 export default function Login({ className, ...props }) {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("superadmin");
+  const [password, setPassword] = useState("caturPOSv1");
   const [isVerifying, setIsVerifying] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
 
   const path = useLocation().pathname;
   const navigate = useNavigate();
@@ -185,7 +182,7 @@ export default function Login({ className, ...props }) {
                   />
                 </div>
               </div>
-
+            
               {/* Password Field */}
               <div className="space-y-2">
                 <Label

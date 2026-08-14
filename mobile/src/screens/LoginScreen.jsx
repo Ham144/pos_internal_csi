@@ -13,7 +13,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { login, getBaseUrl, pingBackend } from "../api";
 import { Settings, X } from "lucide-react-native";
-import { BASE_URL } from "../constant";
+import { BASE_URL, BACKEND_URLS } from "../constant";
 
 const LoginScreen = ({ onLoginSuccess }) => {
   const [username, setUsername] = useState("");
@@ -22,10 +22,20 @@ const LoginScreen = ({ onLoginSuccess }) => {
   const [showBackendModal, setShowBackendModal] = useState(false);
   const [backendUrl, setBackendUrl] = useState("");
 
+  const persistBackendUrl = async (url) => {
+    const normalizedUrl = url?.trim();
+    if (!normalizedUrl) {
+      return;
+    }
+
+    setBackendUrl(normalizedUrl);
+    await AsyncStorage.setItem("BASE_URL", JSON.stringify(normalizedUrl));
+  };
+
   // Backend URL templates
   const BACKEND_TEMPLATES = {
-    production: "https:pos.mycsi.net",
-    development: "http://192.168.169.12:3000",
+    production: BACKEND_URLS.production,
+    development: BACKEND_URLS.development,
   };
 
   // Query for checking backend connection
@@ -48,7 +58,7 @@ const LoginScreen = ({ onLoginSuccess }) => {
   // Save backend URL
   const handleSaveBackend = async () => {
     try {
-      await AsyncStorage.setItem("BASE_URL", JSON.stringify(backendUrl));
+      await persistBackendUrl(backendUrl);
       ToastAndroid?.show("Backend URL berhasil disimpan", ToastAndroid.SHORT);
       setShowBackendModal(false);
     } catch (error) {
@@ -183,13 +193,15 @@ const LoginScreen = ({ onLoginSuccess }) => {
               <View className="flex-row flex-wrap gap-2">
                 <TouchableOpacity
                   className="px-3 py-2 bg-green-500 rounded-lg"
-                  onPress={() => setBackendUrl(BACKEND_TEMPLATES.production)}
+                  onPress={() => persistBackendUrl(BACKEND_TEMPLATES.production)}
                 >
                   <Text className="text-white font-medium">Production</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   className="px-3 py-2 bg-blue-950 rounded-lg"
-                  onPress={() => setBackendUrl(BACKEND_TEMPLATES.development)}
+                  onPress={() =>
+                    persistBackendUrl(BACKEND_TEMPLATES.development)
+                  }
                 >
                   <Text className="text-white font-medium">Development</Text>
                 </TouchableOpacity>
@@ -202,9 +214,7 @@ const LoginScreen = ({ onLoginSuccess }) => {
                 className={`flex-1 justify-center p-3 rounded-lg ${
                   isConnected ? "bg-green-500" : "bg-red-500"
                 }`}
-                onPress={() => {
-                  setBackendUrl(BASE_URL);
-                }}
+                onPress={() => persistBackendUrl(BASE_URL)}
               >
                 <Text className="text-center text-white font-medium">
                   Reset

@@ -3,7 +3,7 @@ import { BASE_URL } from "./constant";
 
 export const getAllPaymentMethod = async () => {
   const response = await axios.get(
-    `${BASE_URL}/api/v1/paymentMethod/getAllPaymentMethod`,
+    `${BASE_URL}/api/v1/payment/getAllPaymentMethod`,
     {
       withCredentials: true,
     }
@@ -13,7 +13,7 @@ export const getAllPaymentMethod = async () => {
 
 export const createPaymentMethod = async (data) => {
   const response = await axios.post(
-    `${BASE_URL}/api/v1/paymentMethod/createPaymentMethod`,
+    `${BASE_URL}/api/v1/payment/createPaymentMethod`,
     data,
     {
       withCredentials: true,
@@ -24,7 +24,7 @@ export const createPaymentMethod = async (data) => {
 
 export const deletePaymentMethod = async (id) => {
   const response = await axios.delete(
-    `${BASE_URL}/api/v1/paymentMethod/deletePaymentMethod/${id}`,
+    `${BASE_URL}/api/v1/payment/deletePaymentMethod/${id}`,
     {
       withCredentials: true,
     }
@@ -34,7 +34,7 @@ export const deletePaymentMethod = async (id) => {
 
 export const togglePaymentMethodStatus = async (id) => {
   const response = await axios.patch(
-    `${BASE_URL}/api/v1/paymentMethod/togglePaymentMethodStatus/${id}`,
+    `${BASE_URL}/api/v1/payment/togglePaymentMethodStatus/${id}`,
     {},
     {
       withCredentials: true,

@@ -80,8 +80,3 @@ bug fixing 2026-06-10
 [x] create new account tidak ada tombol save
 [fail] item isDisabled harusnya tidak muncul di mobile
 [x] optimasi kecepatan lanjutan
-
-# update 06/08/2026
-[] bayarnya ke payment gateway
-[] bisa input biaya berdasarkan category yg di config
-[] check stock berdasarkan location (SOAP)

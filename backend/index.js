@@ -1,6 +1,5 @@
 import express from "express";
 import "dotenv/config";
-import paymentRoute from "./routes/payment.route.js";
 import inventoryRoutes from "./routes/inventory-route.js";
 import unlistedLibrarySourceRoute from "./routes/unlistedLibrary.route.js";
 import { connectDB } from "./utils/connectDB.js";
@@ -15,7 +14,7 @@ import syncMobileRoutes from "./routes/syncMobile.route.js";
 import printerRouter from "./routes/printer.route.js";
 import spgRoutes from "./routes/spg.route.js";
 import customerRoutes from "./routes/customer.route.js";
-import invoiceRoutes from "./routes/invoice.route.js  ";
+import invoiceRoutes from "./routes/invoice.route.js";
 import thumbnailRoutes from "./routes/thumbnail.route.js";
 import outletRoutes from "./routes/Outlet.route.js";
 import kasirRoutes from "./routes/kasir.route.js";
@@ -25,7 +24,6 @@ import authorize from "./middlewares/authorize.js";
 import documentRoutes from "./routes/document.route.js";
 import reportRoutes from "./routes/report.route.js";
 import inventoryStatRoute from "./routes/inventoryStat.route.js";
-import paymentMethodRoutes from "./routes/paymentMethod.route.js";
 import adminRoutes from "./routes/admin.route.js";
 import cookieParser from "cookie-parser";
 import salesReportRoutes from "./routes/saleReport.route.js";
@@ -34,10 +32,8 @@ import pengirimanVoucherCodeJob, {
 } from "./cronjobs/pengirimanVoucherCode.js";
 import donwloadRoutes from "./routes/download.route.js";
 import stackTraceSkuRoutes from "./routes/stackTrace.route.js";
-
-let isProduction = process.env.NODE_ENV === "production";
-
-const corsOrigin = [process.env.FRONTEND, "http://172.20.78.248:5173"];
+import { midtransWebhookRouter } from "./routes/paymentMethod.route.js";
+import paymentMethodRoutes from "./routes/paymentMethod.route.js";
 
 const app = express();
 
@@ -45,12 +41,35 @@ const app = express();
 app.use(express.json({ limit: "20mb" }));
 app.use(express.urlencoded({ extended: true, limit: "20mb" }));
 app.use(cookieParser());
-app.use(
-  cors({
-    origin: corsOrigin,
-    credentials: true,
-  }),
+
+const allowedOrigins = new Set(
+  [
+    process.env.FRONTEND,
+    "http://192.168.21.193:5173",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+  ].filter(Boolean),
 );
+
+const corsOptions = {
+  origin(origin, callback) {
+    if (!origin) {
+      return callback(null, true);
+    }
+
+    if (allowedOrigins.has(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(null, false);
+  },
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 
 app.get("/", async (req, res) => {
   return res.send("Internal POS CSI BACKEND : 200");
@@ -72,6 +91,10 @@ app.get("/api/v1/ping", async (_, res) => {
     online: true,
   });
 });
+
+// Midtrans cannot send our user credentials. Its notification is authenticated
+// by the signature verified inside this router instead.
+app.use("/api/v1/payment/midtrans", midtransWebhookRouter);
 
 //private
 app.use(authenticate);
@@ -101,8 +124,9 @@ app.use("/api/v1/admin", adminRoutes);
 app.use("/api/v1/stackTraceSku", stackTraceSkuRoutes);
 
 const port = process.env.PORT;
-app.listen(port, () => {
-  console.log("Server Berjalan di port ", port);
+const host = process.env.HOST || "0.0.0.0";
+app.listen(port, host, () => {
+  console.log(`Server Berjalan di ${host}:${port}`);
 
   // Inisialisasi cron job pengiriman voucher code setelah server berjalan
   (async () => {

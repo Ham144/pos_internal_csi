@@ -27,10 +27,6 @@ const ModalNewAccount = () => {
   const [newAccount, setNewAccount] = useState({
     username: "",
     password: "",
-    email: "",
-    telepon: "",
-    targetHargaPenjualan: 0,
-    targetQuantityPenjualan: 0,
     outlet: "",
     roleName: "",
     blockedAccess: [],
@@ -87,10 +83,6 @@ const ModalNewAccount = () => {
       setNewAccount({
         username: "",
         password: "",
-        email: "",
-        telepon: "",
-        targetHargaPenjualan: "",
-        targetQuantityPenjualan: "",
         roleName: "",
         blockedAccess: [],
         kodeKasir: "",
@@ -161,7 +153,7 @@ const ModalNewAccount = () => {
             </form>
           </div>
         </div>
-
+        
         {/* Form */}
         <form
           onSubmit={(e) => {
@@ -257,97 +249,6 @@ const ModalNewAccount = () => {
                   )}
                 </button>
               </div>
-            </div>
-
-            {/* Email */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                <Mail className="w-4 h-4 text-blue-950" />
-                Email
-                <span className="text-red-500">*</span>
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  type="email"
-                  name="email"
-                  value={newAccount.email}
-                  onChange={handleChange}
-                  required
-                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-950 transition-all duration-200"
-                  placeholder="user@example.com"
-                />
-              </div>
-            </div>
-
-            {/* Telepon */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                <Phone className="w-4 h-4 text-blue-950" />
-                Telepon
-                <span className="badge badge-soft badge-info text-xs">
-                  Opsional
-                </span>
-              </label>
-              <div className="relative">
-                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  type="tel"
-                  name="telepon"
-                  value={newAccount.telepon}
-                  onChange={handleChange}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-950 transition-all duration-200"
-                  placeholder="08123456789"
-                />
-              </div>
-            </div>
-
-            {/* Target Harga */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                <Target className="w-4 h-4 text-blue-950" />
-                Target Harga Penjualan
-                <span className="badge badge-soft badge-info text-xs">
-                  Opsional
-                </span>
-              </label>
-              <div className="relative">
-                <Target className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  type="number"
-                  name="targetHargaPenjualan"
-                  value={newAccount.targetHargaPenjualan}
-                  onChange={handleChange}
-                  min={0}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-950 transition-all duration-200"
-                  placeholder="Masukkan target harga"
-                />
-              </div>
-              <p className="text-xs text-gray-500">Untuk keperluan statistik</p>
-            </div>
-
-            {/* Target Quantity */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                <Target className="w-4 h-4 text-blue-950" />
-                Target Quantity Penjualan
-                <span className="badge badge-soft badge-info text-xs">
-                  Opsional
-                </span>
-              </label>
-              <div className="relative">
-                <Target className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  type="number"
-                  name="targetQuantityPenjualan"
-                  value={newAccount.targetQuantityPenjualan}
-                  onChange={handleChange}
-                  min={0}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-950 transition-all duration-200"
-                  placeholder="Masukkan target quantity"
-                />
-              </div>
-              <p className="text-xs text-gray-500">Untuk keperluan statistik</p>
             </div>
 
             {/* Outlet */}

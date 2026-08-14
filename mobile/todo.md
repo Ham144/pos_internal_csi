@@ -34,8 +34,6 @@ hapus {
 // "react-native-web": "~0.19.10"
 }
 
-membuka devtools: adb shell input keyevent 82
-
 untuk production web :
 npx expo export --platform web
 
@@ -66,6 +64,7 @@ Bill Offline punya outlet lain (atasi pakai fitur perbarui inventory seluruhnya 
 [x]cari kesalahan fungsi aggregate perubahan quantity
 [] kalau outlet nya diganti, kasih peringatan (seseorang mengganti outletmu, setelah sync terkahir kamu akan logout otomatis)
 [x] perbaiki masuk bulk upload csv \_id nya
+[] add: config printer harusnya nempel di outlet sebagai array yang bisa dipilih
 
 update code javascript dan UI tanpa reinstall pakai lib expo-updates
 tanpa reinstall : eas update --branch production --message "Perbaikan UI dan logika printer"

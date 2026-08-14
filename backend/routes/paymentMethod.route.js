@@ -1,76 +1,260 @@
 import { Router } from "express";
 import PaymentMethod from "../models/PaymentMethod.model.js";
 import Invoice from "../models/invoice.model.js";
-import { createPaymentToken } from "../utils/midtrans.js";
+import Outlet from "../models/Outlet.model.js";
+import {
+  createPaymentTransaction,
+  getMidtransTransactionStatus,
+  isMidtransPaymentSuccessful,
+  verifyMidtransNotificationSignature,
+} from "../utils/midtrans.js";
 
-const router = Router();
+export const router = Router();
 
-router.post("/request-token", async (req, res) => {
-  const { kodeInvoice } = req.body;
+export const midtransWebhookRouter = Router();
+
+const MIDTRANS_PENDING = "pending";
+const MIDTRANS_CREATING = "creating";
+const MIDTRANS_PAID = "paid";
+
+const getGatewayStatus = (notification) => {
+  if (isMidtransPaymentSuccessful(notification)) return MIDTRANS_PAID;
+  if (notification.transaction_status === "pending") return MIDTRANS_PENDING;
+  return "failed";
+};
+
+const buildOrderId = (invoice, attempt) => {
+  const invoiceId = String(invoice._id).replace(/[^a-zA-Z0-9]/g, "").slice(-24);
+  return `POS-${invoiceId}-${attempt}-${Date.now().toString(36)}`;
+};
+
+const getInvoiceForCurrentOutlet = async (req, { invoiceId, kodeInvoice }) => {
+  const outlet = await Outlet.findOne({ kasirList: { $in: [req.userId] } }).select(
+    "kodeOutlet",
+  );
+  if (!outlet) return { error: "Outlet kasir tidak ditemukan", status: 403 };
+
+  const filter = invoiceId ? { _id: invoiceId } : { kodeInvoice };
+  const invoice = await Invoice.findOne(filter);
+  if (!invoice) return { error: "Bill tidak terdaftar", status: 404 };
+  if (!invoice.kodeInvoice.startsWith(outlet.kodeOutlet)) {
+    return { error: "Bill bukan milik outlet Anda", status: 403 };
+  }
+
+  return { invoice };
+};
+
+const validateInvoiceForMidtrans = async (invoice) => {
+  if (invoice.done) return "Bill telah selesai";
+  if (invoice.isVoid || invoice.requestingVoid) {
+    return "Bill telah dibatalkan atau sedang dalam proses pembatalan";
+  }
+  if (!invoice.isPrintedCustomerBilling) {
+    return "Bill customer harus dicetak terlebih dahulu sebelum pembayaran gateway";
+  }
+  if (!invoice.currentBill?.length) return "Bill tidak memiliki barang di dalamnya";
+  if (!Number.isInteger(Number(invoice.total)) || Number(invoice.total) <= 0) {
+    return "Total bill harus berupa nominal Rupiah bulat dan lebih dari nol";
+  }
+
+  const paymentMethod = await PaymentMethod.findOne({
+    method: invoice.paymentMethod,
+    status: true,
+  });
+  if (paymentMethod?.gatewayProvider !== "midtrans") {
+    return "Metode pembayaran bill ini tidak dikonfigurasi untuk Midtrans";
+  }
+
+  return null;
+};
+
+const applyMidtransStatus = async (notification) => {
+  const orderId = notification.order_id;
+  const invoice = await Invoice.findOne({ "paymentGateway.orderId": orderId });
+  if (!invoice) return null;
+
+  const expectedAmount = Number(invoice.paymentGateway?.grossAmount);
+  if (Number(notification.gross_amount) !== expectedAmount) {
+    throw new Error("Nominal notification Midtrans tidak cocok dengan invoice");
+  }
+
+  const gatewayStatus = getGatewayStatus(notification);
+  if (invoice.paymentGateway?.status === MIDTRANS_PAID && gatewayStatus !== MIDTRANS_PAID) {
+    return invoice;
+  }
+
+  const gatewayUpdate = {
+    "paymentGateway.status": gatewayStatus,
+    "paymentGateway.transactionId": notification.transaction_id || "",
+    "paymentGateway.paymentType": notification.payment_type || "",
+    "paymentGateway.transactionStatus": notification.transaction_status || "",
+    "paymentGateway.statusCode": String(notification.status_code || ""),
+    "paymentGateway.fraudStatus": notification.fraud_status || "",
+    "paymentGateway.transactionTime": notification.transaction_time
+      ? new Date(notification.transaction_time)
+      : undefined,
+    "paymentGateway.settlementTime": notification.settlement_time
+      ? new Date(notification.settlement_time)
+      : undefined,
+    "paymentGateway.notificationAt": new Date(),
+  };
+
+  const update = { $set: gatewayUpdate };
+  if (gatewayStatus === MIDTRANS_PAID) {
+    update.$set.done = true;
+    update.$set.tanggalBayar = notification.settlement_time
+      ? new Date(notification.settlement_time)
+      : new Date();
+    update.$set.nomorTransaksi = notification.transaction_id || orderId;
+  }
+
+  return Invoice.findOneAndUpdate(
+    { _id: invoice._id, "paymentGateway.orderId": orderId },
+    update,
+    { new: true },
+  );
+};
+
+const sendPaymentStatus = (res, invoice) => {
+  const gateway = invoice.paymentGateway || {};
+  return res.json({
+    data: {
+      invoiceId: invoice._id,
+      kodeInvoice: invoice.kodeInvoice,
+      status: gateway.status || "not_started",
+      paid: gateway.status === MIDTRANS_PAID && invoice.done === true,
+      transactionId: gateway.transactionId || null,
+      paymentType: gateway.paymentType || null,
+      orderId: gateway.orderId || null,
+    },
+  });
+};
+
+const createMidtransTransaction = async (req, res) => {
+  const { invoiceId, kodeInvoice } = req.body;
+  let orderId;
+  let externalRequestStarted = false;
 
   try {
-    const invoice = await Invoice.findOne({
-      kodeInvoice,
-    });
+    if (!invoiceId && !kodeInvoice) {
+      return res.status(400).json({ message: "invoiceId atau kodeInvoice wajib diisi" });
+    }
+    const result = await getInvoiceForCurrentOutlet(req, { invoiceId, kodeInvoice });
+    if (result.error) return res.status(result.status).json({ message: result.error });
 
-    if (!invoice) {
-      return res.status(404).json({
-        message: "Bill Tidak Terdaftar",
+    const { invoice } = result;
+    const validationError = await validateInvoiceForMidtrans(invoice);
+    if (validationError) return res.status(400).json({ message: validationError });
+
+    const gateway = invoice.paymentGateway || {};
+    if (gateway.status === MIDTRANS_PAID) {
+      return res.status(409).json({ message: "Bill telah dibayar melalui Midtrans" });
+    }
+    if (gateway.status === MIDTRANS_PENDING) {
+      if (gateway.snapToken && gateway.redirectUrl) {
+        return res.json({
+          message: "Menggunakan transaksi Midtrans yang masih menunggu pembayaran",
+          data: { token: gateway.snapToken, redirectUrl: gateway.redirectUrl, orderId: gateway.orderId },
+        });
+      }
+      return res.status(409).json({
+        message: "Transaksi Midtrans sebelumnya masih menunggu. Hubungi administrator sebelum membuat transaksi baru.",
       });
     }
-
-    if (invoice.done) {
-      return res.status(402).json({
-        message: "Bill telah selesai",
-      });
+    if (gateway.status === MIDTRANS_CREATING) {
+      return res.status(409).json({ message: "Pembuatan transaksi pembayaran masih diproses" });
     }
 
-    if (!invoice.currentBill?.length) {
-      return res.status(400).json({
-        message: "Bill tidak memiliki barang didalam",
-      });
-    }
-    if (invoice.total == 0 || invoice.total < 0) {
-      return res.status(400).json({
-        message: "Bill tidak memiliki total yang valid",
-      });
-    }
-
-    if (invoice.isPrintedCustomerBilling) {
-      return res.status(400).json({
-        message: "Bill untuk customer perlu di print dulu",
-      });
-    }
-
-    if (invoice.isVoid) {
-      return res.status(403).json({
-        message: "tidak bisa melakukan pembayaran, Bill telah di batalkan",
-      });
-    }
-
-    if (invoice.requestingVoid) {
-      return res.status(403).json({
-        message:
-          "Bill telah diminta untuk dibatalkan, cancel pembatalan terlebih dahulu",
-      });
-    }
-
-    const token = await createPaymentToken({
-      orderId: String(kodeInvoice),
-      grossAmount: Number(invoice.total),
-      customerDetails: {
-        email: String(invoice.customer),
+    const attempt = Number(gateway.attempt || 0) + 1;
+    orderId = buildOrderId(invoice, attempt);
+    const lock = await Invoice.findOneAndUpdate(
+      { _id: invoice._id, done: { $ne: true }, "paymentGateway.status": { $ne: MIDTRANS_CREATING } },
+      {
+        $set: {
+          paymentGateway: {
+            provider: "midtrans",
+            orderId,
+            attempt,
+            status: MIDTRANS_CREATING,
+            grossAmount: Number(invoice.total),
+            creatingAt: new Date(),
+          },
+        },
       },
+      { new: true },
+    );
+    if (!lock) return res.status(409).json({ message: "Bill tidak dapat diproses untuk pembayaran" });
+
+    externalRequestStarted = true;
+    const transaction = await createPaymentTransaction({
+      orderId,
+      grossAmount: Number(invoice.total),
+      customerDetails: invoice.customer ? { email: String(invoice.customer) } : undefined,
     });
+
+    await Invoice.findOneAndUpdate(
+      { _id: invoice._id, "paymentGateway.orderId": orderId },
+      {
+        $set: {
+          "paymentGateway.status": MIDTRANS_PENDING,
+          "paymentGateway.snapToken": transaction.token,
+          "paymentGateway.redirectUrl": transaction.redirect_url,
+        },
+      },
+    );
+
     return res.json({
       message: "Berhasil generate token pembayaran",
-      data: token,
+      data: { token: transaction.token, redirectUrl: transaction.redirect_url, orderId },
     });
   } catch (error) {
-    console.log(error);
+    console.error("Gagal membuat transaksi Midtrans:", error);
+    // Once a request reached Midtrans, an uncertain network/storage failure must
+    // remain locked. Retrying with a new order could charge the customer twice.
+    if (!externalRequestStarted && (invoiceId || kodeInvoice)) {
+      await Invoice.findOneAndUpdate(
+        invoiceId ? { _id: invoiceId, "paymentGateway.status": MIDTRANS_CREATING } : { kodeInvoice, "paymentGateway.status": MIDTRANS_CREATING },
+        { $set: { "paymentGateway.status": "failed" } },
+      );
+    }
     return res.status(500).json({
       message: error?.message || "Gagal generate token payment gateway",
     });
+  }
+};
+
+router.post("/midtrans/transaction", createMidtransTransaction);
+// Compatibility path for the endpoint created previously.
+router.post("/request-token", createMidtransTransaction);
+
+router.get("/midtrans/status/:invoiceId", async (req, res) => {
+  try {
+    const result = await getInvoiceForCurrentOutlet(req, { invoiceId: req.params.invoiceId });
+    if (result.error) return res.status(result.status).json({ message: result.error });
+
+    let { invoice } = result;
+    if (invoice.paymentGateway?.provider === "midtrans" && invoice.paymentGateway?.orderId && invoice.paymentGateway?.status === MIDTRANS_PENDING) {
+      const status = await getMidtransTransactionStatus(invoice.paymentGateway.orderId);
+      invoice = (await applyMidtransStatus(status)) || invoice;
+    }
+    return sendPaymentStatus(res, invoice);
+  } catch (error) {
+    console.error("Gagal memeriksa status Midtrans:", error);
+    return res.status(502).json({ message: "Gagal memeriksa status pembayaran Midtrans" });
+  }
+});
+
+midtransWebhookRouter.post("/notification", async (req, res) => {
+  try {
+    if (!verifyMidtransNotificationSignature(req.body)) {
+      return res.status(403).json({ message: "Signature notification Midtrans tidak valid" });
+    }
+    const invoice = await applyMidtransStatus(req.body);
+    if (!invoice) return res.status(404).json({ message: "Order Midtrans tidak ditemukan" });
+    return res.status(200).json({ message: "Notification diterima" });
+  } catch (error) {
+    console.error("Gagal memproses notification Midtrans:", error);
+    return res.status(500).json({ message: "Gagal memproses notification Midtrans" });
   }
 });
 

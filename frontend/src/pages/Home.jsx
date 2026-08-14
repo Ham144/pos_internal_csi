@@ -184,9 +184,9 @@ const Home = () => {
           content="Sistem manajemen point of sale internal PT Catur Sukses Internasional (CSI)"
         />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://pos.mycsi.net" />
-        <link rel="canonical" href="https://pos.mycsi.net" />
-        <link rel="preconnect" href="https://pos.mycsi.net" />
+        <meta property="og:url" content="https://internal-pos.mycsi.net" />
+        <link rel="canonical" href="https://internal-pos.mycsi.net" />
+        <link rel="preconnect" href="https://internal-pos.mycsi.net" />
       </Helmet>
 
       <div className="md:mt-20 max-md:mt-20">

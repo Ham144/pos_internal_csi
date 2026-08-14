@@ -20,8 +20,11 @@ export default function About() {
           content="Sistem manajemen point of sale internal PT Catur Sukses Internasional (CSI)"
         />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://pos.mycsi.net/about" />
-        <link rel="canonical" href="https://pos.mycsi.net/about" />
+        <meta
+          property="og:url"
+          content="https://internal-pos.mycsi.net/about"
+        />
+        <link rel="canonical" href="https://internal-pos.mycsi.net/about" />
       </Helmet>
 
       <main className="container mx-auto p-6">

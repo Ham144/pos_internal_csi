@@ -23,13 +23,12 @@ const DetailModal = ({ visible, setModalVisible }) => {
   useEffect(() => {
     const fetchPaymentMethods = async () => {
       try {
-        const storedPaymentMethods = await AsyncStorage.getItem(
-          "paymentMethod"
-        );
+        const storedPaymentMethods =
+          await AsyncStorage.getItem("paymentMethod");
         if (storedPaymentMethods) {
           const parsedPaymentMethods = JSON.parse(storedPaymentMethods);
           const activePaymentMethods = parsedPaymentMethods.filter(
-            (method) => method.status
+            (method) => method.status,
           );
           setPaymentMethodList(activePaymentMethods);
         }
@@ -74,7 +73,7 @@ const DetailModal = ({ visible, setModalVisible }) => {
       setFilteredSpgList(spgList);
     } else {
       const filtered = spgList.filter((spg) =>
-        spg.name.toLowerCase().includes(text.toLowerCase())
+        spg.name.toLowerCase().includes(text.toLowerCase()),
       );
       setFilteredSpgList(filtered);
     }
@@ -112,7 +111,7 @@ const DetailModal = ({ visible, setModalVisible }) => {
           <View className="flex-col justify-between items-center mb-3">
             <View className="flex-row justify-between items-center w-full">
               <Text className="text-xl font-bold text-gray-800 font-aldrich text-center">
-                Pilih Metode Pembayaran & SPG
+                Pilih SPG
               </Text>
               <TouchableOpacity
                 onPress={() => setModalVisible(false)}
@@ -127,7 +126,7 @@ const DetailModal = ({ visible, setModalVisible }) => {
           <ScrollView className="max-h-[50vh]">
             <View className="flex-row gap-4">
               {/* Payment Methods List */}
-              <View className="flex-1 bg-gray-100 rounded-lg">
+              {/* <View className="flex-1 bg-gray-100 rounded-lg">
                 <View className="max-h-[300px]">
                   <ScrollView className="p-2 py-5">
                     {paymentMethodList.map((method, i) => (
@@ -161,7 +160,7 @@ const DetailModal = ({ visible, setModalVisible }) => {
                     ))}
                   </ScrollView>
                 </View>
-              </View>
+              </View> */}
 
               {/* SPG List */}
               <View className="flex-1 bg-gray-100 rounded-lg">

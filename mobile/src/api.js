@@ -12,12 +12,45 @@ import {
 } from "./utils/inventoryFilters.js";
 
 export const getBaseUrl = async () => {
-  let baseUrl = JSON.parse(await AsyncStorage.getItem("BASE_URL"));
-  if (!baseUrl) {
-    await AsyncStorage.setItem("BASE_URL", JSON.stringify(BASE_URL));
-    baseUrl = BASE_URL;
+  const storedBaseUrl = await AsyncStorage.getItem("BASE_URL");
+
+  if (storedBaseUrl) {
+    try {
+      const parsedBaseUrl = JSON.parse(storedBaseUrl);
+      if (parsedBaseUrl) {
+        return parsedBaseUrl;
+      }
+    } catch (error) {
+      if (storedBaseUrl.trim()) {
+        return storedBaseUrl.trim();
+      }
+    }
   }
-  return baseUrl;
+
+  await AsyncStorage.setItem("BASE_URL", JSON.stringify(BASE_URL));
+  return BASE_URL;
+};
+
+const getMobileAuthHeaders = async () => {
+  const token = await AsyncStorage.getItem("token");
+  return { mobile: `Bearer ${token}` };
+};
+
+export const createMidtransPayment = async (invoiceId) => {
+  const response = await axios.post(
+    `${await getBaseUrl()}/api/v1/payment/midtrans/transaction`,
+    { invoiceId },
+    { headers: await getMobileAuthHeaders(), timeout: 30000 },
+  );
+  return response.data?.data;
+};
+
+export const getMidtransPaymentStatus = async (invoiceId) => {
+  const response = await axios.get(
+    `${await getBaseUrl()}/api/v1/payment/midtrans/status/${encodeURIComponent(invoiceId)}`,
+    { headers: await getMobileAuthHeaders(), timeout: 30000 },
+  );
+  return response.data?.data;
 };
 
 //get Offline inventories
@@ -32,7 +65,7 @@ export const getAllinventoriesOffline = async (queryKey) => {
         terjualFromApp:
           item.terjualFromApp !== undefined ? item.terjualFromApp : 0,
       })),
-      removedSkus
+      removedSkus,
     );
 
     //for libraris screen filter
@@ -143,7 +176,7 @@ export const getAllDiskon = async () => {
       headers: {
         mobile: `Bearer ${token}`,
       },
-    }
+    },
   );
   return response.data;
 };
@@ -156,7 +189,7 @@ export const getAllDiskonByProduct = async (sku) => {
       headers: {
         mobile: `Bearer ${token}`,
       },
-    }
+    },
   );
   return response.data;
 };
@@ -177,7 +210,7 @@ export const getAllPromo = async () => {
         headers: {
           mobile: `Bearer ${token}`,
         },
-      }
+      },
     );
 
     if (!response?.data) {
@@ -194,7 +227,7 @@ export const getAllPromo = async () => {
   } catch (error) {
     ToastAndroid?.show(
       error.response?.data.message || "terjadi kesalahan saat ambil data promo",
-      ToastAndroid.SHORT
+      ToastAndroid.SHORT,
     );
     throw error;
   }
@@ -208,7 +241,7 @@ export const getAllPromoByProduct = async (sku) => {
       headers: {
         mobile: `Bearer ${token}`,
       },
-    }
+    },
   );
   return response.data;
 };
@@ -222,7 +255,7 @@ export const getAllVouchers = async () => {
       headers: {
         mobile: `Bearer ${token}`,
       },
-    }
+    },
   );
   return response.data;
 };
@@ -235,7 +268,7 @@ export const getAllVoucherTerblokirByProduct = async (sku) => {
       headers: {
         mobile: `Bearer ${token}`,
       },
-    }
+    },
   );
   return response.data;
 };
@@ -244,12 +277,12 @@ export const getAllVoucherTerblokirByProduct = async (sku) => {
 export const initializePaymentMethod = async () => {
   const token = await AsyncStorage.getItem("token");
   const response = await axios.get(
-    `${await getBaseUrl()}/api/v1/paymentMethod/getAllPaymentMethod`,
+    `${await getBaseUrl()}/api/v1/payment/getAllPaymentMethod`,
     {
       headers: {
         mobile: `Bearer ${token}`,
       },
-    }
+    },
   );
   return response?.data;
 };
@@ -263,7 +296,7 @@ export const getAllInventoriesOnlineInitial = async (page = 1, limit = 50) => {
       headers: {
         mobile: `Bearer ${token}`,
       },
-    }
+    },
   );
   return response?.data;
 };
@@ -350,7 +383,7 @@ export const syncDiskonPromoVoucherInventories = async (isOnline) => {
       : [];
 
   const inventoriesOfflineFull = JSON.parse(
-    await AsyncStorage?.getItem("inventories")
+    await AsyncStorage?.getItem("inventories"),
   );
   const inventoriesOffline = inventoriesOfflineFull?.filter((i) => {
     if (i.quantityDariDataBase !== i.quantity) {
@@ -399,7 +432,7 @@ export const syncDiskonPromoVoucherInventories = async (isOnline) => {
     console.log("gagal mengambil user, coba login ulang");
     ToastAndroid?.show(
       "Gagal mengambil user, coba login ulang",
-      ToastAndroid.SHORT
+      ToastAndroid.SHORT,
     );
     return null;
   }
@@ -420,7 +453,7 @@ export const syncDiskonPromoVoucherInventories = async (isOnline) => {
     //jika tidak ada diskon Offline diasyncstorage maka ambil BE
     if (!updateDiskons?.length || !updateDiskons) {
       console.log(
-        "tidak ada diskon offline, mencoba mengambil data diskon dari BE"
+        "tidak ada diskon offline, mencoba mengambil data diskon dari BE",
       );
 
       const response = await getAllDiskon();
@@ -443,7 +476,7 @@ export const syncDiskonPromoVoucherInventories = async (isOnline) => {
     //jika tidak ada promoOffline di asyncstorage maka ambil BE
     if (!updatedPromos?.length || !updatedPromos) {
       console.log(
-        "tidak ada promo offline, mencoba mengambil data promo dari BE"
+        "tidak ada promo offline, mencoba mengambil data promo dari BE",
       );
       const response = await getAllPromo();
       if (!response) {
@@ -465,7 +498,7 @@ export const syncDiskonPromoVoucherInventories = async (isOnline) => {
     //jika tidak ada voucherOffline diasyncstorage maka ambil BE
     if (!updateVouchers?.length || !updateVouchers) {
       console.log(
-        "Tidak ada voucher offline, mencoba mengambil data voucher dari BE"
+        "Tidak ada voucher offline, mencoba mengambil data voucher dari BE",
       );
       const response = await getAllVouchers();
       if (!response?.data) {
@@ -585,13 +618,13 @@ export const syncDiskonPromoVoucherInventories = async (isOnline) => {
             headers: {
               mobile: `Bearer ${token}`,
             },
-          }
+          },
         );
         if (response?.data?.data) {
           data.newOutletData = response?.data?.data;
           await AsyncStorage.setItem(
             "outlet",
-            JSON.stringify(response?.data?.data)
+            JSON.stringify(response?.data?.data),
           );
           console.log("Initialized outlet ✅");
         }
@@ -602,7 +635,7 @@ export const syncDiskonPromoVoucherInventories = async (isOnline) => {
         } else {
           ToastAndroid?.show(
             "Gagal menginisialisasi outlet",
-            ToastAndroid.SHORT
+            ToastAndroid.SHORT,
           );
         }
         console.log("gagal menginisialisasi outlet ❌");
@@ -622,7 +655,7 @@ export const syncDiskonPromoVoucherInventories = async (isOnline) => {
         if (Platform.OS === "android") {
           ToastAndroid.show(
             "Memulai sinkronisasi inventories...",
-            ToastAndroid.SHORT
+            ToastAndroid.SHORT,
           );
         } else if (Platform.OS === "web") {
           console.log("Memulai sinkronisasi inventories...");
@@ -634,7 +667,7 @@ export const syncDiskonPromoVoucherInventories = async (isOnline) => {
         while (hasMorePages) {
           const inventoriesPage = await getAllInventoriesOnlineInitial(
             currentPage,
-            ITEMS_PER_PAGE
+            ITEMS_PER_PAGE,
           );
 
           if (!inventoriesPage?.data || inventoriesPage.data.length === 0) {
@@ -645,11 +678,11 @@ export const syncDiskonPromoVoucherInventories = async (isOnline) => {
           const currentBatchData = inventoriesPage.data
             .filter((item) => item?.isDisabled !== true)
             .map((item) => ({
-            ...item,
-            quantityDariDataBase: item?.quantity,
-            terakhirSync: new Date(),
-            terjualFromApp: 0,
-          }));
+              ...item,
+              quantityDariDataBase: item?.quantity,
+              terakhirSync: new Date(),
+              terjualFromApp: 0,
+            }));
 
           await saveToAsyncStorage("inventories", currentBatchData);
 
@@ -663,7 +696,7 @@ export const syncDiskonPromoVoucherInventories = async (isOnline) => {
         }
         // Setelah selesai, ambil semua data untuk dikembalikan
         const finalInventories = JSON.parse(
-          await AsyncStorage.getItem("inventories")
+          await AsyncStorage.getItem("inventories"),
         );
 
         if (finalInventories?.length > 0) {
@@ -672,7 +705,7 @@ export const syncDiskonPromoVoucherInventories = async (isOnline) => {
           if (Platform.OS === "android") {
             ToastAndroid.show(
               `Sinkronisasi selesai: ${totalItems} item`,
-              ToastAndroid.SHORT
+              ToastAndroid.SHORT,
             );
           } else if (Platform.OS === "web") {
             console.log(`Sinkronisasi selesai: ${totalItems} item`);
@@ -684,7 +717,7 @@ export const syncDiskonPromoVoucherInventories = async (isOnline) => {
           } else {
             ToastAndroid?.show(
               "Tidak ditemukan data inventories dari Database",
-              ToastAndroid.SHORT
+              ToastAndroid.SHORT,
             );
           }
           console.log("Initialized inventories data ❌");
@@ -694,17 +727,17 @@ export const syncDiskonPromoVoucherInventories = async (isOnline) => {
         Platform.OS === "web"
           ? console.log(
               res?.response?.data?.message ||
-                "gagal inisialisasi inventories offline"
+                "gagal inisialisasi inventories offline",
             )
           : ToastAndroid?.show(
               res?.response?.data?.message ||
                 "gagal inisialisasi inventories offline",
-              ToastAndroid.SHORT
+              ToastAndroid.SHORT,
             );
         if (res?.status == 401) {
           ToastAndroid?.show(
             "Token expired, logout redirect",
-            ToastAndroid.SHORT
+            ToastAndroid.SHORT,
           );
           setTimeout(async () => {
             await AsyncStorage.removeItem("userInfo");
@@ -762,7 +795,7 @@ export const syncDiskonPromoVoucherInventories = async (isOnline) => {
 
     // Filter bills to only include those that haven't been synced yet or have changed
     const unsyncedBills = updatedBill.filter(
-      (bill) => !bill.sync || bill.isChanged
+      (bill) => !bill.sync || bill.isChanged,
     );
 
     const body = {
@@ -782,7 +815,7 @@ export const syncDiskonPromoVoucherInventories = async (isOnline) => {
         }
 
         return Object.values(customer).some(
-          (value) => value !== undefined && value !== null && value !== ""
+          (value) => value !== undefined && value !== null && value !== "",
         );
       }),
       // Make sure salesPerson is explicitly included in each bill and only send unsynced bills
@@ -804,7 +837,7 @@ export const syncDiskonPromoVoucherInventories = async (isOnline) => {
         },
         timeout: 60000, // 1 menit
         timeoutErrorMessage: "Timeout, silahkan coba lagi",
-      }
+      },
     );
 
     // -------- output ----------
@@ -830,7 +863,7 @@ export const syncDiskonPromoVoucherInventories = async (isOnline) => {
             quantityDariDataBase: item?.quantityTersedia,
             terakhirSync: new Date(),
           };
-        }
+        },
       );
       const newSpgsData = response?.data?.data?.newSpgList?.map((item) => {
         return {
@@ -854,7 +887,7 @@ export const syncDiskonPromoVoucherInventories = async (isOnline) => {
 
           // Skip customers where all values are empty
           const hasAnyValue = Object.values(item).some(
-            (value) => value !== undefined && value !== null && value !== ""
+            (value) => value !== undefined && value !== null && value !== "",
           );
 
           if (!hasAnyValue) {
@@ -885,22 +918,22 @@ export const syncDiskonPromoVoucherInventories = async (isOnline) => {
               item.isPrintedKwitansi === true
                 ? true
                 : localBill?.isPrintedKwitansi === true
-                ? true
-                : false,
+                  ? true
+                  : false,
             isPrintedCustomerBilling:
               item.isPrintedCustomerBilling === true
                 ? true
                 : localBill?.isPrintedCustomerBilling === true
-                ? true
-                : false,
+                  ? true
+                  : false,
             done:
               item.done === true
                 ? true
                 : localBill?.done === true
-                ? true
-                : false,
+                  ? true
+                  : false,
           };
-        }
+        },
       );
 
       const newOutletData = {
@@ -956,7 +989,7 @@ export const syncDiskonPromoVoucherInventories = async (isOnline) => {
           // Mark synced bills as synced
           unsyncedBills.forEach((syncedBill) => {
             const index = allBills.findIndex(
-              (bill) => bill._id === syncedBill._id
+              (bill) => bill._id === syncedBill._id,
             );
             if (index !== -1) {
               allBills[index] = {
@@ -979,7 +1012,7 @@ export const syncDiskonPromoVoucherInventories = async (isOnline) => {
       //proses tanpa perubaham hanya ambil dari DB dan update AsyncStorage
       await AsyncStorage.setItem(
         "paymentMethod",
-        JSON.stringify(response?.data?.data?.newPaymentMethodData)
+        JSON.stringify(response?.data?.data?.newPaymentMethodData),
       );
 
       return data;
@@ -1075,7 +1108,7 @@ export const printTest = async (config) => {
               });
             }
           }, 500);
-        }
+        },
       );
 
       // Set connection timeout
@@ -1140,7 +1173,7 @@ export const printCetakBillCustomer = async (
   bill,
   time,
   outlet,
-  isFirstTime
+  isFirstTime,
 ) => {
   const { ipPrinter, portPrinter } = config;
   const {
@@ -1227,7 +1260,7 @@ export const printCetakBillCustomer = async (
           printerFormatter.formatColumns(
             "\tPotongan Diskon",
             "",
-            formatCurrency(potongan)
+            formatCurrency(potongan),
           ) + "\n";
       });
 
@@ -1250,17 +1283,17 @@ export const printCetakBillCustomer = async (
           printerFormatter.formatColumns(
             "\tVoucher (NEXT TIME)",
             "",
-            `Rp ${potongan.toLocaleString("id-ID")}`
+            `Rp ${potongan.toLocaleString("id-ID")}`,
           ) + "\n";
 
         const tanggal = new Date(
-          voucher.voucherInfo.berlakuHingga
+          voucher.voucherInfo.berlakuHingga,
         ).toLocaleDateString();
         message +=
           printerFormatter.formatColumns(
             "\tVoucher Berlaku hingga",
             "",
-            tanggal
+            tanggal,
           ) + "\n";
       });
     });
@@ -1286,13 +1319,13 @@ export const printCetakBillCustomer = async (
     message += printerFormatter.formatColumns(
       "SUBTOTAL",
       "",
-      `Rp ${subTotal.toLocaleString("id-ID")}`
+      `Rp ${subTotal.toLocaleString("id-ID")}`,
     );
     message += "\n";
     message += printerFormatter.formatColumns(
       "TOTAL",
       "",
-      `Rp ${total.toLocaleString("id-ID")}`
+      `Rp ${total.toLocaleString("id-ID")}`,
     );
     message += "\n";
 
@@ -1379,7 +1412,7 @@ export const printCetakBillCustomer = async (
               });
             }
           }, 500);
-        }
+        },
       );
 
       // Set connection timeout
@@ -1445,7 +1478,7 @@ export const printCetakKwitansi = async (
   bill,
   time,
   outlet,
-  isFirstTime
+  isFirstTime,
 ) => {
   const { ipPrinter, portPrinter } = config;
   const {
@@ -1506,24 +1539,24 @@ export const printCetakKwitansi = async (
       `${printerFormatter.formatWithSpace("Ext doc", _id)}\n` +
       `${printerFormatter.formatWithSpace(
         "Waktu Pembayaran",
-        tanggalBayarStr || time
+        tanggalBayarStr || time,
       )}\n` +
       `${printerFormatter.formatWithSpace("Waktu Print", time)}\n` +
       `${printerFormatter.formatWithSpace(
         "Nama Customer",
-        customer?.name || ""
+        customer?.name || "",
       )}\n` +
       `${printerFormatter.formatWithSpace("Kasir", salesPerson)}\n` +
       `${printerFormatter.formatWithSpace("Spg", spg?.name || "")}\n` +
       `${printerFormatter.formatWithSpace(
         "Payment Method",
-        paymentMethod || ""
+        paymentMethod || "",
       )}\n`;
 
     if (nomorTransaksi) {
       infoBill += `${printerFormatter.formatWithSpace(
         "Nomor Transaksi",
-        nomorTransaksi
+        nomorTransaksi,
       )}\n`;
     }
     message += infoBill;
@@ -1559,7 +1592,7 @@ export const printCetakKwitansi = async (
           printerFormatter.formatColumns(
             "\tPotongan Diskon",
             "",
-            formatCurrency(potongan)
+            formatCurrency(potongan),
           ) + "\n";
       });
 
@@ -1580,17 +1613,17 @@ export const printCetakKwitansi = async (
           printerFormatter.formatColumns(
             "\tVoucher (NEXT TIME)",
             "",
-            `Rp ${potongan.toLocaleString("id-ID")}`
+            `Rp ${potongan.toLocaleString("id-ID")}`,
           ) + "\n";
 
         const tanggal = new Date(
-          voucher.voucherInfo.berlakuHingga
+          voucher.voucherInfo.berlakuHingga,
         ).toLocaleDateString();
         message +=
           printerFormatter.formatColumns(
             "\tVoucher Berlaku hingga",
             "",
-            tanggal
+            tanggal,
           ) + "\n";
       });
     });
@@ -1616,13 +1649,13 @@ export const printCetakKwitansi = async (
     message += printerFormatter.formatColumns(
       "SUBTOTAL",
       "",
-      `Rp ${subTotal.toLocaleString("id-ID")}`
+      `Rp ${subTotal.toLocaleString("id-ID")}`,
     );
     message += "\n";
     message += printerFormatter.formatColumns(
       "TOTAL",
       "",
-      `Rp ${total.toLocaleString("id-ID")}`
+      `Rp ${total.toLocaleString("id-ID")}`,
     );
     message += "\n";
 
@@ -1717,7 +1750,7 @@ export const printCetakKwitansi = async (
               });
             }
           }, 500);
-        }
+        },
       );
 
       // Set connection timeout
@@ -1784,7 +1817,7 @@ export const printCetakHelper = async (
   items,
   promo,
   catatans,
-  time
+  time,
 ) => {
   const { ipPrinter, portPrinter } = config;
 
@@ -1947,7 +1980,7 @@ export const printCetakHelper = async (
               });
             }
           }, 500);
-        }
+        },
       );
 
       // Set connection timeout
@@ -2047,7 +2080,7 @@ const sendRawPrintMessage = (config, message) => {
                   if (client) client.destroy();
                   finish(
                     reject,
-                    new Error(`Gagal mengirim data ke printer: ${err.message}`)
+                    new Error(`Gagal mengirim data ke printer: ${err.message}`),
                   );
                   return;
                 }
@@ -2063,7 +2096,7 @@ const sendRawPrintMessage = (config, message) => {
               finish(reject, new Error("Printer tidak siap"));
             }
           }, 500);
-        }
+        },
       );
 
       client.setTimeout(10000, () => {
@@ -2090,7 +2123,7 @@ const sendRawPrintMessage = (config, message) => {
         if (!isDataSent) {
           finish(
             reject,
-            new Error("Koneksi printer terputus sebelum data terkirim")
+            new Error("Koneksi printer terputus sebelum data terkirim"),
           );
         }
       });
@@ -2114,51 +2147,50 @@ export const printSettlement = async ({
 
   // Print
   const ESC_INIT = printerFormatter.ESC_INIT;
-    const CUT_PAPER = printerFormatter.CUT_PAPER;
-    const ESC_ALIGN_CENTER = printerFormatter.ESC_ALIGN_CENTER;
-    const ESC_ALIGN_LEFT = printerFormatter.ESC_ALIGN_LEFT;
-    const ESC_FONT_SIZE_LARGE = printerFormatter.ESC_FONT_SIZE_LARGE;
-    const ESC_FONT_SIZE_NORMAL = printerFormatter.ESC_FONT_SIZE_NORMAL;
-    const totalWidth = printerFormatter.totalWidth;
+  const CUT_PAPER = printerFormatter.CUT_PAPER;
+  const ESC_ALIGN_CENTER = printerFormatter.ESC_ALIGN_CENTER;
+  const ESC_ALIGN_LEFT = printerFormatter.ESC_ALIGN_LEFT;
+  const ESC_FONT_SIZE_LARGE = printerFormatter.ESC_FONT_SIZE_LARGE;
+  const ESC_FONT_SIZE_NORMAL = printerFormatter.ESC_FONT_SIZE_NORMAL;
+  const totalWidth = printerFormatter.totalWidth;
 
-    let printMessage = ESC_INIT;
-    printMessage +=
-      ESC_ALIGN_CENTER + ESC_FONT_SIZE_LARGE + "SETTLEMENT" + "\n\n";
-    printMessage +=
-      ESC_ALIGN_CENTER + ESC_FONT_SIZE_LARGE + outletName + "\n\n";
-    printMessage += ESC_FONT_SIZE_NORMAL + "-".repeat(totalWidth) + "\n";
-    printMessage += `Tanggal Settlement: ${settlementDate}\n`;
-    printMessage += "Metode Pembayaran dan Total\n";
-    printMessage += "-".repeat(totalWidth) + "\n\n";
-    printMessage += ESC_ALIGN_LEFT;
+  let printMessage = ESC_INIT;
+  printMessage +=
+    ESC_ALIGN_CENTER + ESC_FONT_SIZE_LARGE + "SETTLEMENT" + "\n\n";
+  printMessage += ESC_ALIGN_CENTER + ESC_FONT_SIZE_LARGE + outletName + "\n\n";
+  printMessage += ESC_FONT_SIZE_NORMAL + "-".repeat(totalWidth) + "\n";
+  printMessage += `Tanggal Settlement: ${settlementDate}\n`;
+  printMessage += "Metode Pembayaran dan Total\n";
+  printMessage += "-".repeat(totalWidth) + "\n\n";
+  printMessage += ESC_ALIGN_LEFT;
 
-    printerFormatter.formatColumns("Metode Pembayaran", "", "Total");
-    totals.forEach((item) => {
-      const paymentMethod = item?._id ?? "UNKNOWN";
-
-      printMessage += printerFormatter.formatColumns(
-        paymentMethod,
-        "",
-        formatCurrency(item?.totalSales)
-      );
-      printMessage += "\n";
-    });
-
-    printMessage += "-".repeat(totalWidth) + "\n";
+  printerFormatter.formatColumns("Metode Pembayaran", "", "Total");
+  totals.forEach((item) => {
+    const paymentMethod = item?._id ?? "UNKNOWN";
 
     printMessage += printerFormatter.formatColumns(
-      "Total Keseluruhan",
+      paymentMethod,
       "",
-      formatCurrency(totalAmount)
+      formatCurrency(item?.totalSales),
     );
-    printMessage += "\n\n\n\n\n";
-    printMessage += CUT_PAPER;
+    printMessage += "\n";
+  });
 
-    if (environment == "development") {
-      return true;
-    }
+  printMessage += "-".repeat(totalWidth) + "\n";
 
-    return sendRawPrintMessage(config, printMessage);
+  printMessage += printerFormatter.formatColumns(
+    "Total Keseluruhan",
+    "",
+    formatCurrency(totalAmount),
+  );
+  printMessage += "\n\n\n\n\n";
+  printMessage += CUT_PAPER;
+
+  if (environment == "development") {
+    return true;
+  }
+
+  return sendRawPrintMessage(config, printMessage);
 };
 
 //untuk mencetak end of day (pengelompokan total quantity dan harga hari ini pada outlet)
@@ -2173,76 +2205,75 @@ export const printCetakEOD = async ({
     throw new Error("Config printer belum lengkap");
   }
 
-    // Format currency
-    const formatCurrency = (amount) => {
-      return `Rp ${amount.toLocaleString("id-ID")}`;
-    };
+  // Format currency
+  const formatCurrency = (amount) => {
+    return `Rp ${amount.toLocaleString("id-ID")}`;
+  };
 
-    // Print
-    const ESC_INIT = printerFormatter.ESC_INIT;
-    const CUT_PAPER = printerFormatter.CUT_PAPER;
-    const ESC_ALIGN_CENTER = printerFormatter.ESC_ALIGN_CENTER;
-    const ESC_ALIGN_LEFT = printerFormatter.ESC_ALIGN_LEFT;
-    const ESC_FONT_SIZE_LARGE = printerFormatter.ESC_FONT_SIZE_LARGE;
-    const ESC_FONT_SIZE_NORMAL = printerFormatter.ESC_FONT_SIZE_NORMAL;
-    const totalWidth = printerFormatter.totalWidth;
+  // Print
+  const ESC_INIT = printerFormatter.ESC_INIT;
+  const CUT_PAPER = printerFormatter.CUT_PAPER;
+  const ESC_ALIGN_CENTER = printerFormatter.ESC_ALIGN_CENTER;
+  const ESC_ALIGN_LEFT = printerFormatter.ESC_ALIGN_LEFT;
+  const ESC_FONT_SIZE_LARGE = printerFormatter.ESC_FONT_SIZE_LARGE;
+  const ESC_FONT_SIZE_NORMAL = printerFormatter.ESC_FONT_SIZE_NORMAL;
+  const totalWidth = printerFormatter.totalWidth;
 
-    let printMessage = ESC_INIT;
-    printMessage +=
-      ESC_ALIGN_CENTER + ESC_FONT_SIZE_LARGE + "END OF DAY" + "\n\n";
-    printMessage +=
-      ESC_ALIGN_CENTER + ESC_FONT_SIZE_LARGE + outletName + "\n\n";
-    printMessage += ESC_FONT_SIZE_NORMAL + "-".repeat(totalWidth) + "\n";
-    printMessage += `End of Day: ${date}\n`;
-    printMessage += "SKU Grouping by today\n";
-    printMessage += "-".repeat(totalWidth) + "\n\n";
-    printMessage += ESC_ALIGN_LEFT;
+  let printMessage = ESC_INIT;
+  printMessage +=
+    ESC_ALIGN_CENTER + ESC_FONT_SIZE_LARGE + "END OF DAY" + "\n\n";
+  printMessage += ESC_ALIGN_CENTER + ESC_FONT_SIZE_LARGE + outletName + "\n\n";
+  printMessage += ESC_FONT_SIZE_NORMAL + "-".repeat(totalWidth) + "\n";
+  printMessage += `End of Day: ${date}\n`;
+  printMessage += "SKU Grouping by today\n";
+  printMessage += "-".repeat(totalWidth) + "\n\n";
+  printMessage += ESC_ALIGN_LEFT;
 
-    printMessage += printerFormatter.formatColumns("SKU", "QTY", "SALE");
-    printMessage += "\n";
+  printMessage += printerFormatter.formatColumns("SKU", "QTY", "SALE");
+  printMessage += "\n";
 
-    totals.forEach((item) => {
-      const sku = item?._id ?? "?sku?";
+  totals.forEach((item) => {
+    const sku = item?._id ?? "?sku?";
 
-      printMessage += printerFormatter.formatColumns(
-        sku,
-        item?.totalQuantity ? item.totalQuantity : "-",
-        item?.totalSales ? item.totalSales : "-"
-      );
-      printMessage += "\n";
-    });
-
-    const totalAmountQuantity = totals.reduce(
-      (acc, item) => acc + (item?.totalQuantity || 0),
-      0
-    );
-
-    printMessage += "-".repeat(totalWidth) + "\n";
     printMessage += printerFormatter.formatColumns(
-      "Total Keseluruhan",
-      totalAmountQuantity ? totalAmountQuantity : "-",
-      formatCurrency(totalAmount)
+      sku,
+      item?.totalQuantity ? item.totalQuantity : "-",
+      item?.totalSales ? item.totalSales : "-",
     );
-    printMessage += "\n\n\n\n\n";
-    printMessage += CUT_PAPER;
+    printMessage += "\n";
+  });
 
-    if (environment == "development") {
-      return true;
-    }
+  const totalAmountQuantity = totals.reduce(
+    (acc, item) => acc + (item?.totalQuantity || 0),
+    0,
+  );
 
-    return sendRawPrintMessage(config, printMessage);
+  printMessage += "-".repeat(totalWidth) + "\n";
+  printMessage += printerFormatter.formatColumns(
+    "Total Keseluruhan",
+    totalAmountQuantity ? totalAmountQuantity : "-",
+    formatCurrency(totalAmount),
+  );
+  printMessage += "\n\n\n\n\n";
+  printMessage += CUT_PAPER;
+
+  if (environment == "development") {
+    return true;
+  }
+
+  return sendRawPrintMessage(config, printMessage);
 };
 export const deleteFromKirimNanti = async (_id) => {
   try {
     const kirimNantiBill = JSON.parse(
-      await AsyncStorage.getItem("kirimNantiKwitansi")
+      await AsyncStorage.getItem("kirimNantiKwitansi"),
     );
     const updatedKirimNantiBill = kirimNantiBill.filter(
-      (item) => item._id !== _id
+      (item) => item._id !== _id,
     );
     await AsyncStorage.setItem(
       "kirimNantiKwitansi",
-      JSON.stringify(updatedKirimNantiBill)
+      JSON.stringify(updatedKirimNantiBill),
     );
   } catch (error) {
     console.log("gagal menghapus dari kirim nanti", error);
@@ -2259,7 +2290,7 @@ export const sendKwitansiViaEmail = async () => {
       return;
     }
     const filteredBillTersimpanOffline = billTersimpanOffline?.filter(
-      (item) => !item?.isPrintedKwitansi || item?.isPrintedKwitansi == false
+      (item) => !item?.isPrintedKwitansi || item?.isPrintedKwitansi == false,
     );
     if (!filteredBillTersimpanOffline?.length) {
       console.log("tidak ada bill untuk dikirim via email");
@@ -2273,7 +2304,7 @@ export const sendKwitansiViaEmail = async () => {
           headers: {
             mobile: `Bearer ${token}`,
           },
-        }
+        },
       )
       .then((response) => {})
       .catch((error) => {
@@ -2281,7 +2312,7 @@ export const sendKwitansiViaEmail = async () => {
         Platform.OS == "android" &&
           ToastAndroid?.show(
             "error di sendKwitansiViaEmail",
-            ToastAndroid.SHORT
+            ToastAndroid.SHORT,
           );
       });
     Platform.OS == "android" &&
@@ -2301,7 +2332,7 @@ export const getAllSpg = async () => {
       headers: {
         mobile: `Bearer ${token}`,
       },
-    }
+    },
   );
   return response.data;
 };
@@ -2314,7 +2345,7 @@ export const getAllBill = async () => {
       headers: {
         mobile: `Bearer ${token}`,
       },
-    }
+    },
   );
   return response.data;
 };
@@ -2327,7 +2358,7 @@ export const getAllCustomer = async () => {
       headers: {
         mobile: `Bearer ${token}`,
       },
-    }
+    },
   );
   return response.data;
 };
@@ -2360,7 +2391,7 @@ export const getOuletByUserId = async (userId) => {
         headers: {
           mobile: `Bearer ${token}`,
         },
-      }
+      },
     );
     return response?.data;
   } catch (error) {
@@ -2373,14 +2404,11 @@ export const getThumbnail = async (itemId) => {
   const baseUrl = await getBaseUrl();
   const id = itemId?.$oid ?? itemId;
   try {
-    const response = await axios.get(
-      `${baseUrl}/api/v1/thumbnail/get/${id}`,
-      {
-        headers: {
-          mobile: `Bearer ${token}`,
-        },
-      }
-    );
+    const response = await axios.get(`${baseUrl}/api/v1/thumbnail/get/${id}`, {
+      headers: {
+        mobile: `Bearer ${token}`,
+      },
+    });
     return response?.data;
   } catch (error) {
     throw new Error(error?.response?.data?.message);
@@ -2402,6 +2430,7 @@ export const extractThumbnailBase64 = (response) => {
 //test URL BASE
 export const pingBackend = async (BE) => {
   try {
+    console.log(BE);
     const response = await axios.get(`${BE}/api/v1/ping`);
     return response?.status === 200;
   } catch (error) {
@@ -2419,13 +2448,13 @@ export const getisOnline = async () => {
 //offline search
 export const searchInventoriesOffline = async (q) => {
   const inventoriOffline = JSON.parse(
-    await AsyncStorage.getItem("inventories")
+    await AsyncStorage.getItem("inventories"),
   );
   if (!inventoriOffline) {
     ToastAndroid?.show("tidak ada inventories offline", ToastAndroid.SHORT);
   } else {
     const filteredInventoriesOffline = inventoriOffline?.filter((item) =>
-      item?.sku?.toLowerCase().includes(q?.toLowerCase())
+      item?.sku?.toLowerCase().includes(q?.toLowerCase()),
     );
     if (!filteredInventoriesOffline?.length) {
       ToastAndroid?.show("tidak ada inventories offline", ToastAndroid.SHORT);
@@ -2444,7 +2473,7 @@ export const login = async (username, password) => {
 
     const response = await axios.post(
       `${await getBaseUrl()}/api/v1/auth/loginMobile`,
-      body
+      body,
     );
 
     return response.data;
@@ -2455,17 +2484,17 @@ export const login = async (username, password) => {
         throw new Error("Username atau password salah");
       } else if (error.response.status === 404) {
         throw new Error(
-          "Server tidak ditemukan. Periksa koneksi atau URL server"
+          "Server tidak ditemukan. Periksa koneksi atau URL server",
         );
       } else {
         throw new Error(
-          error.response.data?.message || "Terjadi kesalahan saat login"
+          error.response.data?.message || "Terjadi kesalahan saat login",
         );
       }
     } else if (error.request) {
       // Request was made but no response
       throw new Error(
-        "Tidak dapat terhubung ke server. Periksa koneksi internet Anda"
+        "Tidak dapat terhubung ke server. Periksa koneksi internet Anda",
       );
     } else {
       // Error in request setup
@@ -2481,13 +2510,13 @@ export const getUserInfo = async () => {
       `${await getBaseUrl()}/api/v1/auth/getUserInfo`,
       {
         headers: { mobile: `Bearer ${token}` },
-      }
+      },
     );
     return response?.data;
   } catch (error) {
     console.log(
       error,
-      "Error getUserInfo, gagal mendapatkan userInfo maak login ulang"
+      "Error getUserInfo, gagal mendapatkan userInfo maak login ulang",
     );
   }
 };
@@ -2504,7 +2533,7 @@ export const voucherRedeem = async (voucherCode, outletId) => {
       headers: {
         mobile: `Bearer ${token}`,
       },
-    }
+    },
   );
 
   return response.data;
@@ -2512,28 +2541,30 @@ export const voucherRedeem = async (voucherCode, outletId) => {
 
 export const getPaymentMethodRanking = async (params) => {
   const token = await AsyncStorage.getItem("token");
+  const baseUrl = await getBaseUrl();
   const response = await axios.get(
-    `${BASE_URL}/api/v1/dashboard/rangking-payment-method`,
+    `${baseUrl}/api/v1/dashboard/rangking-payment-method`,
     {
       params,
       headers: {
         mobile: `Bearer ${token}`,
       },
-    }
+    },
   );
   return response.data;
 };
 
 export const endOfDayBySku = async (params) => {
   const token = await AsyncStorage.getItem("token");
+  const baseUrl = await getBaseUrl();
   const response = await axios.get(
-    `${BASE_URL}/api/v1/dashboard/end-of-day-by-sku`,
+    `${baseUrl}/api/v1/dashboard/end-of-day-by-sku`,
     {
       params,
       headers: {
         mobile: `Bearer ${token}`,
       },
-    }
+    },
   );
   return response.data;
 };

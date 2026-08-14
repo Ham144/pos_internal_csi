@@ -20,11 +20,8 @@ const authenticate = (req, res, next) => {
     req?.cookies?.token || req.headers.authorization?.split(" ")[1] || null; // Web token
   const mobileToken = req.headers.mobile?.split(" ")[1] || null; // Mobile token
 
-  console.log(mobileToken);
-
   // If neither token is provided, return Unauthorized
   if (!token && !mobileToken) {
-    console.log("authentication failed : ", req.originalUrl);
     return res.status(401).json({ message: "No Authentication" });
   }
 

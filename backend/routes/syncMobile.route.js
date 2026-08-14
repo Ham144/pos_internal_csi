@@ -215,7 +215,8 @@ router.post("/syncDiskonPromoVoucher", authenticate, async (req, res) => {
             }),
             implementedVoucher: bill?.implementedVoucher,
             isPrintedCustomerBilling: bill?.isPrintedCustomerBilling,
-            done: bill?.done,
+            // A delayed mobile sync must never revert a payment confirmed by Midtrans.
+            done: invoiceDB.done === true || bill?.done === true,
             isPrintedKwitansi: bill?.isPrintedKwitansi,
             requestingVoid: bill?.requestingVoid,
           },
