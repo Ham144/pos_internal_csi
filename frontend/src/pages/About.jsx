@@ -1,23 +1,21 @@
 import { mockPages, mockBackend } from "@/api/constant";
-import { Helmet } from "react-helmet-async";
 
 export default function About() {
   return (
     <>
-      <Helmet>
-        <title>Tentang Internal POS CSI - Sistem Manajemen Point of Sale</title>
+        <title>Tentang CSI SUPER POS - Sistem POS by CSI untuk penjualan di outlet dan event besar</title>
         <meta
           name="description"
-          content="Internal POS CSI adalah sistem manajemen point of sale internal PT Catur Sukses Internasional (CSI) yang terintegrasi dengan aplikasi mobile Internal POS CSI."
+          content="CSI SUPER POS adalah Sistem POS by CSI untuk penjualan di outlet dan event besar internal PT Catur Sukses Internasional (CSI) yang terintegrasi dengan aplikasi mobile CSI SUPER POS."
         />
         <meta
           name="keywords"
-          content="Internal POS CSI, Point of Sale, POS System, Retail Management, Inventory Management"
+          content="CSI SUPER POS, Point of Sale, POS System, Retail Management, Inventory Management"
         />
-        <meta property="og:title" content="Tentang Internal POS CSI" />
+        <meta property="og:title" content="Tentang CSI SUPER POS" />
         <meta
           property="og:description"
-          content="Sistem manajemen point of sale internal PT Catur Sukses Internasional (CSI)"
+          content="Sistem POS by CSI untuk penjualan di outlet dan event besar internal PT Catur Sukses Internasional (CSI)"
         />
         <meta property="og:type" content="website" />
         <meta
@@ -25,12 +23,11 @@ export default function About() {
           content="https://internal-pos.mycsi.net/about"
         />
         <link rel="canonical" href="https://internal-pos.mycsi.net/about" />
-      </Helmet>
 
       <main className="container mx-auto p-6">
         <div className="bg-base-100 p-8 rounded-2xl shadow-lg border border-base-300">
           <h1 className="text-4xl font-bold mb-8 text-center">
-            Tentang Internal POS CSI
+            Tentang CSI SUPER POS
           </h1>
 
           <div className="space-y-12">
@@ -50,9 +47,9 @@ export default function About() {
                 Overview
               </h2>
               <p className="text-base-content/80 text-lg">
-                Internal POS CSI adalah sistem manajemen point of sale internal
+                CSI SUPER POS adalah Sistem POS by CSI untuk penjualan di outlet dan event besar internal
                 PT Catur Sukses Internasional (CSI) yang terintegrasi dengan
-                aplikasi mobile Internal POS CSI. Sistem ini dirancang untuk
+                aplikasi mobile CSI SUPER POS. Sistem ini dirancang untuk
                 mengelola operasi bisnis kasir dengan fokus pada:
               </p>
               <ul className="list-disc list-inside space-y-3 mt-6 text-base-content/80">

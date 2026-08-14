@@ -359,7 +359,7 @@ const SalesReport = () => {
       month: "long",
       day: "numeric",
     });
-    link.download = `Statement Internal POS CSI - filter:: ${selectedOutletObj?.namaOutlet} : ${date} - ${dateRange.startDate}: ${dateRange.endDate}.csv`;
+    link.download = `Statement CSI SUPER POS - filter:: ${selectedOutletObj?.namaOutlet} : ${date} - ${dateRange.startDate}: ${dateRange.endDate}.csv`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

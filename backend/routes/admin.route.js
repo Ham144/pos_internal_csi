@@ -168,14 +168,14 @@ router.post("/test-outlook-connection", async (req, res) => {
     // Kirim email test
     const currentConfig = await getPublicSystemConfig();
     const info = await outlookTransporter.sendMail({
-      from: `"Test Internal POS CSI" <${currentConfig.user}>`,
+      from: `"Test CSI SUPER POS" <${currentConfig.user}>`,
       to,
-      subject: "Test Email dari Internal POS CSI",
+      subject: "Test Email dari CSI SUPER POS",
       text: "Ini adalah email test menggunakan Outlook",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px;">
-          <h1>Test Email Internal POS CSI</h1>
-          <p>Jika Anda menerima email ini, berarti konfigurasi SMTP Outlook365 di server Internal POS CSI Anda berhasil!</p>
+          <h1>Test Email CSI SUPER POS</h1>
+          <p>Jika Anda menerima email ini, berarti konfigurasi SMTP Outlook365 di server CSI SUPER POS Anda berhasil!</p>
           <p>Detail konfigurasi:</p>
           <ul>
             <li>Host: ${currentConfig.host}</li>

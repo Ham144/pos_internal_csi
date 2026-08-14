@@ -394,6 +394,4 @@ router.delete("/logout", async (req, res) => {
   return res.json({ message: "Berhasil logout" });
 });
 
-//mobile
-
 export default router;

@@ -72,7 +72,7 @@ app.use(cors(corsOptions));
 app.options("*", cors(corsOptions));
 
 app.get("/", async (req, res) => {
-  return res.send("Internal POS CSI BACKEND : 200");
+  return res.send(process.env.APP_NAME +  " BACKEND : 200");
 });
 
 //database

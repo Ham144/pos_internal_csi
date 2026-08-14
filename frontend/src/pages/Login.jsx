@@ -124,7 +124,7 @@ export default function Login({ className, ...props }) {
                 <div className="absolute inset-0 bg-blue-400 rounded-2xl blur-xl opacity-50 group-hover:opacity-75 transition-opacity"></div>
                 <img
                   src="/internal-pos.png"
-                  alt="Internal POS CSI Logo"
+                  alt="CSI SUPER POS Logo"
                   width={120}
                   height={120}
                   className="relative rounded-2xl bg-white p-2 shadow-xl transform transition-all duration-300 group-hover:scale-110 group-hover:-translate-y-1"
@@ -248,7 +248,7 @@ export default function Login({ className, ...props }) {
         {/* Footer */}
         <div className="px-8 py-4 border-t border-gray-100 bg-gray-50/50">
           <p className="text-xs text-center text-gray-500">
-            © 2024 Internal POS CSI. All rights reserved.
+            © 2024 CSI SUPER POS. All rights reserved.
           </p>
         </div>
       </Card>

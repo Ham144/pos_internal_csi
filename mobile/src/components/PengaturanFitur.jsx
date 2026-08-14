@@ -191,7 +191,7 @@ const PengaturanFitur = () => {
                 <View className="bg-yellow-100 p-2 rounded-lg ml-2">
                   <Text className="text-xs font-semibold text-yellow-700">
                     Default: 1 hari dipagi hari (cron job memeriksa, lihat
-                    email_config di web Internal POS CSI untuk pengaturan lebih
+                    email_config di web CSI SUPER POS untuk pengaturan lebih
                     lanjut)
                   </Text>
                 </View>

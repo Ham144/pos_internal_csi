@@ -1,9 +1,10 @@
-export const APP_NAME = "Internal POS CSI";
+export const APP_NAME = "CSI SUPER POS";
 export const environment = "production";
 // export const environment = "development";
+export const DESC_NAME = "Sistem POS by CSI untuk penjualan di outlet dan event besar"
 
 export const BACKEND_URLS = {
-  production: "https://internal-pos.mycsi.net",
+  production: "https://pos.mycsi.net",
   development: "http://192.168.21.193:3003",
 };
 

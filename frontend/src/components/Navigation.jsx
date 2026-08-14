@@ -188,8 +188,8 @@ const SideDrawer = ({ children }) => {
           <div className="flex items-center space-x-3">
             <div className="w-12 h-12 rounded-2xl bg-white shadow-lg flex items-center justify-center shrink-0">
               <img
-                src="./internal-pos.png"
-                alt="Internal POS CSI Logo"
+                src="./logo.png"
+                alt="CSI SUPER POS Logo"
                 className="w-10 h-10 object-contain rounded-xl"
               />
             </div>

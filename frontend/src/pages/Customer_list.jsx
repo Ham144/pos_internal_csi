@@ -32,7 +32,7 @@ export default function Customer_list() {
       <div role="alert" className="alert alert-info text-white">
         <Info />
         <span>
-          Customer list dibuat di app mobile Internal POS CSI, hanya bisa
+          Customer list dibuat di app mobile CSI SUPER POS, hanya bisa
           menghapus dan mengedit disini
         </span>
       </div>

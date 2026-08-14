@@ -25,7 +25,6 @@ import {
   ExternalLink,
 } from "lucide-react";
 import toast from "react-hot-toast";
-import { Helmet } from "react-helmet-async";
 
 // Lazy load components
 const DashboardPreview = lazy(() => import("../components/DashboardPreview"));
@@ -165,29 +164,27 @@ const Home = () => {
 
   return (
     <>
-      <Helmet>
         <title>
-          Internal POS CSI - Sistem Manajemen Point of Sale PT. Catur Sukses
+          CSI SUPER POS - Sistem POS by CSI untuk penjualan di outlet dan event besar PT. Catur Sukses
           Internasional
         </title>
         <meta
           name="description"
-          content="Internal POS CSI adalah sistem manajemen point of sale internal PT Catur Sukses Internasional (CSI) yang terintegrasi dengan aplikasi mobile Internal POS CSI."
+          content="CSI SUPER POS adalah Sistem POS by CSI untuk penjualan di outlet dan event besar internal PT Catur Sukses Internasional (CSI) yang terintegrasi dengan aplikasi mobile CSI SUPER POS."
         />
         <meta
           name="keywords"
-          content="Catur sukses internasional, catur sukses, Internal POS CSI, Point of Sale, POS System, Retail Management, Inventory Management"
+          content="Catur sukses internasional, catur sukses, CSI SUPER POS, Point of Sale, POS System, Retail Management, Inventory Management"
         />
-        <meta property="og:title" content="Internal POS CSI" />
+        <meta property="og:title" content="CSI SUPER POS" />
         <meta
           property="og:description"
-          content="Sistem manajemen point of sale internal PT Catur Sukses Internasional (CSI)"
+          content="Sistem POS by CSI untuk penjualan di outlet dan event besar internal PT Catur Sukses Internasional (CSI)"
         />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://internal-pos.mycsi.net" />
         <link rel="canonical" href="https://internal-pos.mycsi.net" />
         <link rel="preconnect" href="https://internal-pos.mycsi.net" />
-      </Helmet>
 
       <div className="md:mt-20 max-md:mt-20">
         <MenuNavigation />
@@ -212,17 +209,17 @@ const Home = () => {
                   <div className="p-4 bg-white rounded-3xl backdrop-blur-sm border border-white/20">
                     <img
                       src="/internal-pos.png"
-                      alt="Internal POS CSI"
+                      alt="CSI SUPER POS"
                       className="w-16 h-16 md:w-20 md:h-20"
                     />
                   </div>
                 </div>
 
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 tracking-tight">
-                  Internal POS CSI
+                  CSI SUPER POS
                 </h1>
                 <p className="text-xl md:text-2xl text-blue-100 mb-8 max-w-3xl mx-auto">
-                  Sistem Manajemen Point of Sale Terintegrasi
+                  Sistem POS by CSI untuk penjualan di outlet dan event besar Terintegrasi
                 </p>
               </div>
             </div>
@@ -528,7 +525,7 @@ const Home = () => {
             >
               <DashboardPreview />
             </Suspense>
-
+              
             <Suspense
               fallback={
                 <div className="flex justify-center py-8">
@@ -599,7 +596,7 @@ const Home = () => {
           </div>
         </div>
       </div>
-    </>
+      </>
   );
 };
 

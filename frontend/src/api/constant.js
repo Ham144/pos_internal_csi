@@ -1,4 +1,4 @@
-export const APP_NAME = "Internal POS CSI";
+export const APP_NAME = "CSI SUPER POS";
 
 const PROD_URL = "https://internal-pos.mycsi.net";
 const DEV_URL = "http://192.168.21.193:3003";
@@ -153,7 +153,7 @@ export const mockBackend = [
   },
   {
     originalPath: "/api/v1/auth/loginMobile",
-    description: "API untuk login ke App mobile Internal POS CSI",
+    description: "API untuk login ke App mobile CSI SUPER POS",
   },
   {
     originalPath: "/api/v1/auth/getUserById/:id",
